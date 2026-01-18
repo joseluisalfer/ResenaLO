@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
-const Home = () => {
+const Notification = () => {
 return (
 <View style={styles.layout}>
-<Text style={styles.title}>Home</Text>
+<Text style={styles.title}>Notification</Text>
 </View>
 );
 };
@@ -18,4 +18,4 @@ fontWeight: 'bold',
 textAlign: 'center',
 }
 });
-export default Home;
+export default Notification;

@@ -13,6 +13,7 @@ const App = () => (
   <NavigationContainer>
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        tabBarShowLabel: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -28,7 +29,7 @@ const App = () => (
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#000",
+        tabBarActiveTintColor: "#090dff",
         tabBarInactiveTintColor: "gray",
         headerShown: false,
       })}
