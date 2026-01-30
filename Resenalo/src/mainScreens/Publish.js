@@ -12,47 +12,71 @@ import {
 
 import { useState } from 'react';
 import { TextInput } from 'react-native-paper';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
+
 
 
 const Publish = () => {
-  const [imagenes, setImagenes] = useState([null, null, null, null]);
-  const seleccionarImagen = (index) => {
+  const [imagenes, setImagenes] = useState([null]);
+  const seleccionarImagen = async (index) => {
     Alert.alert('Añadir imagen', 'Elige una opción', [
       {
         text: 'Galería',
-        onPress: () => {
-          launchImageLibrary(
-            { mediaType: 'photo', quality: 0.7 },
-            (response) => {
-              if (!response.didCancel && !response.errorCode) {
-                const nuevasImagenes = [...imagenes];
-                nuevasImagenes[index] = response.assets[0];
-                setImagenes(nuevasImagenes);
-              }
-            }
-          );
+        onPress: async () => {
+          const { status } =
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+          if (status !== 'granted') {
+            Alert.alert('Permiso denegado');
+            return;
+          }
+
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaType.Images,
+            quality: 0.7,
+          });
+
+          if (!result.canceled) {
+            const nuevas = [...imagenes];
+            nuevas[index] = result.assets[0];
+            setImagenes(nuevas);
+          }
         },
       },
       {
         text: 'Cámara',
-        onPress: () => {
-          launchCamera({ mediaType: 'photo', quality: 0.7 }, (response) => {
-            if (!response.didCancel && !response.errorCode) {
-              const nuevasImagenes = [...imagenes];
-              nuevasImagenes[index] = response.assets[0];
-              setImagenes(nuevasImagenes);
-            }
+        onPress: async () => {
+          const { status } =
+            await ImagePicker.requestCameraPermissionsAsync();
+
+          if (status !== 'granted') {
+            Alert.alert('Permiso denegado');
+            return;
+          }
+
+          const result = await ImagePicker.launchCameraAsync({
+            quality: 0.7,
           });
+
+          if (!result.canceled) {
+            const nuevas = [...imagenes];
+            nuevas[index] = result.assets[0];
+
+            if (index === imagenes.length - 1) {
+              nuevas.push(null);
+            }
+            setImagenes(nuevas);
+          }
         },
       },
       { text: 'Cancelar', style: 'cancel' },
     ]);
   };
 
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
           <Text style={styles.title}>Añadir nuevo lugar</Text>
 
@@ -178,7 +202,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   photoSquare: {
     width: '48%',
