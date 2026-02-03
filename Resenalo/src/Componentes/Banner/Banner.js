@@ -6,13 +6,13 @@ import {
   TextInput,
   Image,
 } from 'react-native';
-import ImagenResenalo from '../../../assets/resenalo3.png';
+//import ImagenResenalo from '../../../assets/images/ReseñaLo_Banner';
 
-const Imagen1 = () => {
+const Banner = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../../assets/resenalo3.png')}
+        source={require('../../../assets/images/ResenaLo_Banner.jpeg')}
         style={styles.image}
       />
     </View>
@@ -30,4 +30,4 @@ const styles = StyleSheet.create({
     height: 230,
   },
 });
-export default Imagen1
+export default Banner

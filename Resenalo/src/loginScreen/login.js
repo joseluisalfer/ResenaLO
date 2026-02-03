@@ -6,15 +6,15 @@ import {
   TextInput,
   Image,
 } from 'react-native';
-import Imagen1 from '../../Componentes/Imagen1/imagen1';
-import Texto1 from '../../Componentes/Texto1/texto1';
-import PedirDatos from '../../Componentes/PedirDatos/pedridatos';
-import Texto2 from '../../Componentes/Texto2/Texto2'
-import Registrarse from '../../Componentes/BotonRegistrar/registrarse'
-const Screen1 = ({navigation}) => {
+import Banner from '../Componentes/Banner/Banner';
+import Texto1 from '../Componentes/Texto1/texto1';
+import PedirDatos from '../Componentes/PedirDatos/pedridatos';
+import Texto2 from '../Componentes/Texto2/Texto2'
+import Registrarse from '../Componentes/BotonRegistrar/registrarse'
+const Login = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <Imagen1></Imagen1>
+      <Banner></Banner>
       <Texto1></Texto1>
       <PedirDatos></PedirDatos>
       <Texto2></Texto2>
@@ -30,4 +30,4 @@ const styles = StyleSheet.create({
   },
 
 });
-export default Screen1;
+export default Login;

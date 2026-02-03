@@ -7,9 +7,9 @@ import {
   Pressable,
   Image,
 } from 'react-native';
-import Logo from '../../Componentes/Imagen1/imagen1';
+import Logo from '../Componentes/Banner/Banner';
 
-const Screen1 = ({ navigation }) => {
+const Register = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,7 +23,7 @@ const Screen1 = ({ navigation }) => {
     }
 
     console.log({ email, password, username, birth });
-    navigation.navigate('Home');
+    navigation.navigate('Login');
   };
 
   return (
@@ -126,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Screen1;
+export default Register;
