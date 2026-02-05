@@ -78,7 +78,7 @@ const Publish = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
-          <Text style={styles.title}>Añadir nuevo lugar</Text>
+          <Text style={styles.title}>Añaadir nuevo lugar</Text>
 
           <View style={styles.form}>
             <View style={styles.row}>
