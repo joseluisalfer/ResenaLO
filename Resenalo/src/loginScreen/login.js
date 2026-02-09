@@ -1,32 +1,22 @@
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
-
+import { StyleSheet, View, Text } from 'react-native';
 import Banner from '../Componentes/Banner/Banner';
-import Texto1 from '../Componentes/Texto1/texto1';
 import PedirDatos from '../Componentes/PedirDatos/pedridatos';
-import Texto2 from '../Componentes/Texto2/Texto2';
 import Registrarse from '../Componentes/BotonRegistrar/registrarse';
 
 const Login = ({ navigation }) => {
-  const { width, height } = useWindowDimensions();
-
-  // Ejemplos de "porcentajes" adaptativos
-  const layout = {
-    bannerHeight: height * 0.22,
-    contentWidth: width * 0.9,
-    inputWidth: width * 0.85,
-    buttonWidth: width * 0.85,
-    spacing: height * 0.02,
-    titleSize: width * 0.06,
-    textSize: width * 0.04,
-  };
-
   return (
     <View style={styles.container}>
-      <Banner layout={layout} />
-      <Texto1 layout={layout} />
-      <PedirDatos layout={layout} />
-      <Texto2 layout={layout} />
-      <Registrarse navigation={navigation} layout={layout} />
+      <Banner/>
+      <Text style={styles.titulo}>Iniciar sesión</Text>
+      <Text style={styles.descripcion}>
+        Introduce tu correo electrónico y contraseña para iniciar sesión en esta aplicación
+      </Text>
+      <PedirDatos/>
+      <Text style={styles.titulo}>Crear una cuenta</Text>
+      <Text style={styles.descripcion}>
+        Crea tu cuenta para poder registrarte en ReseñaLo y descubrir nuevos lugares.
+      </Text>
+      <Registrarse navigation={navigation}/>
     </View>
   );
 };
@@ -35,6 +25,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    backgroundColor: '#f7f7f7',
+    paddingHorizontal: 20, // Añadido para el espaciado
+    justifyContent: 'flex-start', // Alinea todo hacia la parte superior
+  },
+  titulo: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,  // Añadir un pequeño margen superior para los títulos
+  },
+  descripcion: {
+    fontSize: 15,
+    textAlign: 'center',
+    marginTop: 5,
+    fontFamily: 'verdana',
   },
 });
 

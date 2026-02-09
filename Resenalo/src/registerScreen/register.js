@@ -27,7 +27,7 @@ const Register = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Banner />
+      <Banner/>
 
       <Text style={styles.title}>Crear cuenta</Text>
       <Text style={styles.subtitle}>
@@ -84,36 +84,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',  // Esto coloca los elementos hacia arriba
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
+    marginTop: 20,  // Reducir el margen superior para acercar la caja a la parte superior
+  },
+  banner: {
+    marginBottom: -20, // Ajusta la imagen hacia arriba
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 20,
     marginBottom: 5,
   },
   subtitle: {
     fontSize: 14,
     color: '#555',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 10, // Reducir el espacio entre el título y los campos
   },
   input: {
     width: '100%',
-    height: 50,
+    height: 45,  // Reducir la altura de los inputs
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 15,
+    marginBottom: 10,  // Reducir el margen entre los inputs
     fontSize: 16,
   },
-  buttom: {
+  button: {
     backgroundColor: 'black',
     justifyContent: 'center',
-    padding: 15,
+    padding: 12,  // Reducir el padding del botón
     height: 50,
     width: 300,
     borderRadius: 10,
