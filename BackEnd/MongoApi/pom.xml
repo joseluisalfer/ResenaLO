@@ -16,6 +16,13 @@
 	<name>Conexion</name>
 
 	<dependencies>
+		<!-- No cierre-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 
 		<!-- Web -->
 		<dependency>
@@ -36,12 +43,6 @@
 			<version>20250517</version>
 		</dependency>
 
-		<!-- Librería externa -->
-		<dependency>
-			<groupId>MavemT3</groupId>
-			<artifactId>MavemT3</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 
 	</dependencies>
 
