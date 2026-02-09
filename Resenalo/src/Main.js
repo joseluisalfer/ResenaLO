@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-import Home from "./mainScreens/Home";
+import Home from "./placeScreens/PlaceStacks";
 import Publish from "./mainScreens/Publish";
 import Notification from "./mainScreens/Notification";
 import Profile from "./mainScreens/Profile";

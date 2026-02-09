@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const Place = () => {
+const AllFriends = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Sitio concreto</Text>
+      <Text style={styles.text}>Pantalla para ver todos los amigos</Text>
     </View>
   );
 };
@@ -23,4 +23,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Place;
+export default AllFriends;
