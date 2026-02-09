@@ -23,22 +23,31 @@ const Publish = () => {
       {
         text: 'Galería',
         onPress: async () => {
-          const { status } =
+          // 1. Permisos galería
+          const permissionResult =
             await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-          if (status !== 'granted') {
-            Alert.alert('Permiso denegado');
+          if (!permissionResult.granted) {
+            Alert.alert('Necesitamos permisos para acceder a la galería');
             return;
           }
 
+          // 2. Abrir galería
           const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaType.Images,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             quality: 0.7,
           });
 
+          // 3. Guardar imagen
           if (!result.canceled) {
             const nuevas = [...imagenes];
             nuevas[index] = result.assets[0];
+
+            // Si es el último cuadrado, añade otro "+"
+            if (index === imagenes.length - 1) {
+              nuevas.push(null);
+            }
+
             setImagenes(nuevas);
           }
         },
@@ -46,16 +55,19 @@ const Publish = () => {
       {
         text: 'Cámara',
         onPress: async () => {
-          const { status } =
+          // Permisos cámara
+          const permissionResult =
             await ImagePicker.requestCameraPermissionsAsync();
 
-          if (status !== 'granted') {
-            Alert.alert('Permiso denegado');
+          if (!permissionResult.granted) {
+            Alert.alert('Necesitamos permisos para usar la cámara');
             return;
           }
 
           const result = await ImagePicker.launchCameraAsync({
-            quality: 0.7,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
           });
 
           if (!result.canceled) {
@@ -65,6 +77,7 @@ const Publish = () => {
             if (index === imagenes.length - 1) {
               nuevas.push(null);
             }
+
             setImagenes(nuevas);
           }
         },
@@ -74,11 +87,12 @@ const Publish = () => {
   };
 
 
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
-          <Text style={styles.title}>Añaadir nuevo lugar</Text>
+          <Text style={styles.title}>Añadir nuevo lugar</Text>
 
           <View style={styles.form}>
             <View style={styles.row}>
