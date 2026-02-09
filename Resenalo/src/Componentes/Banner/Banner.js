@@ -8,12 +8,13 @@ import {
 } from 'react-native';
 //import ImagenResenalo from '../../../assets/images/ReseñaLo_Banner';
 
-const Banner = () => {
+const Banner = ({layout}) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: layout.bannerHeight, width: layout.contentWidth }]}>
       <Image
         source={require('../../../assets/images/ResenaLo_Banner.jpeg')}
         style={styles.image}
+        resizeMode='contain'
       />
     </View>
   );
@@ -21,13 +22,14 @@ const Banner = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     width: '100%',
     alignItems: 'center',
-    marginTop: '15%',
+    marginTop: '20%',
   },
   image: {
     width: '100%',
-    height: 230,
+    height: '80%',
   },
 });
 export default Banner
