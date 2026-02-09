@@ -11,28 +11,6 @@ import {
 const Home = () => {
   return (
     <View style={styles.container}>
-
-      {/* 🔍 Buscador */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          placeholder="Buscar"
-          style={styles.searchInput}
-        />
-      </View>
-
-      {/* 🏷️ Filtros */}
-      <View style={styles.filters}>
-        <TouchableOpacity style={styles.filterBtn}>
-          <Text>Favoritos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterBtn}>
-          <Text>Historial</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterBtn}>
-          <Text>Siguiendo</Text>
-        </TouchableOpacity>
-      </View>
-
     
       {/* 🖼️ Banner */}
       <View style={styles.banner}>

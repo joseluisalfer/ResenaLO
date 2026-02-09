@@ -10,6 +10,7 @@ import Profile from "./mainScreens/Profile";
 const Tab = createBottomTabNavigator();
 
 const App = () => (
+  <NavigationContainer>
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarShowLabel: false,
@@ -38,6 +39,7 @@ const App = () => (
       <Tab.Screen name="Notification" component={Notification} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
+  </NavigationContainer>
 );
 
 export default App;
