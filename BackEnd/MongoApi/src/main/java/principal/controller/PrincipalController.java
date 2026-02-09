@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -19,7 +21,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 
+import principal.model.Images;
 import principal.model.User;
+import principal.repository.ImagesRepository;
 import principal.repository.UserRepository;
 
 import static com.mongodb.client.model.Filters.*;
@@ -28,7 +32,7 @@ import static com.mongodb.client.model.Filters.*;
 @RequestMapping("first")
 public class PrincipalController {
 
-	// Genera el hash (esto es lo que guardas en la BD)
+	// Genera la contraseña encriptada
 	public static String hashPassword(String plainPassword) {
 		// 10-12 suele ser un buen coste; 12 es común si el servidor lo aguanta
 		int cost = 12;
@@ -36,9 +40,11 @@ public class PrincipalController {
 	}
 
 	private final UserRepository userRepository;
+	private final ImagesRepository imagesRepository;
 
-	public PrincipalController(UserRepository userRepository) {
+	public PrincipalController(UserRepository userRepository, ImagesRepository imagesRepository) {
 		this.userRepository = userRepository;
+		this.imagesRepository = imagesRepository;
 	}
 
 	MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
@@ -102,5 +108,21 @@ public class PrincipalController {
 
 		return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + dbUser.getUser());
 	}
+	
+	
+	//Hay que hacerlo a la vez que el frontEnd para comprobar como funciona
+//	@PostMapping("/uploadImage")
+//	public ResponseEntity<Object> uploadImage(@RequestParam("file")  MultipartFile file,  @RequestParam("username") String username) throws IOException {
+//		
+//		// Convertimos el archivo recibido a un array de bytes (binario)
+//        byte[] imageBytes = file.getBytes();
+//
+//        // Creamos un objeto Imagen con los datos binarios
+//        Images image = new Images(imageBytes, username); 
+//
+//        // Guardamos la imagen en la base de datos (MongoDB)
+//        imagesRepository.save(image);
+//		return ResponseEntity.status(HttpStatus.OK).body("Foto subida");
+//	}
 
 }
