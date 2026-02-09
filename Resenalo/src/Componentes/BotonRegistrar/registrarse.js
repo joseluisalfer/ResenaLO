@@ -3,8 +3,8 @@ import { StyleSheet, Text, View, Pressable } from 'react-native';
 const Registrarse = (props) => {
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => props.navigation.navigate('Screen 2')} style={styles.buttom}>
-        <Text style={styles.text_buttom}>¡Registrate!</Text>
+      <Pressable onPress={() => props.navigation.navigate('Register')} style={styles.buttom}>
+        <Text style={styles.text_buttom}>Registrarse</Text>
       </Pressable>
     </View>
   );

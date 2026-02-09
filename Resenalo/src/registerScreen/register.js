@@ -4,10 +4,9 @@ import {
   Text,
   View,
   TextInput,
-  Pressable,
-  Image,
+  Pressable
 } from 'react-native';
-import Logo from '../Componentes/Banner/Banner';
+import Banner from '../Componentes/Banner/Banner';
 
 const Register = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -28,7 +27,7 @@ const Register = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Logo />
+      <Banner />
 
       <Text style={styles.title}>Crear cuenta</Text>
       <Text style={styles.subtitle}>
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   buttonText: {
-        color: 'white',
+    color: 'white',
     textAlign: 'center',
     fontSize: 15,
   },
