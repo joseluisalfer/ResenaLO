@@ -17,65 +17,71 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+
+import principal.model.User;
+import principal.repository.UserRepository;
+
 import static com.mongodb.client.model.Filters.*;
 
 @RestController
 @RequestMapping("first")
 public class PrincipalController {
 
+	private final UserRepository userRepository;
+
+	public PrincipalController(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
 	MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 	MongoDatabase database = mongoClient.getDatabase("ResenaLo");
 	MongoCollection<Document> accounts = database.getCollection("acounts");
 
-	@PostMapping("register")
-	public ResponseEntity<Object> register(@RequestBody String body) throws IOException {
+	@PostMapping("/register")
+	public ResponseEntity<Object> register(@RequestBody User user) {
 
-		JSONObject json = new JSONObject(body);
-		String user = json.getString("user");
-		String email = json.getString("email");
-		String password = json.getString("password");
-		String password2 = json.getString("password2");
-
-		boolean errorPassword = false;
-
-		MongoCursor<Document> existAcountEmail = accounts.find(eq("email", email)).iterator();
-		if (!existAcountEmail.hasNext()) {
-			if (password.equals(password2)) {
-				Document doc = new Document().append("user", user).append("email", email).append("password", password)
-						.append("logged", "false");
-				accounts.insertOne(doc);
-			} else {
-				errorPassword = true;
-			}
-		} else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Este correo ya esta registrado"); // 401
+		// Email ya registrado
+		if (userRepository.existsByEmail(user.getEmail())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT) // 409
+					.body("Este correo ya está registrado");
 		}
 
-		if (errorPassword) {
-			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Las contraseñas no son iguales"); // 406
-		} else {
-			return ResponseEntity.status(HttpStatus.OK).body("Cuenta creada con EXITO"); // 200
+		// Username ya usado (opcional pero recomendable)
+		if (userRepository.existsByUser(user.getUser())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("Este nombre de usuario ya existe");
 		}
+
+		// Valores por defecto
+		user.setLogged(false);
+
+		// aquí deberías hashear el password (luego)
+		userRepository.save(user);
+
+		return ResponseEntity.status(HttpStatus.CREATED) // 201
+				.body("Cuenta creada con ÉXITO");
 	}
 
-	@PostMapping("login")
-	public ResponseEntity<Object> login(@RequestBody String body) throws IOException {
+	@PostMapping("/login")
+	public ResponseEntity<Object> login(@RequestBody User user) throws IOException {
 
-		JSONObject json = new JSONObject(body);
-		String user = json.getString("user");
-		String email = json.getString("email");
-		String password = json.getString("password");
+		User dbUser = userRepository.findByUserAndPassword(user.getUser(), user.getPassword());
 
-		Bson queryLogin = and(eq("email", email), eq("user", user), eq("password", password));
-		MongoCursor<Document> existAcountEmail = accounts.find(queryLogin).iterator();
-		if (existAcountEmail.hasNext()) {
-			accounts.updateOne(queryLogin, new Document("$set", new Document("logged", "true")));
-			return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + user); // 401
-
-		} else {
+		if (dbUser == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("O las credenciales son incorrectas o no te has registrado anteriormente"); // 401
-		}
+					.body("Credenciales incorrectas o usuario no registrado");
+		} else {
+			//Mira a ver si ya esta logeado
+			if (dbUser.isLogged()) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya está logeado");
+			} else {
+				// marcar como logueado
+				dbUser.setLogged(true);
+				// guardar la configuracion del usuario
+				userRepository.save(dbUser);
 
+				return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + dbUser.getUser());
+			}
+		}
 	}
+
 }
