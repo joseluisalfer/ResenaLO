@@ -1,0 +1,96 @@
+import React from 'react';
+import { View, Pressable, Text, Image, Alert, StyleSheet } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+
+const SelectorImagen = ({ imagenes, setImagenes }) => {
+  const seleccionarImagen = async (index) => {
+    Alert.alert('Añadir imagen', 'Elige una opción', [
+      {
+        text: 'Galería',
+        onPress: async () => {
+          const permissionResult =
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (!permissionResult.granted) {
+            Alert.alert('Necesitamos permisos para acceder a la galería');
+            return;
+          }
+
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 0.7,
+          });
+
+          if (!result.canceled) {
+            const nuevas = [...imagenes];
+            nuevas[index] = result.assets[0];
+            if (index === imagenes.length - 1) nuevas.push(null);
+            setImagenes(nuevas);
+          }
+        },
+      },
+      {
+        text: 'Cámara',
+        onPress: async () => {
+          const permissionResult =
+            await ImagePicker.requestCameraPermissionsAsync();
+          if (!permissionResult.granted) {
+            Alert.alert('Necesitamos permisos para usar la cámara');
+            return;
+          }
+
+          const result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+          });
+
+          if (!result.canceled) {
+            const nuevas = [...imagenes];
+            nuevas[index] = result.assets[0];
+            if (index === imagenes.length - 1) nuevas.push(null);
+            setImagenes(nuevas);
+          }
+        },
+      },
+      { text: 'Cancelar', style: 'cancel' },
+    ]);
+  };
+
+  return (
+    <View style={styles.container}>
+      {imagenes.map((img, indx) => (
+        <Pressable key={indx} onPress={() => seleccionarImagen(indx)} style={styles.photoSquare}>
+          {img ? (
+            <Image source={{ uri: img.uri }} style={styles.photo} />
+          ) : (
+            <Text style={styles.plus}>+</Text>
+          )}
+        </Pressable>
+      ))}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginVertical: 16,
+  },
+  photoSquare: {
+    width: '48%',
+    aspectRatio: 1,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    backgroundColor: '#f5f5f5',
+  },
+  photo: { width: '100%', height: '100%', borderRadius: 12 },
+  plus: { fontSize: 32, color: '#aaa' },
+});
+
+export default SelectorImagen;
