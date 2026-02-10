@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-import Home from "./placeScreens/PlaceStacks";
+import Home from "./mainScreens/Home";
 import Publish from "./mainScreens/Publish";
 import Notification from "./mainScreens/Notification";
 import Profile from "./mainScreens/Profile";
@@ -10,7 +10,6 @@ import Profile from "./mainScreens/Profile";
 const Tab = createBottomTabNavigator();
 
 const App = () => (
-  <NavigationContainer>
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarShowLabel: false,
@@ -39,7 +38,6 @@ const App = () => (
       <Tab.Screen name="Notification" component={Notification} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
-  </NavigationContainer>
 );
 
 export default App;

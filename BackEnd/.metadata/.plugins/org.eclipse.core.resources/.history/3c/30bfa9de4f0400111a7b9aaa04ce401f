@@ -1,0 +1,27 @@
+package principal.controller;
+
+import java.io.IOException;
+
+import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("first")
+public class PrincipalController {
+
+	@PostMapping("register")
+	public ResponseEntity<Object> login(@RequestBody String body) throws IOException {
+		
+		JSONObject json = new JSONObject(body);
+		String user = json.getString("user");
+		String email = json.getString("email");
+		String password = json.getString("password");
+		String password2 = json.getString("password2");
+
+		return null;
+	}
+}

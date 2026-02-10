@@ -1,13 +1,20 @@
-import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  TextInput,
+  Image,
+} from 'react-native';
+//import ImagenResenalo from '../../../assets/images/ReseñaLo_Banner';
 
-const Banner = () => {
+const Banner = ({layout}) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: layout.bannerHeight, width: layout.contentWidth }]}>
       <Image
         source={require('../../../assets/images/ResenaLo_Banner.jpeg')}
         style={styles.image}
-        resizeMode="contain"
+        resizeMode='contain'
       />
     </View>
   );
@@ -15,14 +22,14 @@ const Banner = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     width: '100%',
     alignItems: 'center',
-    marginTop: '15%', // Reduce el espacio superior para que la imagen esté más arriba
+    marginTop: '20%',
   },
   image: {
     width: '100%',
-    height: 200,  // Ajusta la altura si necesitas una imagen más pequeña
+    height: '80%',
   },
 });
-
-export default Banner;
+export default Banner
