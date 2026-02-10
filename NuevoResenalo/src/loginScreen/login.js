@@ -1,22 +1,28 @@
 import { StyleSheet, View, Text } from 'react-native';
 import Banner from '../Componentes/Banner/Banner';
-import PedirDatos from '../Componentes/SetData/setData';
-import Registrarse from '../Componentes/RegisterButton/registerButton';
-
+import PedirDatos from '../Componentes/Buttons/SetData/setData';
+import Registrarse from '../Componentes/Buttons/RegisterButton/registerButton';
+import { useTranslation } from 'react-i18next';
+import '../../assets/i18n/index';
+import Idioms from '../Componentes/Buttons/Idioms/idioms';
 const Login = ({ navigation }) => {
+
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
-      <Banner/>
-      <Text style={styles.titulo}>Iniciar sesión</Text>
+      <Banner />
+      <Text style={styles.titulo}>{t('componente1.iniciarSesion')}</Text>
       <Text style={styles.descripcion}>
-        Introduce tu correo electrónico y contraseña para iniciar sesión en esta aplicación
+        {t('component1.encabezado')}
       </Text>
-      <PedirDatos/>
-      <Text style={styles.titulo}>Crear una cuenta</Text>
+      <PedirDatos />
+      <Text style={styles.titulo}>{t('componente1.createAccount')}</Text>
       <Text style={styles.descripcion}>
-        Crea tu cuenta para poder registrarte en ReseñaLo y descubrir nuevos lugares.
+        {t('componente1.TextAcount')}
       </Text>
-      <Registrarse navigation={navigation}/>
+      <Registrarse navigation={navigation} />
+      <Idioms navigation={navigation}></Idioms>
     </View>
   );
 };

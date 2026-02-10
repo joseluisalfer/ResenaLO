@@ -1,0 +1,8 @@
+{
+    "componente1": {
+        "iniciarSesion": "Iniciar sesión",
+        "Encabezado": "Introduce tu dirección de correo electrónico y contraseña para iniciar sesión en esta aplicación",
+        "createAccount": "Crear cuenta",
+        "TextAcount": "Crea tu cuenta para registrarte en ReseñaLo y descubrir nuevos lugares."
+    }
+}
