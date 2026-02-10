@@ -1,6 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import Login from "./src/loginScreen/login";
+
 import Register from "./src/registerScreen/register";
 import Language from "./src/Componentes/language/language";
 const Stack = createStackNavigator();
@@ -17,5 +18,6 @@ const App = () => (
       <Stack.Screen name="Lang" component={Language} />
     </Stack.Navigator>
   </NavigationContainer>
+
 );
 export default App;

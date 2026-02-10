@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView, Image } from "react-native";
 
 const Friends = ({ navigation, friends }) => {
   return (
@@ -25,7 +25,10 @@ const Friends = ({ navigation, friends }) => {
               navigation.navigate("Friend", { friendId: f.id })
             }
           >
-            <View style={styles.avatar} />
+            <Image
+              source={require("../../../../assets/images/Konoha.png")} 
+              style={styles.avatar}
+            />
             <Text style={styles.name} numberOfLines={1}>
               {f.name}
             </Text>
@@ -72,7 +75,6 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: "#d9d9d9",
     marginBottom: 4,
   },
   name: {
