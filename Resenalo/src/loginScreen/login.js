@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text } from 'react-native';
 import Banner from '../Componentes/Banner/Banner';
-import PedirDatos from '../Componentes/PedirDatos/pedridatos';
-import Registrarse from '../Componentes/BotonRegistrar/registrarse';
+import PedirDatos from '../Componentes/SetData/setData';
+import Registrarse from '../Componentes/RegisterButton/registerButton';
 
 const Login = ({ navigation }) => {
   return (
