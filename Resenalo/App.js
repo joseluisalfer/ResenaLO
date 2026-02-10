@@ -6,6 +6,11 @@ import Register from './src/registerScreen/register'
 
 const Stack = createStackNavigator();
 const App = () => (
-<Main />
+  <NavigationContainer>
+    <Stack.Navigator options="false">
+      <Stack.Screen options={{headerShown: false}} name="Login" component={Login} />
+      <Stack.Screen name="Register" component={Register} />
+    </Stack.Navigator>
+  </NavigationContainer>
 );
 export default App;
