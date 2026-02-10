@@ -1,6 +1,8 @@
 {
     "componente1":{
         "iniciarSesion": "login",
-        "Encabezado": ""
+        "Encabezado": "Enter your email address and password to log in to this application",
+        "createAccount": "Create account",
+        "TextAcount": "Create your account to register on ReseñaLo and discover new places."
     }
 }
