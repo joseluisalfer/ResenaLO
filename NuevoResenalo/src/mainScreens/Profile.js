@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   Text,
-  useTheme,
   Divider,
   IconButton,
 } from "react-native-paper";
@@ -44,25 +43,21 @@ const Profile = () => {
     <FlatList
       ListHeaderComponent={
         <View style={styles.container}>
-          <View style={styles.topContainer}>
-            <IconButton
-              icon="menu"
-              color="#ffffff"
-              size={30}
-              onPress={() => console.log("Abrir menú")}
-              style={styles.menuIcon}
-            />
-            <Text style={styles.headerText}>PERFIL</Text>
-          </View>
-
+          {/* Imagen de perfil */}
           <ProfileImage image={image} setImage={setImage} />
 
-          <View style={{alignItems:'center'}}>
+          <View style={{ alignItems: "center" }}>
+            <Text variant="bodyMedium" style={styles.username}>
+              @samueltrava.official
+            </Text>
+          </View>
+
+          <View style={{ alignItems: "center" }}>
             <Text variant="headlineSmall" style={styles.name}>
               Samuel Rodriguez
             </Text>
 
-            <Text variant="bodyMedium" style={styles.username}>
+            <Text variant="bodyMedium" style={styles.ubication}>
               Valencia, España
             </Text>
 
@@ -70,6 +65,15 @@ const Profile = () => {
               Desarrollador móvil | Amante de las mujeres | LOL player
             </Text>
           </View>
+
+          {/* Botón de editar perfil */}
+          <Button
+            mode="contained"
+            onPress={() => console.log("Editar perfil")}
+            style={styles.editButton}
+          >
+            Editar Perfil
+          </Button>
 
 
           {/* Estadísticas */}
@@ -89,6 +93,8 @@ const Profile = () => {
               </View>
             </Card.Content>
           </Card>
+
+
 
           <Divider style={{ marginVertical: 16 }} />
 
@@ -156,7 +162,11 @@ const styles = StyleSheet.create({
   },
   username: {
     color: "gray",
-    marginTop: 4,
+    marginTop: 3
+  },
+  ubication: {
+    color: "gray",
+    marginTop: 0,
   },
   bio: {
     textAlign: "center",
@@ -180,6 +190,13 @@ const styles = StyleSheet.create({
   },
   postCard: {
     marginBottom: 12,
+  },
+  editButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    width: 200,
+    alignSelf: "center",
   },
 });
 
