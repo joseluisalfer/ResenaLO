@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 
 const Explore = ({ navigation, places }) => {
   const items = places.slice(0, 4);
@@ -23,7 +23,11 @@ const Explore = ({ navigation, places }) => {
               navigation.navigate("Place", { placeId: p.id })
             }
           >
-            <View style={styles.image} />
+            <Image
+              source={require("../../../../assets/images/Konoha.png")} 
+              style={styles.image}
+              resizeMode="cover"
+            />
             <View style={styles.footer}>
               <Text style={styles.place} numberOfLines={1}>
                 {p.title}
@@ -72,11 +76,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
     backgroundColor: "#eee",
-    aspectRatio: 1.2, 
+    aspectRatio: 1.2,
   },
   image: {
     flex: 1,
-    backgroundColor: "#bfbfbf",
+    width: "100%",
+    height: "100%",
   },
   footer: {
     flexDirection: "row",
