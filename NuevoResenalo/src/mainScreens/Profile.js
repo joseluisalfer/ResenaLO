@@ -1,13 +1,7 @@
 import React, { useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
-import {
-  Avatar,
-  Button,
-  Card,
-  Text,
-  Divider,
-  IconButton,
-} from "react-native-paper";
+import { View, StyleSheet, FlatList, Text } from "react-native";
+import { Button, Card, Divider } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native"; // Asegúrate de que importas useNavigation
 
 import ProfileImage from "../Componentes/ProfileImage/ProfileImage";
 
@@ -27,6 +21,7 @@ const mockPosts = [
 
 const Profile = () => {
   const [image, setImage] = useState(null);
+  const navigation = useNavigation();  // Usar el hook para navegación
 
   const renderPost = ({ item }) => (
     <Card style={styles.postCard}>
@@ -69,12 +64,11 @@ const Profile = () => {
           {/* Botón de editar perfil */}
           <Button
             mode="contained"
-            onPress={() => console.log("Editar perfil")}
+            onPress={() => navigation.navigate("EditProfile")}  // Asegúrate de que el nombre coincida con el registrado
             style={styles.editButton}
           >
             Editar Perfil
           </Button>
-
 
           {/* Estadísticas */}
           <Card style={styles.statsCard}>
@@ -93,8 +87,6 @@ const Profile = () => {
               </View>
             </Card.Content>
           </Card>
-
-
 
           <Divider style={{ marginVertical: 16 }} />
 
@@ -162,7 +154,7 @@ const styles = StyleSheet.create({
   },
   username: {
     color: "gray",
-    marginTop: 3
+    marginTop: 3,
   },
   ubication: {
     color: "gray",
@@ -192,8 +184,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   editButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 20,
     width: 200,
     alignSelf: "center",
