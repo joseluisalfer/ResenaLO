@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 const Notification = () => {
 return (
 <View style={styles.layout}>
-<Text style={styles.title}>Notification</Text>
+<Text style={styles.title}>NOTIFICACIÓN</Text>
 </View>
 );
 };
