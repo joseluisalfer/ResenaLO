@@ -1,5 +1,7 @@
 package principal.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,8 +14,11 @@ public class User {
 	private String password;
 	private String email;
 	private boolean logged;
-	  
-	public User() {}
+	private byte[] image;
+	private Date date;
+
+	public User() {
+	}
 
 	public String getId() {
 		return id;
@@ -38,10 +43,11 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -53,5 +59,21 @@ public class User {
 	public void setLogged(boolean logged) {
 		this.logged = logged;
 	}
-	
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
 }
