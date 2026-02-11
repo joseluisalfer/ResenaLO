@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import HomeScreen from "../mainScreens/Home";
-import Place from "./Place";
+import Place from "../placeScreens/addModalReview/ModalReview";
 import ListPlace from "./ListPlace";
 import Podium from "./Podium";
 import AllFriends from "./AllFriends"

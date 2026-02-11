@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList, Text } from "react-native";
 import { Button, Card, Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native"; // Asegúrate de que importas useNavigation
 
-import ProfileImage from "../Componentes/ProfileImage/ProfileImage";
+import ProfileImage from "../Componentes/Profile/ProfileImage/ProfileImage";
 
 const mockPosts = [
   {
