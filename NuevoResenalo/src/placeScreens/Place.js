@@ -15,8 +15,8 @@ import CommentBox from "../Componentes/Place/CommentBox"; // Importar el compone
 
 const Place = ({ navigation }) => {
   const [region, setRegion] = useState({
-    latitude: 39.4038783, // Coordenadas de Catarroja
-    longitude: -0.4034584,
+    latitude: 18.29828136066675, // Coordenadas de Catarroja
+    longitude: -64.82818048541905,
     latitudeDelta: 0.0922, // Ajusta el zoom
     longitudeDelta: 0.0421, // Ajusta el zoom
   });
@@ -107,13 +107,13 @@ const Place = ({ navigation }) => {
               region={region} // Cambiar a 'region' para controlar el mapa dinámicamente
               onRegionChangeComplete={(newRegion) => setRegion(newRegion)} // Actualizar región si cambia
               scrollEnabled={false} // Deshabilitar el desplazamiento
-              zoomEnabled={false} // Deshabilitar el zoom
+              zoomEnabled={true} // Deshabilitar el zoom
               rotateEnabled={false} // Deshabilitar la rotación
               pitchEnabled={false} // Deshabilitar la inclinación
             >
               <Marker
-                coordinate={{ latitude: 39.4038783, longitude: -0.4034584 }}
-                title={"Catarroja"}
+                coordinate={{ latitude: 18.29828136066675, longitude: -64.82818048541905 }}
+                title={"Epstein Island"}
               />
             </MapView>
           </View>

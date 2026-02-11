@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  ScrollView,
+  FlatList,
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
@@ -20,27 +20,31 @@ const Friends = ({ navigation, friends }) => {
         <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
       </Pressable>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.row}
-      >
-        {friends.map((f, idx) => (
-          <Pressable
-            key={f.id}
-            style={[styles.item, idx !== friends.length - 1 && styles.itemGap]}
-            onPress={() => navigation.navigate("Friend", { friendId: f.id })}
-          >
-            <Image
-              source={require("../../../../assets/images/Konoha.png")}
-              style={styles.avatar}
-            />
-            <Text style={styles.name} numberOfLines={1}>
-              {f.name}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+      <FlatList
+  horizontal
+  data={friends}
+  keyExtractor={(item) => String(item.id)}
+  showsHorizontalScrollIndicator={false}
+  contentContainerStyle={styles.row}
+  renderItem={({ item, index }) => (
+    <Pressable
+      style={[
+        styles.item,
+        index !== friends.length - 1 && styles.itemGap,
+      ]}
+      onPress={() => navigation.navigate("Friend", { friendId: item.id })}
+    >
+      <Image
+        source={require("../../../../assets/images/Konoha.png")}
+        style={styles.avatar}
+      />
+      <Text style={styles.name} numberOfLines={1}>
+        {item.name}
+      </Text>
+    </Pressable>
+  )}
+/>
+
     </View>
   );
 };
