@@ -21,30 +21,29 @@ const Friends = ({ navigation, friends }) => {
       </Pressable>
 
       <FlatList
-  horizontal
-  data={friends}
-  keyExtractor={(item) => String(item.id)}
-  showsHorizontalScrollIndicator={false}
-  contentContainerStyle={styles.row}
-  renderItem={({ item, index }) => (
-    <Pressable
-      style={[
-        styles.item,
-        index !== friends.length - 1 && styles.itemGap,
-      ]}
-      onPress={() => navigation.navigate("Friend", { friendId: item.id })}
-    >
-      <Image
-        source={require("../../../../assets/images/Konoha.png")}
-        style={styles.avatar}
+        horizontal
+        data={friends}
+        keyExtractor={(item) => String(item.id)}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.row}
+        renderItem={({ item, index }) => (
+          <Pressable
+            style={[
+              styles.item,
+              index !== friends.length - 1 && styles.itemGap,
+            ]}
+            onPress={() => navigation.navigate("Friend", { friendId: item.id })}
+          >
+            <Image
+              source={require("../../../../assets/images/Konoha.png")}
+              style={styles.avatar}
+            />
+            <Text style={styles.name} numberOfLines={1}>
+              {item.name}
+            </Text>
+          </Pressable>
+        )}
       />
-      <Text style={styles.name} numberOfLines={1}>
-        {item.name}
-      </Text>
-    </Pressable>
-  )}
-/>
-
     </View>
   );
 };
