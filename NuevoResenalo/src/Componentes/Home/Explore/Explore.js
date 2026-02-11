@@ -20,7 +20,7 @@ const Explore = ({ navigation, places }) => {
             key={p.id}
             style={styles.card}
             onPress={() =>
-              navigation.navigate("Place", { placeId: p.id })
+              navigation.navigate("Place")
             }
           >
             <Image
