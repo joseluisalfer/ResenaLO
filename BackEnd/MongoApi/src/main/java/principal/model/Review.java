@@ -14,14 +14,14 @@ public class Review {
 	private String title;
 	private List<byte[]> images;
 	private String user;
-	private double valoration;
+	private int valoration;
 	private String description;
 	private Date date;
 
 	public Review() {
 	}
 
-	public Review(String title, List<byte[]> images, String user, double valoration, String description) {
+	public Review(String title, List<byte[]> images, String user, int valoration, String description) {
 		super();
 		this.title = title;
 		this.images = images;
@@ -62,11 +62,11 @@ public class Review {
 		this.user = user;
 	}
 
-	public double getValoration() {
+	public int getValoration() {
 		return valoration;
 	}
 
-	public void setValoration(double valoration) {
+	public void setValoration(int valoration) {
 		this.valoration = valoration;
 	}
 
