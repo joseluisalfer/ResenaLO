@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { View, StyleSheet, FlatList, Text } from "react-native";
+import { View, StyleSheet, FlatList, Text, Modal, Pressable } from "react-native";
 import { Button, Card, Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native"; // Asegúrate de que importas useNavigation
-
+import { Ionicons } from '@expo/vector-icons';
 import ProfileImage from "../Componentes/Profile/ProfileImage/ProfileImage";
 
 const mockPosts = [
@@ -17,11 +17,15 @@ const mockPosts = [
     title: "React Native 🚀",
     content: "Me encanta desarrollar apps móviles.",
   },
-]; 
+];
 
 const Profile = () => {
   const [image, setImage] = useState(null);
-  const navigation = useNavigation();  // Usar el hook para navegación
+  const [modalVisible, setModalVisible] = useState(false);
+  const [showLanguageOptions, setShowLanguageOptions] = useState(false); // Para manejar si mostrar opciones de idioma
+  const [selectedLanguage, setSelectedLanguage] = useState("Español");
+  const [isLanguageChanged, setIsLanguageChanged] = useState(false);
+  const navigation = useNavigation();
 
   const renderPost = ({ item }) => (
     <Card style={styles.postCard}>
@@ -34,10 +38,112 @@ const Profile = () => {
     </Card>
   );
 
+  const handleLogOut = () => {
+    console.log("Log Out clicked");
+    setModalVisible(false);
+  };
+
+  const handleChangeLanguage = (language) => {
+    setSelectedLanguage(language);
+    setIsLanguageChanged(true);
+  };
+
+  const handleSaveLanguage = () => {
+    console.log("Idioma guardado:", selectedLanguage);
+    setModalVisible(false); // Cierra el modal al guardar el idioma
+    setShowLanguageOptions(false)
+  };
+
+  const handleCancelLanguageChange = () => {
+    setModalVisible(false); // Cierra el modal
+    setShowLanguageOptions(false); // Restablece las opciones para mostrar las opciones generales
+  };
+
+  const handleChangeToLanguageSelection = () => {
+    setShowLanguageOptions(true); // Al presionar Cambiar Idioma, se muestran solo las opciones de idioma
+  };
+
   return (
     <FlatList
       ListHeaderComponent={
         <View style={styles.container}>
+          {/* Icono de configuración (tuerca) */}
+          <View style={styles.iconContainer}>
+            <Pressable onPress={() => setModalVisible(true)}>
+              <Ionicons name="settings-outline" size={30} color="black" />
+            </Pressable>
+          </View>
+
+          {/* Modal de opciones */}
+          <Modal
+            visible={modalVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                {!showLanguageOptions ? (
+                  <>
+                    {/* Opciones generales como Cambiar Tema, Log Out */}
+                    <Button onPress={handleLogOut} mode="outlined" style={styles.modalButton}>
+                      Log Out
+                    </Button>
+                    <Button onPress={handleChangeToLanguageSelection} mode="outlined" style={styles.modalButton}>
+                      Cambiar Idioma
+                    </Button>
+                    <Button mode="outlined" style={styles.modalButton}>
+                      Cambiar Tema
+                    </Button>
+                    <Button onPress={() => setModalVisible(false)} mode="outlined" style={styles.modalButton}>
+                      Cancelar
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    {/* Solo mostrar idiomas y guardar */}
+                    <Text style={styles.modalTitle}>Seleccionar Idioma</Text>
+                    <Pressable
+                      onPress={() => handleChangeLanguage("Español")}
+                      style={[
+                        styles.languageOption,
+                        selectedLanguage === "Español" && styles.selectedLanguage
+                      ]}
+                    >
+                      <Text>Español</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => handleChangeLanguage("Valenciano")}
+                      style={[
+                        styles.languageOption,
+                        selectedLanguage === "Valenciano" && styles.selectedLanguage
+                      ]}
+                    >
+                      <Text>Valenciano</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => handleChangeLanguage("English")}
+                      style={[
+                        styles.languageOption,
+                        selectedLanguage === "English" && styles.selectedLanguage
+                      ]}
+                    >
+                      <Text>English</Text>
+                    </Pressable>
+
+                    {isLanguageChanged && (
+                      <Button onPress={handleSaveLanguage}> <Text style={{ color: 'black' }} >Guardar cambios</Text> </Button>
+                    )}
+
+                    <Pressable onPress={handleCancelLanguageChange}>
+                      <Text style={styles.cancelButton}>Cancelar</Text>
+                    </Pressable>
+                  </>
+                )}
+              </View>
+            </View>
+          </Modal>
+
           {/* Imagen de perfil */}
           <ProfileImage image={image} setImage={setImage} />
 
@@ -64,7 +170,7 @@ const Profile = () => {
           {/* Botón de editar perfil */}
           <Button
             mode="contained"
-            onPress={() => navigation.navigate("EditProfile")}  // Asegúrate de que el nombre coincida con el registrado
+            onPress={() => navigation.navigate("EditProfile")}
             style={styles.editButton}
           >
             Editar Perfil
@@ -78,12 +184,12 @@ const Profile = () => {
                 <Text variant="bodySmall">Posts</Text>
               </View>
               <View style={styles.statItem}>
-                <Text variant="titleMedium">1.2K</Text>
-                <Text variant="bodySmall">Seguidores</Text>
+                <Text variant="titleMedium">100</Text>
+                <Text variant="bodySmall">Comentarios</Text>
               </View>
               <View style={styles.statItem}>
-                <Text variant="titleMedium">180</Text>
-                <Text variant="bodySmall">Siguiendo</Text>
+                <Text variant="titleMedium">30</Text>
+                <Text variant="bodySmall">Amigos</Text>
               </View>
             </Card.Content>
           </Card>
@@ -108,53 +214,62 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 40,
   },
-  topContainer: {
-    height: 50,
+  // Contenedor para el ícono de la tuerca (settings)
+  iconContainer: {
     width: "100%",
+    alignItems: "flex-end",
+    padding: 10,
+  },
+  modalOverlay: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "black",
-    flexDirection: "row",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",  // Fondo oscuro para el modal
+  },
+  modalContent: {
+    backgroundColor: "white",
     borderRadius: 10,
+    padding: 20,
+    width: "80%",  // Ancho del modal
   },
-  menuIcon: {
-    position: "absolute",
-    left: 10,
-  },
-  headerText: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  profileHeader: {
-    marginTop: 35,
-    alignItems: "center",
-  },
-  profilePicContainer: {
-    position: "relative",
-  },
-  avatar: {
-    backgroundColor: "#f0f0f0",
-  },
-  addButtonContainer: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: "black",
-    borderRadius: 20,
-    padding: 5,
-  },
-  addButton: {
-    color: "white",
+  modalTitle: {
     fontSize: 18,
-  },
-  name: {
-    marginTop: 12,
     fontWeight: "bold",
+    marginBottom: 10,
+  },
+  languageOption: {
+    fontSize: 16,
+    marginVertical: 10,
+    color: "blue",
+  },
+  buttonContainer: {
+    marginTop: 20,
+  },
+  cancelButton: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 15,
+  },
+  modalButton: {
+    marginBottom: 10,
+  },
+  postCard: {
+    marginBottom: 12,
+  },
+  editButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    width: 200,
+    alignSelf: "center",
   },
   username: {
     color: "gray",
     marginTop: 3,
+  },
+  name: {
+    marginTop: 12,
+    fontWeight: "bold",
   },
   ubication: {
     color: "gray",
@@ -180,15 +295,10 @@ const styles = StyleSheet.create({
   statItem: {
     alignItems: "center",
   },
-  postCard: {
-    marginBottom: 12,
-  },
-  editButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    width: 200,
-    alignSelf: "center",
+  selectedLanguage: {
+    backgroundColor: '#d3d3d3', // Un color de fondo al seleccionar
+    borderRadius: 5,             // Agregar bordes redondeados
+    padding: 5,                  // Espaciado extra dentro del botón
   },
 });
 

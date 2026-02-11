@@ -78,12 +78,12 @@ const FriendProfile = () => {
                 <Text variant="bodySmall">Posts</Text>
               </View>
               <View style={styles.statItem}>
-                <Text variant="titleMedium">1.2K</Text>
-                <Text variant="bodySmall">Seguidores</Text>
+                <Text variant="titleMedium">100</Text>
+                <Text variant="bodySmall">Comentarios</Text>
               </View>
               <View style={styles.statItem}>
                 <Text variant="titleMedium">180</Text>
-                <Text variant="bodySmall">Siguiendo</Text>
+                <Text variant="bodySmall">Amigos</Text>
               </View>
             </Card.Content>
           </Card>
