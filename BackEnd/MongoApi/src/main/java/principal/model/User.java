@@ -1,6 +1,7 @@
 package principal.model;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,7 +17,9 @@ public class User {
 	private boolean logged;
 	private byte[] image;
 	private Date date;
-
+	private List<String> follows;
+	private List<String> followers;
+	
 	public User() {
 	}
 
@@ -74,6 +77,22 @@ public class User {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public List<String> getFollows() {
+		return follows;
+	}
+
+	public void setFollows(List<String> follows) {
+		this.follows = follows;
+	}
+
+	public List<String> getFollowers() {
+		return followers;
+	}
+
+	public void setFollowers(List<String> followers) {
+		this.followers = followers;
 	}
 
 }

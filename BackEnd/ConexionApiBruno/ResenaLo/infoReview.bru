@@ -1,0 +1,20 @@
+meta {
+  name: infoReview
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:8080/first/review?id=698b757dec84634ee51ccf96
+  body: none
+  auth: inherit
+}
+
+params:query {
+  id: 698b757dec84634ee51ccf96
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
