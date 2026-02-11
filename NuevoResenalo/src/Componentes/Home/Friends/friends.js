@@ -1,5 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  Image,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
 
 const Friends = ({ navigation, friends }) => {
   return (
@@ -9,7 +17,7 @@ const Friends = ({ navigation, friends }) => {
         onPress={() => navigation.navigate("AllFriends")}
       >
         <Text style={styles.title}>Amigos</Text>
-        <Text style={styles.arrow}>&gt;</Text>
+        <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
       </Pressable>
 
       <ScrollView
@@ -21,12 +29,10 @@ const Friends = ({ navigation, friends }) => {
           <Pressable
             key={f.id}
             style={[styles.item, idx !== friends.length - 1 && styles.itemGap]}
-            onPress={() =>
-              navigation.navigate("Friend", { friendId: f.id })
-            }
+            onPress={() => navigation.navigate("Friend", { friendId: f.id })}
           >
             <Image
-              source={require("../../../../assets/images/Konoha.png")} 
+              source={require("../../../../assets/images/Konoha.png")}
               style={styles.avatar}
             />
             <Text style={styles.name} numberOfLines={1}>

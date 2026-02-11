@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Podium from "../../../placeScreens/Podium";
+import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
 
 const WeekPlace = ({ navigation }) => {
   return (
@@ -31,7 +32,7 @@ const WeekPlace = ({ navigation }) => {
           onPress={() => navigation.navigate("Podium")}
         >
           <Text style={styles.title}>Lugares de la Semana</Text>
-          <Text style={styles.arrow}>&gt;</Text>
+          <Ionicons name="chevron-forward-outline" size={25} color="#fff" />
         </Pressable>
       </View>
     </View>
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    backgroundColor: "#bfbfbf",
+    backgroundColor: "#2654d1",
     borderRadius: 14,
     padding: "4%",
     justifyContent: "space-between",
@@ -73,15 +74,15 @@ const styles = StyleSheet.create({
   },
   gold: {
     height: "50%",
-    backgroundColor: "#ffd549", 
+    backgroundColor: "#ffd549",
   },
   silver: {
     height: "40%",
-    backgroundColor: "#e7e7e7", 
+    backgroundColor: "#e7e7e7",
   },
   bronze: {
     height: "30%",
-    backgroundColor: "#d48332", 
+    backgroundColor: "#d48332",
   },
   place: {
     color: "#fff",
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   titleWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: "4%", 
+    marginTop: "4%",
   },
   title: {
     fontSize: 18,
