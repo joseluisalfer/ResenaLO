@@ -17,7 +17,7 @@ const mockPosts = [
     title: "React Native 🚀",
     content: "Me encanta desarrollar apps móviles.",
   },
-];
+]; 
 
 const Profile = () => {
   const [image, setImage] = useState(null);

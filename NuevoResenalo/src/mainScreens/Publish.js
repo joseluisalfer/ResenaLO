@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableWithoutFeedback, Keyboard, Pressable, Text, StyleSheet } from 'react-native';
-import DatosPublish from '../Componentes/PublishData/PublishData'
-import SelectorImagen from '../Componentes/ImageSelector/imageSelector';
+import DatosPublish from '../Componentes/Publish/PublishData/PublishData'
+import SelectorImagen from '../Componentes/Publish/ImageSelector/imageSelector';
 
 const Publish = () => {
   const [imagenes, setImagenes] = useState([null]);
