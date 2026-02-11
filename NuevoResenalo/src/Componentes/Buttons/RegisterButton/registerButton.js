@@ -1,10 +1,13 @@
+import { t } from 'i18next';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
-
+import { useTranslation } from 'react-i18next'
+import '../../../../assets/i18n/index';
 const Registrarse = (props) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <Pressable onPress={() => props.navigation.navigate('Register')} style={styles.buttom}>
-        <Text style={styles.text_buttom}>Registrarse</Text>
+        <Text style={styles.text_buttom}>{t("loginScreen.register")} </Text>
       </Pressable>
     </View>
   );

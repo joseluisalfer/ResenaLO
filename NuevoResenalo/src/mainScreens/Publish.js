@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { View, ScrollView, TouchableWithoutFeedback, Keyboard, Pressable, Text, StyleSheet } from 'react-native';
 import DatosPublish from '../Componentes/Publish/PublishData/PublishData'
 import SelectorImagen from '../Componentes/Publish/ImageSelector/imageSelector';
-
+import { useTranslation } from 'react-i18next'
+import '../../assets/i18n/index';
 const Publish = () => {
   const [imagenes, setImagenes] = useState([null]);
-
+  const { t } = useTranslation(); 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{ flex: 1 }}>
@@ -16,7 +17,7 @@ const Publish = () => {
             paddingBottom: 120,
           }}
         >
-          <Text style={styles.title}>Añadir nuevo lugar</Text>
+          <Text style={styles.title}>{t("publishScreen.new_place")}</Text>
 
           <DatosPublish />
 
@@ -24,7 +25,7 @@ const Publish = () => {
         </ScrollView>
 
         <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>Añadir al mapa</Text>
+          <Text style={styles.buttonText}>{t("publishScreen.buttonAdd")}</Text>
         </Pressable>
       </View>
     </TouchableWithoutFeedback>

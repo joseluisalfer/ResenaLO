@@ -1,9 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
-
+import { useTranslation } from 'react-i18next'
+import '../../../../assets/i18n/index';
 const Explore = ({ navigation, places }) => {
   const items = places.slice(0, 4);
+  const { t } = useTranslation();
 
   return (
     <View style={styles.wrapper}>
@@ -11,7 +13,7 @@ const Explore = ({ navigation, places }) => {
         style={styles.header}
         onPress={() => navigation.navigate("ListPlace")}
       >
-        <Text style={styles.title}>Explorar</Text>
+        <Text style={styles.title}>{t("home.buttonExplorer")}</Text>
         <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
       </Pressable>
 

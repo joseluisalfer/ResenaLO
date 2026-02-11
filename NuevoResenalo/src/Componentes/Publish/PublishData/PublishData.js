@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, Keyboard, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
-
+import { useTranslation } from 'react-i18next'
+import '../../../../assets/i18n/index';
 const FormInput = ({ label, placeholder }) => (
+
   <View style={styles.row}>
     <Text style={styles.label}>{label}</Text>
     <TextInput
@@ -16,12 +18,14 @@ const FormInput = ({ label, placeholder }) => (
 );
 
 const DatosPublish = () => {
+  const { t } = useTranslation();
+
   return (
     <View>
-      <FormInput label="NOMBRE" placeholder="Añadir nombre del lugar" />
-      <FormInput label="UBICACIÓN" placeholder="Añadir coordenadas..." />
-      <FormInput label="TIPO DE DESTINO" placeholder="Elige de qué tipo es" />
-      <FormInput label="DESCRIPCIÓN" placeholder="Describe el lugar..." />
+      <FormInput label={t("publishScreen.name")} placeholder={t("publishScreen.new_place")} />
+      <FormInput label={t("publishScreen.location")} placeholder={t("publishScreen.new_location")} />
+      <FormInput label={t("publishScreen.type")} placeholder={t("publishScreen.new_type")} />
+      <FormInput label={t("publishScreen.description")} placeholder={t("publishScreen.new_description")} />
     </View>
   );
 };

@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Pressable, Text, Image, Alert, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-
+import { useTranslation } from 'react-i18next';
+import '../../../../assets/i18n/index';
 const SelectorImagen = ({ imagenes, setImagenes }) => {
+  const { t } = useTranslation();
   const seleccionarImagen = async (index) => {
-    Alert.alert('Añadir imagen', 'Elige una opción', [
+    Alert.alert("Añadir la imagen ",'Elige una opción', [
       {
         text: 'Galería',
         onPress: async () => {
