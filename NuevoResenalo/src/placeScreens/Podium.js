@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { IconButton, Card } from "react-native-paper";
+import { Card } from "react-native-paper";
+import { Ionicons } from "@expo/vector-icons";
 
 const mockPodium = [
   { id: "1", name: "Sevilla", rating: "4.8/5" },
@@ -68,9 +69,14 @@ const Podium = () => {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-        <IconButton icon="arrow-left" size={30} color="#000" />
-      </Pressable>
+          <Ionicons 
+            name="arrow-back" 
+            marginTop= "5%"
+            size={30} 
+            color="black" 
+            style={styles.backButton} 
+            onPress={() => navigation.goBack()} 
+          />
 
       <Text style={styles.title}>Top 10 Lugares Más Valorados</Text>
 
