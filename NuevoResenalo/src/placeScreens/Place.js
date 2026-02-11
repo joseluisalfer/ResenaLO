@@ -47,13 +47,21 @@ const Place = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Button title="Back" onPress={() => navigation.goBack()} />
-        <Button
-          title="Options"
-          onPress={() => {
-            /* Opciones de menú aquí */
-          }}
-        />
+          <Ionicons
+            name="arrow-back"
+            size={30}
+            color="black"
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          />
+        <Ionicons
+            name="settings-outline"
+            size={30}
+            color="black"
+            style={styles.backButton}
+            //Poner opciones que si es el dueño de la reseña pueda eliminar o editar
+            onPress={() => navigation.goBack()}
+          />
       </View>
       <ScrollView>
         <View style={styles.imageContainer}>
