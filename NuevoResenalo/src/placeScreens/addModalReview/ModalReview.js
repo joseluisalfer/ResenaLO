@@ -8,7 +8,7 @@ const Stack = createStackNavigator();
 const ModalReview = () => ( 
     <Stack.Navigator> 
       <Stack.Group> 
-        <Stack.Screen name="Place" component={Place} /> 
+        <Stack.Screen name="Place" component={Place} options={{ headerShown: false }}/> 
       </Stack.Group> 
       <Stack.Group screenOptions={{ presentation: 'modal' }}> 
         <Stack.Screen 

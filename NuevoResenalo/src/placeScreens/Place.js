@@ -118,7 +118,7 @@ const Place = ({ navigation }) => {
             </MapView>
           </View>
           <View style={{ alignItems: "center", marginTop: "3%" }}>
-            <Pressable style={styles.addBox}>
+            <Pressable style={styles.addBox} onPress={() => navigation.navigate("Review")}>
               <Text style={{ fontSize: 20 }}>Añadir reseña</Text>
               <Ionicons name="add" size={50} color="#000000" />
             </Pressable>
