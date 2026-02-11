@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -133,38 +131,6 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + dbUser.getUser());
 	}
 
-	@PostMapping("/logout")
-	public ResponseEntity<Object> logout(@RequestBody User user) {
-
-		// Buscar usuario solo por username
-		User dbUser = userRepository.findByUser(user.getUser());
-
-		if (dbUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("Credenciales incorrectas o usuario no registrado");
-		}
-
-		// Comparar contraseña en claro vs hash guardado
-		boolean ok = BCrypt.checkpw(user.getPassword(), // contraseña que llega del POST
-				dbUser.getPassword() // hash guardado en la BD
-		);
-
-		if (!ok) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
-		}
-
-		// Comprobar si ya está logeado
-		if (!dbUser.isLogged()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario no está logeado");
-		}
-
-		// Marcar como logeado
-		dbUser.setLogged(false);
-		userRepository.save(dbUser);
-
-		return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + dbUser.getUser());
-	}
-	
 	@PostMapping("/uploadReview")
 	public ResponseEntity<Object> uploadReview(@RequestParam("title") String title,
 			@RequestParam("file") List<MultipartFile> files, @RequestParam("user") String user,
@@ -216,33 +182,46 @@ public class PrincipalController {
 	    // Convertir la imagen del usuario a Base64 si existe
 	    if (user.getImage() != null) {
 	        String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
-	        jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
+	        jsonR.put("photo", encodedImage);  // Agregar la imagen convertida a Base64
 	    } else {
 	        jsonR.put("photo", "null"); // Si no hay foto, poner null
 	    }
 
-	    // Convertir solo los links de las reseñas a JSON
+	    // Convertir las reseñas a JSON
 	    for (Review review : listReviews) {
 	        JSONObject reviewJson = new JSONObject();
+	        JSONArray reviewImages = new JSONArray();
 
-	        // Generar el link de la reseña (Asegúrate de que la URL esté correcta y completa)
-	        String reviewLink = "http://localhost:8080/first/review?id=" + review.getId(); // Cambia a la URL de tu API
-	        reviewJson.put("link", reviewLink);  // Agregar el link de la reseña
+	        // Agregar los datos de la reseña
+	        reviewJson.put("title", review.getTitle());
+	        reviewJson.put("description", review.getDescription());
+	        reviewJson.put("valoracion", review.getValoration());
 
-	        // Agregar la reseña (solo el link) a la lista de reseñas
+	        // Verificar si la reseña tiene imágenes
+	        if (!review.getImages().isEmpty()) {
+	            // Convertir cada imagen a Base64 y agregarla al array de imágenes (hay que hacerlo en aws para que sea un link)
+	            for (byte[] imageBytes : review.getImages()) {
+	                String encodedReviewImage = Base64.getEncoder().encodeToString(imageBytes);
+	                reviewImages.put(encodedReviewImage);  // Agregar la imagen al array
+	            }
+	        }
+
+	        // Agregar las imágenes de la reseña al JSON
+	        reviewJson.put("images", reviewImages);
+	        // Agregar la reseña a la lista de reseñas
 	        jsonA.put(reviewJson);
 	    }
 
 	    // Si no hay reseñas, agregar un array vacío
 	    if (jsonA.isEmpty()) {
-	        jsonR.put("reviews", new JSONArray()); // Poner array vacío si no hay reseñas
+	        jsonR.put("reviews", new JSONArray());  // Poner array vacío si no hay reseñas
 	    } else {
 	        jsonR.put("reviews", jsonA);
 	    }
 
 	    // Agregar la fecha de creación del usuario
 	    if (user.getDate() != null) {
-	        String formattedDate = user.getDate().toString(); // O usar un formateador si lo prefieres
+	        String formattedDate = user.getDate().toString();  // O usar un formateador si lo prefieres
 	        jsonR.put("created", formattedDate);
 	    }
 
@@ -252,52 +231,6 @@ public class PrincipalController {
 	    // Retornar la respuesta
 	    return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
 	}
-
-
-
-	@GetMapping("/review")
-	public ResponseEntity<String> review(@RequestParam(value = "id") String id) {
-	    Optional<Review> Oreview = reviewRepository.findById(id);
-
-	    // Verificar si la reseña existe
-	    if (!Oreview.isPresent()) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
-	    }
-	    
-	    JSONObject jsonP = new JSONObject();
-	    JSONArray jsonA = new JSONArray();
-	    Review review = Oreview.get();
-
-	    // Agregar información básica de la reseña
-	    jsonP.put("id", review.getId());
-	    jsonP.put("title", review.getTitle());
-	    jsonP.put("user", review.getUser());
-	    jsonP.put("valoration", review.getValoration());
-	    jsonP.put("description", review.getDescription());
-
-	    // Verificar si hay imágenes
-	    List<byte[]> images = review.getImages();
-	    if (images != null && !images.isEmpty()) {
-	        // Convertir las imágenes a Base64
-	        for (byte[] image : images) {
-	            if (image != null) {
-	                String encodedImage = Base64.getEncoder().encodeToString(image);
-	                jsonA.put(encodedImage);  // Agregar imagen codificada a la respuesta
-	            }
-	        }
-	    } else {
-	        // Si no hay imágenes, agregar un campo vacío o null
-	        jsonP.put("images", "No images available");
-	    }
-	    
-	    // Agregar los datos de las imágenes y el tipo MIME
-	    jsonP.put("mimeType", "image/jpeg");
-	    jsonP.put("images", jsonA);
-
-	    // Retornar la respuesta con la reseña en formato JSON
-	    return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
-	}
-
-
-
+	
+	
 }
