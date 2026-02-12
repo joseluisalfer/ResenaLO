@@ -4,8 +4,10 @@ import {
   Text,
   View,
   TextInput,
-  Pressable
+  Pressable,
+  Modal
 } from 'react-native';
+import { Button } from 'react-native-paper';
 import Banner from '../Componentes/Banner/Banner';
 
 const Register = ({ navigation }) => {
@@ -14,6 +16,8 @@ const Register = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [birth, setBirth] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
@@ -25,14 +29,55 @@ const Register = ({ navigation }) => {
     navigation.navigate('Login');
   };
 
+    const handleModalConfirm = () => {
+    console.log("Código de verificación confirmado:", verificationCode);
+    setModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
-      <Banner/>
+      <Banner />
 
       <Text style={styles.title}>Crear cuenta</Text>
       <Text style={styles.subtitle}>
         Introduce tu correo electrónico y contraseña para crear una cuenta:
       </Text>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Introduce el código de verificación</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Código de verificacion"
+              autoCapitalize="none"
+              value={verificationCode}
+              onChangeText={setVerificationCode}
+            />
+
+            {/* Botón de confirmar que aparece solo si hay texto en el campo */}
+            {verificationCode.trim().length > 0 && (
+              <Button
+                onPress={handleModalConfirm}
+                mode="contained"
+              >
+                Confirmar
+              </Button>
+            )}
+
+            <Text onPress={() => setModalVisible(false)} mode="outlined" style={styles.cancelButton}>
+              Cancelar
+            </Text>
+          </View>
+        </View>
+
+      </Modal>
+
 
       <TextInput
         style={styles.input}
@@ -73,7 +118,10 @@ const Register = ({ navigation }) => {
         onChangeText={setBirth}
       />
 
-      <Pressable style={styles.button} onPress={handleRegister}>
+      <Pressable style={styles.button} onPress={() => {
+        // handleRegister();
+        setModalVisible(true);
+      }}>
         <Text style={styles.buttonText}>Registrarse</Text>
       </Pressable>
     </View>
@@ -125,6 +173,29 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontSize: 15,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",  // Fondo oscuro para el modal
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    width: "80%",  // Ancho del modal
+  },
+  cancelButton: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 15,
+  },
+  modalText: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    marginBottom: 20,
   },
 });
 
