@@ -1,8 +1,53 @@
 {
-    "componente1": {
-        "iniciarSesion": "Iniciar sesión",
-        "Encabezado": "Introduce tu dirección de correo electrónico y contraseña para iniciar sesión en esta aplicación",
+    "loginScreen": {
+        "login": "Iniciar sesión",
+        "footer": "Introduce tu dirección de correo electrónico y contraseña para iniciar sesión en esta aplicación",
         "createAccount": "Crear cuenta",
-        "TextAcount": "Crea tu cuenta para registrarte en ReseñaLo y descubrir nuevos lugares."
+        "textAccount": "Crea tu cuenta para registrarte en ReseñaLo y descubrir nuevos lugares.",
+        "register": "Registrarse"
+    },
+
+    "registerScreen": {
+        "createAccount": "Crear cuenta",
+        "footer": " Introduce tu correo electrónico y contraseña para crear una cuenta:",
+        "email": "correo electrónico",
+        "password": "contraseña",
+        "confirm": "Confirmar contraseña",
+        "user": "Nombre de usuario",
+        "date": "Fecha de nacimiento (DD/MM/AAAA)",
+        "register": "Registrarse"
+
+    },
+
+    "home":{
+        "places_week": "Lugares de la semana",
+        "buttonFriend": "Amigos",
+        "buttonExplorer": "Explorar"
+    },
+
+    "publishScreen":{
+        "new_place": "Añadir nuevo lugar.",
+        "name": "NOMBRE",
+        "new_name": "Añadir nuevo lugar",
+        "location": "UBICACIÓN",
+        "new_location": "Añadir coordenadas",
+        "type": "TIPO DE DESTINO",
+        "new_type": "Elige de que tipo es",
+        "description": "DESCRIPCIÓN",
+        "new_description": "Describe el lugar",
+        "buttonAdd": "Añadir al mapa"
+    },
+
+    "buttonAdd": {
+        "add": "Añadir imagen ",
+        "option": "Elige una opcion",
+        "gallery": "GALERÍA",
+        "camera": "CÁMARA",
+        "cancel": "CANCELAR"
+    },
+
+    "profile":{
+        "buttonEdit": "Editar perfil",
+        "post": "Publicaciones"
     }
 }

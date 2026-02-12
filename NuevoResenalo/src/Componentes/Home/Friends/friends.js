@@ -8,15 +8,19 @@ import {
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
-
+import { useTranslation } from 'react-i18next';
+import '../../../../assets/i18n/index';
 const Friends = ({ navigation, friends }) => {
+
+  const { t } = useTranslation();
+
   return (
     <View style={styles.wrapper}>
       <Pressable
         style={styles.header}
         onPress={() => navigation.navigate("AllFriends")}
       >
-        <Text style={styles.title}>Amigos</Text>
+        <Text style={styles.title}>{t("home.buttonFriend")}</Text>
         <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
       </Pressable>
 

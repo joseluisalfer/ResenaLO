@@ -4,7 +4,6 @@ import PedirDatos from '../Componentes/Buttons/SetData/setData';
 import Registrarse from '../Componentes/Buttons/RegisterButton/registerButton';
 import { useTranslation } from 'react-i18next';
 import '../../assets/i18n/index';
-import Idioms from '../Componentes/Buttons/Idioms/idioms';
 const Login = ({ navigation }) => {
 
   const { t } = useTranslation();
@@ -12,17 +11,16 @@ const Login = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Banner />
-      <Text style={styles.titulo}>{t('componente1.iniciarSesion')}</Text>
+      <Text style={styles.titulo}>{t('loginScreen.login')}</Text>
       <Text style={styles.descripcion}>
-        {t('component1.encabezado')}
+        {t('loginScreen.footer')}
       </Text>
       <PedirDatos />
-      <Text style={styles.titulo}>{t('componente1.createAccount')}</Text>
+      <Text style={styles.titulo}>{t('loginScreen.createAccount')}</Text>
       <Text style={styles.descripcion}>
-        {t('componente1.TextAcount')}
+        {t('loginScreen.textAccount')}
       </Text>
       <Registrarse navigation={navigation} />
-      <Idioms navigation={navigation}></Idioms>
     </View>
   );
 };

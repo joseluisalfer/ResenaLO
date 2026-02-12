@@ -4,6 +4,8 @@ import { Button, Card, Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native"; // Asegúrate de que importas useNavigation
 import { Ionicons } from '@expo/vector-icons';
 import ProfileImage from "../Componentes/Profile/ProfileImage/ProfileImage";
+import { useTranslation } from 'react-i18next';
+import '../../assets/i18n/index';
 
 const mockPosts = [
   {
@@ -21,12 +23,18 @@ const mockPosts = [
 
 const Profile = () => {
   const [image, setImage] = useState(null);
+<<<<<<< HEAD
   const [modalVisible, setModalVisible] = useState(false);
   const [showLanguageOptions, setShowLanguageOptions] = useState(false); // Para manejar si mostrar opciones de idioma
   const [selectedLanguage, setSelectedLanguage] = useState("Español");
   const [isLanguageChanged, setIsLanguageChanged] = useState(false);
   const navigation = useNavigation();
 
+=======
+  const navigation = useNavigation();  // Usar el hook para navegación
+   const { t } = useTranslation();
+   
+>>>>>>> 35a91ceeae180ef325246d9b0cd1e1d562b51a73
   const renderPost = ({ item }) => (
     <Card style={styles.postCard}>
       <Card.Content>
@@ -173,7 +181,7 @@ const Profile = () => {
             onPress={() => navigation.navigate("EditProfile")}
             style={styles.editButton}
           >
-            Editar Perfil
+            <Text>{t("profile.buttonEdit")}</Text>
           </Button>
 
           {/* Estadísticas */}
@@ -197,7 +205,7 @@ const Profile = () => {
           <Divider style={{ marginVertical: 16 }} />
 
           <Text variant="titleLarge" style={{ marginBottom: 8 }}>
-            Publicaciones
+            {t("profile.post")}
           </Text>
         </View>
       }

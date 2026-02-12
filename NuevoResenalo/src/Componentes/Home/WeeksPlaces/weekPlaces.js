@@ -2,8 +2,12 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Podium from "../../../placeScreens/Podium";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
-
+import { useTranslation } from 'react-i18next'
+import '../../../../assets/i18n/index';
 const WeekPlace = ({ navigation }) => {
+
+  const { t } = useTranslation();
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.card}>
@@ -31,7 +35,7 @@ const WeekPlace = ({ navigation }) => {
           style={styles.titleWrapper}
           onPress={() => navigation.navigate("Podium")}
         >
-          <Text style={styles.title}>Lugares de la Semana</Text>
+          <Text style={styles.title}>{t("home.places_week")}</Text>
           <Ionicons name="chevron-forward-outline" size={25} color="#fff" />
         </Pressable>
       </View>

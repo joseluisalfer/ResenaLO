@@ -7,13 +7,15 @@ import {
   Pressable
 } from 'react-native';
 import Banner from '../Componentes/Banner/Banner';
-
+import { useTranslation } from 'react-i18next'
+import '../../assets/i18n/index';
 const Register = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [birth, setBirth] = useState('');
+  const { t } = useTranslation();
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
@@ -29,14 +31,14 @@ const Register = ({ navigation }) => {
     <View style={styles.container}>
       <Banner/>
 
-      <Text style={styles.title}>Crear cuenta</Text>
+      <Text style={styles.title}>{t("registerScreen.createAccount")}</Text>
       <Text style={styles.subtitle}>
-        Introduce tu correo electrónico y contraseña para crear una cuenta:
+       {t("registerScreen.footer")}
       </Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder={t("registerScreen.email")}
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
@@ -45,7 +47,7 @@ const Register = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Contraseña"
+        placeholder={t("registerScreen.password")}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -53,7 +55,7 @@ const Register = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Confirmar contraseña"
+        placeholder={t("registerScreen.confirm")}
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
@@ -61,20 +63,20 @@ const Register = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Nombre de usuario"
+        placeholder={t("registerScreen.user")}
         value={username}
         onChangeText={setUsername}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Fecha de nacimiento (DD/MM/AAAA)"
+        placeholder={t("registerScreen.date")}
         value={birth}
         onChangeText={setBirth}
       />
 
       <Pressable style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Registrarse</Text>
+        <Text style={styles.buttonText}>{t("registerScreen.register")}</Text>
       </Pressable>
     </View>
   );
@@ -84,13 +86,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',  // Esto coloca los elementos hacia arriba
+    justifyContent: 'flex-start',
     paddingHorizontal: 20,
     backgroundColor: '#f7f7f7',
-    marginTop: 20,  // Reducir el margen superior para acercar la caja a la parte superior
+    marginTop: 20,  
   },
   banner: {
-    marginBottom: -20, // Ajusta la imagen hacia arriba
+    marginBottom: -20,
   },
   title: {
     fontSize: 24,
@@ -101,22 +103,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     textAlign: 'center',
-    marginBottom: 10, // Reducir el espacio entre el título y los campos
+    marginBottom: 10,
   },
   input: {
     width: '100%',
-    height: 45,  // Reducir la altura de los inputs
+    height: 45,  
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 10,  // Reducir el margen entre los inputs
+    marginBottom: 10,  
     fontSize: 16,
   },
   button: {
     backgroundColor: 'black',
     justifyContent: 'center',
-    padding: 12,  // Reducir el padding del botón
+    padding: 12,  
     height: 50,
     width: 300,
     borderRadius: 10,
