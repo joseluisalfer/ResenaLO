@@ -23,18 +23,14 @@ const mockPosts = [
 
 const Profile = () => {
   const [image, setImage] = useState(null);
-<<<<<<< HEAD
   const [modalVisible, setModalVisible] = useState(false);
   const [showLanguageOptions, setShowLanguageOptions] = useState(false); // Para manejar si mostrar opciones de idioma
   const [selectedLanguage, setSelectedLanguage] = useState("Español");
   const [isLanguageChanged, setIsLanguageChanged] = useState(false);
-  const navigation = useNavigation();
-
-=======
   const navigation = useNavigation();  // Usar el hook para navegación
    const { t } = useTranslation();
    
->>>>>>> 35a91ceeae180ef325246d9b0cd1e1d562b51a73
+
   const renderPost = ({ item }) => (
     <Card style={styles.postCard}>
       <Card.Content>
