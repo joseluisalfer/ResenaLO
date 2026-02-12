@@ -6,9 +6,9 @@ import '../../../../assets/i18n/index';
 const SelectorImagen = ({ imagenes, setImagenes }) => {
   const { t } = useTranslation();
   const seleccionarImagen = async (index) => {
-    Alert.alert("Añadir la imagen ",'Elige una opción', [
+    Alert.alert(t("buttonAdd.add"), t("buttonAdd.option"), [
       {
-        text: 'Galería',
+        text: t("buttonAdd.gallery"),
         onPress: async () => {
           const permissionResult =
             await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -31,7 +31,7 @@ const SelectorImagen = ({ imagenes, setImagenes }) => {
         },
       },
       {
-        text: 'Cámara',
+        text: t("buttonAdd.camera"),
         onPress: async () => {
           const permissionResult =
             await ImagePicker.requestCameraPermissionsAsync();
@@ -54,7 +54,7 @@ const SelectorImagen = ({ imagenes, setImagenes }) => {
           }
         },
       },
-      { text: 'Cancelar', style: 'cancel' },
+      { text: t("buttonAdd.cancel"), style: 'cancel' },
     ]);
   };
 

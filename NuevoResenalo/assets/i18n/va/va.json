@@ -6,30 +6,36 @@
         "textAccount": "Crea el teu compte per registrar-te a ReseñaLo i descobrir nous llocs.",
         "register": "Registrarse"
     },
-
-     "registerScreen": {
-        "email": "correu electrònic",
-        "password": "contrasenya",
+    "registerScreen": {
+        "createAccount": "Crear compte",
+        "footer": "Introdueix el teu correu electrònic i contrasenya per crear un compte:",
+        "email": "Correu electrònic",
+        "password": "Contrasenya",
         "confirm": "Confirmar contrasenya",
         "user": "Nom d'usuari",
-        "date": "Data de naixement (DD/MM/AAAA)"
+        "date": "Data de naixement (DD/MM/AAAA)",
+        "register": "Registrar"
     },
-
+    
     "home": {
         "places_week": "Llocs de la setmana",
         "buttonFriend": "Amics",
         "buttonExplorer": "Explorar"
     },
-
+    
     "publishScreen": {
-        "new_place": "Afegir lloc nou",
+        "new_place": "Afegir nou lloc",
         "name": "NOM",
+        "new_name": "Afegir nou lloc",
         "location": "UBICACIÓ",
+        "new_location": "Afegir coordenades",
         "type": "TIPUS DE DESTÍ",
+        "new_type": "Tria el tipus",
         "description": "DESCRIPCIÓ",
+        "new_description": "Descriu el lloc",
         "buttonAdd": "Afegir al mapa"
     },
-
+   
     "buttonAdd": {
         "add": "Afegir imatge",
         "option": "Tria una opció",
@@ -37,7 +43,7 @@
         "camera": "CÀMERA",
         "cancel": "CANCEL·LAR"
     },
-
+    
     "profile": {
         "buttonEdit": "Editar perfil",
         "post": "Publicacions"

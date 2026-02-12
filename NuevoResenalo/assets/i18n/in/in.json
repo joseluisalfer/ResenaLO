@@ -1,36 +1,43 @@
 {
-
-    "loginScreen":{
+    "loginScreen": {
         "login": "login",
         "footer": "Enter your email address and password to log in to this application",
         "createAccount": "Create account",
         "textAccount": "Create your account to register on ReseñaLo and discover new places.",
         "register": "Register"
     },
-
-  "registerScreen": {
-        "email": "email",
-        "password": "password",
+    "registerScreen": {
+        "createAccount": "Create account",
+        "footer": "Enter your email and password to create an account:",
+        "email": "Email",
+        "password": "Password",
         "confirm": "Confirm password",
         "user": "Username",
-        "date": "Date of birth (DD/MM/YYYY)"
+        "date": "Date of birth (DD/MM/YYYY)",
+        "register": "Register"
     },
-
+   
+   
     "home": {
         "places_week": "Places of the week",
         "buttonFriend": "Friends",
         "buttonExplorer": "Explore"
+    
     },
-
+    
+    
     "publishScreen": {
         "new_place": "Add new place",
         "name": "NAME",
+        "new_name": "Add new place",
         "location": "LOCATION",
-        "type": "TYPE OF DESTINATION",
+        "new_location": "Add coordinates",
+        "type": "DESTINATION TYPE",
+        "new_type": "Choose the type",
         "description": "DESCRIPTION",
+        "new_description": "Describe the place",
         "buttonAdd": "Add to map"
     },
-
     "buttonAdd": {
         "add": "Add image",
         "option": "Choose an option",
@@ -38,7 +45,6 @@
         "camera": "CAMERA",
         "cancel": "CANCEL"
     },
-
     "profile": {
         "buttonEdit": "Edit profile",
         "post": "Posts"

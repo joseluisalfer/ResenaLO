@@ -4,6 +4,8 @@ import { Button, Card, Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native"; // Asegúrate de que importas useNavigation
 
 import ProfileImage from "../Componentes/Profile/ProfileImage/ProfileImage";
+import { useTranslation } from 'react-i18next';
+import '../../assets/i18n/index';
 
 const mockPosts = [
   {
@@ -22,7 +24,8 @@ const mockPosts = [
 const Profile = () => {
   const [image, setImage] = useState(null);
   const navigation = useNavigation();  // Usar el hook para navegación
-
+   const { t } = useTranslation();
+   
   const renderPost = ({ item }) => (
     <Card style={styles.postCard}>
       <Card.Content>
@@ -67,7 +70,7 @@ const Profile = () => {
             onPress={() => navigation.navigate("EditProfile")}  // Asegúrate de que el nombre coincida con el registrado
             style={styles.editButton}
           >
-            Editar Perfil
+            <Text>{t("profile.buttonEdit")}</Text>
           </Button>
 
           {/* Estadísticas */}
@@ -91,7 +94,7 @@ const Profile = () => {
           <Divider style={{ marginVertical: 16 }} />
 
           <Text variant="titleLarge" style={{ marginBottom: 8 }}>
-            Publicaciones
+            {t("profile.post")}
           </Text>
         </View>
       }
