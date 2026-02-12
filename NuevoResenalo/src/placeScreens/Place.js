@@ -55,12 +55,12 @@ const Place = ({ navigation }) => {
             onPress={() => navigation.goBack()}
           />
         <Ionicons
-            name="settings-outline"
+            name="create-outline"
             size={30}
             color="black"
             style={styles.backButton}
             //Poner opciones que si es el dueño de la reseña pueda eliminar o editar
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate("EditPlace")}
           />
       </View>
       <ScrollView>
