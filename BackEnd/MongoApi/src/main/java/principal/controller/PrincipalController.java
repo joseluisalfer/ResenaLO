@@ -91,68 +91,73 @@ public class PrincipalController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Object> login(@RequestBody User user) {
+	public ResponseEntity<Object> login(@RequestBody String body) {
+		try {
+			JSONObject json = new JSONObject(body);
+			String email = json.getString("email");
+			String password = json.getString("password");
 
-		// Buscar usuario solo por username
-		User dbUser = userRepository.findByEmailAndPassword(user.getEmail(), user.getPassword());
+			// Buscar usuario por email
+			User dbUser = userRepository.findByEmail(email);
 
-		if (dbUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("Credenciales incorrectas o usuario no registrado");
+			if (dbUser == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+						.body("Credenciales incorrectas o usuario no registrado");
+			}
+
+			// Comparar la contraseña proporcionada con el hash almacenado
+			boolean ok = BCrypt.checkpw(password, dbUser.getPassword());
+
+			if (!ok) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
+			}
+
+			// Comprobar si el usuario ya está logeado
+			if (dbUser.isLogged()) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya está logeado");
+			}
+
+			// Marcar al usuario como logeado
+			dbUser.setLogged(true);
+			userRepository.save(dbUser);
+
+			return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + dbUser.getUser());
+
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error en el servidor: " + e.getMessage());
 		}
-
-		// Comparar contraseña en claro vs hash guardado
-		boolean ok = BCrypt.checkpw(user.getPassword(), // contraseña que llega del POST
-				dbUser.getPassword() // hash guardado en la BD
-		);
-
-		if (!ok) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
-		}
-
-		// Comprobar si ya está logeado
-		if (dbUser.isLogged()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya está logeado");
-		}
-
-		// Marcar como logeado
-		dbUser.setLogged(true);
-
-		userRepository.save(dbUser);
-
-		return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + dbUser.getUser());
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<Object> logout(@RequestBody User user) {
+	public ResponseEntity<Object> logout(@RequestBody String body) {
+		try {
+			JSONObject json = new JSONObject(body);
+			String email = json.getString("email");
 
-		// Buscar usuario solo por username
-		User dbUser = userRepository.findByUser(user.getUser());
+			// Buscar usuario por email
+			User dbUser = userRepository.findByEmail(email);
 
-		if (dbUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("Credenciales incorrectas o usuario no registrado");
+			if (dbUser == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+						.body("Credenciales incorrectas o usuario no registrado");
+			}
+
+			// Comprobar si el usuario ya está logeado
+			if (!dbUser.isLogged()) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya se ha salido del logout");
+			}
+
+			// Marcar al usuario como logeado
+			dbUser.setLogged(false);
+			userRepository.save(dbUser);
+
+			return ResponseEntity.status(HttpStatus.OK).build();
+
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error en el servidor: " + e.getMessage());
 		}
-
-		// Comparar contraseña en claro vs hash guardado
-		boolean ok = BCrypt.checkpw(user.getPassword(), // contraseña que llega del POST
-				dbUser.getPassword() // hash guardado en la BD
-		);
-
-		if (!ok) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
-		}
-
-		// Comprobar si ya está logeado
-		if (!dbUser.isLogged()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario no está logeado");
-		}
-
-		// Marcar como logeado
-		dbUser.setLogged(false);
-		userRepository.save(dbUser);
-
-		return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + dbUser.getUser());
 	}
 
 	@PostMapping("/uploadReview")
@@ -172,6 +177,36 @@ public class PrincipalController {
 		// Guardamos la resna en la base de datos (MongoDB)
 		reviewRepository.save(resena);
 		return ResponseEntity.status(HttpStatus.OK).body("Resena creada de manera exitosa");
+	}
+
+	@PostMapping("updateTitle")
+	public ResponseEntity<Object> updateTitle(@RequestParam("id") String idReview,
+			@RequestParam("newTitle") String newTitle) throws IOException {
+
+		Optional<Review> Oreview = reviewRepository.findById(idReview);
+		if (!Oreview.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		Review review = Oreview.get();
+		review.setTitle(newTitle);
+		reviewRepository.save(review);
+		return ResponseEntity.status(HttpStatus.OK).body("Titulo actualizado de manera exitosa");
+	}
+
+	@PostMapping("updateComment")
+	public ResponseEntity<Object> updateComment(@RequestParam("id") String idComment,
+			@RequestParam("newText") String newText) throws IOException {
+
+		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
+		if (!Ocomment.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		Comments comment = Ocomment.get();
+		comment.setText(newText);
+		commentsRepository.save(comment);
+		return ResponseEntity.status(HttpStatus.OK).body("Comentario actualizado de manera exitosa");
 	}
 
 	@PostMapping("/commentReview")
