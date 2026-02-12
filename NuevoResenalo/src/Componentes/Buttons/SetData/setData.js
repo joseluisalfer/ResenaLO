@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import "../../../../assets/i18n/index"; // Esto se asume que está en el directorio adecuado
+import "../../../../assets/i18n/index"; // Asegúrate de que esto está en el directorio adecuado
 import { postData } from "../../../services/services"; // Asegúrate de que esta ruta sea correcta
 
 const PedirDatos = ({ navigation }) => {
@@ -36,7 +36,7 @@ const PedirDatos = ({ navigation }) => {
 
     try {
       // Enviar datos al servidor con POST
-      const response = await postData("", data);
+      const response = await postData("http://44.213.235.160:8080/first/login", data);
       console.log("Respuesta del servidor:", response);
 
       // Si la respuesta es exitosa, redirigir a la pantalla principal
@@ -90,7 +90,7 @@ const PedirDatos = ({ navigation }) => {
   );
 };
 
- const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
