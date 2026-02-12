@@ -9,10 +9,23 @@ const PedirDatos = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const { t } = useTranslation();
 
+  // Función para validar si el email tiene un formato correcto
+  const validateEmail = (email) => {
+    // Expresión regular básica para email
+    const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    return emailRegex.test(email);
+  };
+
   const handleOnPress = async () => {
     // Validar que los campos no estén vacíos
     if (email === "" || password === "") {
       alert(t("loginScreen.emptyFields")); // Traducción de campos vacíos
+      return;
+    }
+
+    // Validar que el correo electrónico sea correcto
+    if (!validateEmail(email)) {
+      alert(t("loginScreen.invalidEmail")); // Traducción de email no válido
       return;
     }
 
@@ -23,7 +36,7 @@ const PedirDatos = ({ navigation }) => {
 
     try {
       // Enviar datos al servidor con POST
-      const response = await postData("https://api.ejemplo.com/login", data);
+      const response = await postData("", data);
       console.log("Respuesta del servidor:", response);
 
       // Si la respuesta es exitosa, redirigir a la pantalla principal
@@ -51,7 +64,7 @@ const PedirDatos = ({ navigation }) => {
       <View style={styles.space}>
         <TextInput
           style={styles.inputs}
-          placeholder={"password"}
+          placeholder={t("loginScreen.passwordPlaceholder")}
           onChangeText={(newText) => setPassword(newText)}
           secureTextEntry={true}
           value={password}
