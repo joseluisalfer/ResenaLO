@@ -6,6 +6,6 @@ import Register from "./src/registerScreen/register";
 import Main from './src/Main'
 const Stack = createStackNavigator();
 const App = () => (
-  <Main/>
+  <Main />
 );
 export default App;
