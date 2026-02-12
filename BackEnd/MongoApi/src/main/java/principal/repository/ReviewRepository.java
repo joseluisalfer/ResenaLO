@@ -1,6 +1,7 @@
 package principal.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -11,5 +12,5 @@ public interface ReviewRepository extends MongoRepository<Review, String> {
 	List<Review> findByUser(String user);
 	List<Review> findByValoration(int valoration);
 	List<Review> findByTitle(String title);
-	
+	Optional<Review> findById(String id);
 }

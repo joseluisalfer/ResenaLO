@@ -1,6 +1,8 @@
 package principal.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -50,7 +52,7 @@ public class PrincipalController {
 
 	@PostMapping("/register")
 	public ResponseEntity<Object> register(@RequestParam("user") String user, @RequestParam("password") String password,
-			@RequestParam("email") String email, @RequestParam("image") MultipartFile image) throws IOException {
+			@RequestParam("email") String email) throws IOException {
 
 		// Email ya registrado
 		if (userRepository.existsByEmail(email)) {
@@ -68,17 +70,19 @@ public class PrincipalController {
 		// Encriptar contraseña
 		String pass = hashPassword(password);
 
-		// Convertir la imagen a bytes
-		byte[] imageBytes = image.getBytes();
-
 		// Crear el objeto de usuario
 		User newUser = new User();
 		newUser.setUser(user);
 		newUser.setEmail(email);
 		newUser.setPassword(pass);
 		newUser.setLogged(logged);
-		newUser.setImage(imageBytes);
+
 		newUser.setDate(new Date());
+
+		String imagePath = "src/main/resources/foto_default.png";
+		byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
+		newUser.setImage(imageBytes);
+
 		// Guardar el usuario en la base de datos
 		userRepository.save(newUser);
 
@@ -90,7 +94,7 @@ public class PrincipalController {
 	public ResponseEntity<Object> login(@RequestBody User user) {
 
 		// Buscar usuario solo por username
-		User dbUser = userRepository.findByUser(user.getUser());
+		User dbUser = userRepository.findByEmailAndPassword(user.getEmail(), user.getPassword());
 
 		if (dbUser == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -184,6 +188,36 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body("Comentario creado de manera exitosa");
 	}
 
+	@PostMapping("deleteReview")
+	public ResponseEntity<Object> deleteReview(@RequestParam("id") String idReview) throws IOException {
+		Optional<Review> Oreview = reviewRepository.findById(idReview);
+
+		// Verificar si la reseña existe
+		if (!Oreview.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		Review review = Oreview.get();
+		reviewRepository.delete(review);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+	}
+
+	@PostMapping("deleteComment")
+	public ResponseEntity<Object> deleteComment(@RequestParam("id") String idComment) throws IOException {
+		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
+
+		// Verificar si la reseña existe
+		if (!Ocomment.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		Comments comment = Ocomment.get();
+		commentsRepository.delete(comment);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+	}
+
 	@GetMapping("/user")
 	public ResponseEntity<String> user(@RequestParam(value = "user") String us) {
 		// Obtener el usuario y las reseñas
@@ -213,7 +247,8 @@ public class PrincipalController {
 
 			// Generar el link de la reseña (Asegúrate de que la URL esté correcta y
 			// completa)
-			String reviewLink = "http://localhost:8080/first/review?id=" + review.getId(); // Cambia a la URL de tu API
+			String reviewLink = "http://44.213.235.160:8080/first/review?id=" + review.getId(); // Cambia a la URL de tu
+																								// API
 			reviewJson.put("link", reviewLink); // Agregar el link de la reseña
 
 			// Agregar la reseña (solo el link) a la lista de reseñas
@@ -318,8 +353,9 @@ public class PrincipalController {
 				JSONObject reviewJson = new JSONObject();
 
 				// Generar el link de la reseña
-				String reviewLink = "http://localhost:8080/review?id=" + review.getId(); // Cambiar la URL de tu API si
-																							// es necesario
+				String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId(); // Cambiar la URL de tu
+																								// API si
+																								// es necesario
 				reviewJson.put("link", reviewLink); // Agregar el link de la reseña
 
 				// Agregar la reseña (solo el link) a la lista de reseñas
@@ -351,7 +387,7 @@ public class PrincipalController {
 	}
 
 	@GetMapping("/reviews")
-	public String reviews() {
+	public ResponseEntity<String> reviews() {
 		// Obtener todas las reseñas
 		List<Review> listReviews = reviewRepository.findAll();
 
@@ -397,7 +433,84 @@ public class PrincipalController {
 		}
 
 		// Devolver la respuesta como un string JSON
-		return jsonReviews.toString();
+		return ResponseEntity.status(HttpStatus.OK).body(jsonReviews.toString());
+	}
+
+	@GetMapping("comments")
+	public ResponseEntity<String> comments() {
+
+		// Obtener todos los comentarios
+		List<Comments> listComments = commentsRepository.findAll();
+		// Crear el array JSON que contendrá todas las reseñas
+		JSONArray jsonComments = new JSONArray();
+
+		for (Comments comment : listComments) {
+			// Crear un objeto JSON para cada comentario
+			JSONObject commentJson = new JSONObject();
+			commentJson.put("id", comment.getId());
+			commentJson.put("text", comment.getText());
+			commentJson.put("date_publication", comment.getDate());
+
+			// Obtener el usuario asociado a la reseña usando el userId de la reseña
+			String userId = comment.getUser();
+			User user = userRepository.findByUser(userId);
+
+			// Generar el enlace al usuario
+			String userLink = (user != null) ? "http://localhost:8080/user?id=" + user.getId() : null;
+
+			// Agregar el enlace del usuario a la reseña
+			commentJson.put("user", userLink);
+
+			String reviewId = comment.getId();
+			Optional<Review> Oreview = reviewRepository.findById(reviewId);
+
+			// Verificar si la reseña existe
+			if (!Oreview.isPresent()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
+			}
+
+			Review review = Oreview.get();
+			String linkReview = "http://localhost:8080/review?id=" + review.getId();
+			commentJson.put("review", linkReview);
+			jsonComments.put(commentJson);
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).body(jsonComments.toString());
+	}
+
+	@GetMapping("/comment")
+	public ResponseEntity<String> comment(@RequestParam(value = "idReview") String idReview) {
+		List<Comments> listComments = commentsRepository.findByResenaId(idReview);
+		JSONArray jsonComments = new JSONArray();
+		for (Comments comment : listComments) {
+			JSONObject commentJson = new JSONObject();
+			commentJson.put("id", comment.getId());
+			commentJson.put("text", comment.getText());
+			commentJson.put("date_publication", comment.getDate());
+
+			// Obtener el usuario asociado a la reseña usando el userId de la reseña
+			String userId = comment.getUser();
+			User user = userRepository.findByUser(userId);
+
+			// Generar el enlace al usuario
+			String userLink = (user != null) ? "http://localhost:8080/user?id=" + user.getId() : null;
+
+			// Agregar el enlace del usuario a la reseña
+			commentJson.put("user", userLink);
+			String reviewId = comment.getId();
+			Optional<Review> Oreview = reviewRepository.findById(reviewId);
+
+			// Verificar si la reseña existe
+			if (!Oreview.isPresent()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
+			}
+
+			Review review = Oreview.get();
+			String linkReview = "http://localhost:8080/review?id=" + review.getId();
+			commentJson.put("review", linkReview);
+			jsonComments.put(commentJson);
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(jsonComments.toString());
 	}
 
 }
