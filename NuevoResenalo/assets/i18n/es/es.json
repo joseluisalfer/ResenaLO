@@ -6,7 +6,6 @@
         "textAccount": "Crea tu cuenta para registrarte en ReseñaLo y descubrir nuevos lugares.",
         "register": "Registrarse"
     },
-
     "registerScreen": {
         "createAccount": "Crear cuenta",
         "footer": " Introduce tu correo electrónico y contraseña para crear una cuenta:",
@@ -16,16 +15,13 @@
         "user": "Nombre de usuario",
         "date": "Fecha de nacimiento (DD/MM/AAAA)",
         "register": "Registrarse"
-
     },
-
-    "home":{
+    "home": {
         "places_week": "Lugares de la semana",
         "buttonFriend": "Amigos",
         "buttonExplorer": "Explorar"
     },
-
-    "publishScreen":{
+    "publishScreen": {
         "new_place": "Añadir nuevo lugar.",
         "name": "NOMBRE",
         "new_name": "Añadir nuevo lugar",
@@ -37,7 +33,6 @@
         "new_description": "Describe el lugar",
         "buttonAdd": "Añadir al mapa"
     },
-
     "buttonAdd": {
         "add": "Añadir imagen ",
         "option": "Elige una opcion",
@@ -45,9 +40,21 @@
         "camera": "CÁMARA",
         "cancel": "CANCELAR"
     },
-
-    "profile":{
+    "profile": {
         "buttonEdit": "Editar perfil",
-        "post": "Publicaciones"
+        "post": "Publicaciones",
+        "logout": "Cerrar sesión",
+        "change_lang": "Cambiar idioma",
+        "change_theme": "Cambiar Tema",
+        "cancel": "cancelar",
+        "comments": "Comentarios",
+        "friends": "Amigos",
+        "save": "Guardar cambios",
+        "title": "Seleccionar idioma"
+    },
+    "language": {
+        "sp": "Español",
+        "en": "Ingles",
+        "ca": "Valenciano"
     }
 }

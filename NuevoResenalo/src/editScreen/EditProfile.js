@@ -3,14 +3,15 @@ import { View, StyleSheet, TextInput, Button, Text, ScrollView } from "react-nat
 import { useNavigation } from '@react-navigation/native';
 import ProfileImage from "../Componentes/Profile/ProfileImage/ProfileImage";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useTranslation } from 'react-i18next';
+import '../../assets/i18n/index';
 const EditProfile = () => {
   const [image, setImage] = useState(null);
   const [name, setName] = useState("Samuel Rodriguez");
   const [username, setUsername] = useState("@samueltrava.official");
   const [location, setLocation] = useState("Valencia, España");
   const [bio, setBio] = useState("Desarrollador móvil | Amante de las mujeres | LOL player");
-
+  const { t } = useTranslation();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -88,8 +89,8 @@ const EditProfile = () => {
 
       {/* Botones de acción */}
       <View style={styles.buttonsContainer}>
-        <Button title="Guardar Cambios" onPress={handleSave} />
-        <Button title="Cancelar" onPress={handleCancel} color="gray" />
+        <Button title={t("profile.save")} onPress={handleSave} />
+        <Button title={t("profile.cancel")} onPress={handleCancel} color="gray" />
       </View>
     </ScrollView>
   );

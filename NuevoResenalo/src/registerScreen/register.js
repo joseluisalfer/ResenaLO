@@ -123,17 +123,12 @@ const Register = ({ navigation }) => {
         onChangeText={setBirth}
       />
 
-<<<<<<< HEAD
+
       <Pressable style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>{t("registerScreen.register")}</Text>
-=======
-      <Pressable style={styles.button} onPress={() => {
-        // handleRegister();
-        setModalVisible(true);
-      }}>
-        <Text style={styles.buttonText}>Registrarse</Text>
->>>>>>> Verificacion
-      </Pressable>
+        {/*handleRegister()*/}
+</Pressable>
+      
     </View>
   );
 };

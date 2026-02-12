@@ -15,7 +15,7 @@ const Login = ({ navigation }) => {
       <Text style={styles.descripcion}>
         {t('loginScreen.footer')}
       </Text>
-      <PedirDatos />
+      <PedirDatos navigation={navigation} />
       <Text style={styles.titulo}>{t('loginScreen.createAccount')}</Text>
       <Text style={styles.descripcion}>
         {t('loginScreen.textAccount')}

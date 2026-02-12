@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../../../../assets/i18n/index';
-const PedirDatos = () => {
+const PedirDatos = ({navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { t } = useTranslation();
@@ -11,6 +11,7 @@ const PedirDatos = () => {
     if (email === '' || password === '') {
       alert('Datos en blanco.');
     }
+   navigation.navigate('Main')
   };
 
   return (
@@ -33,7 +34,7 @@ const PedirDatos = () => {
         />
       </View>
       <View style={styles.space}>
-        <Pressable style={styles.buttom} onPress={handleOnpress}>
+        <Pressable style={styles.buttom} onPress={() => handleOnpress()}>
           <Text style={styles.text_buttom}>{t("loginScreen.login")}</Text>
         </Pressable>
       </View>
