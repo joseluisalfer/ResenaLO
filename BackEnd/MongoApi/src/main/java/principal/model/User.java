@@ -20,7 +20,9 @@ public class User {
 	private List<String> followeds;
 	private List<String> followers;
 	private List<String> friends;
-
+	private int token;
+	private boolean verified;
+	
 	public User() {
 	}
 

@@ -161,52 +161,79 @@ public class PrincipalController {
 	}
 
 	@PostMapping("/uploadReview")
-	public ResponseEntity<Object> uploadReview(@RequestParam("title") String title,
-			@RequestParam("file") List<MultipartFile> files, @RequestParam("user") String user,
-			@RequestParam("valoration") int valoration, @RequestParam("description") String description)
-			throws IOException {
+	public ResponseEntity<Object> uploadReview(@RequestBody String body) throws IOException {
 
-		// Convertimos el archivo recibido a un array de bytes (binario)
-		List<byte[]> imageBytesList = new ArrayList<>();
-		for (MultipartFile image : files) {
-			byte[] imageBytes = image.getBytes(); // Convertir cada imagen a bytes
-			imageBytesList.add(imageBytes);
-		}
+	    // Parsear el cuerpo del JSON usando JSONObject
+	    JSONObject json = new JSONObject(body);
 
-		Review resena = new Review(title, imageBytesList, user, valoration, description);
-		// Guardamos la resna en la base de datos (MongoDB)
-		reviewRepository.save(resena);
-		return ResponseEntity.status(HttpStatus.OK).body("Resena creada de manera exitosa");
+	    String title = json.getString("title");
+	    String user = json.getString("user");
+	    String ubication = json.getString("ubication");
+	    double valoration = json.getInt("valoration");
+	    String description = json.getString("description");
+
+	    // Procesar la lista de imágenes (en base64)
+	    List<byte[]> imageBytesList = new ArrayList<>();
+	    JSONArray files = json.getJSONArray("files");
+	    for (int i = 0; i < files.length(); i++) {
+	        String base64Image = files.getString(i);
+	        byte[] imageBytes = Base64.getDecoder().decode(base64Image); // Convertir base64 a bytes
+	        imageBytesList.add(imageBytes);
+	    }
+
+	    // Crear la nueva reseña
+	    Review resena = new Review(title, imageBytesList, user, valoration, description, ubication);
+	    
+	    // Guardar la reseña en la base de datos
+	    reviewRepository.save(resena);
+
+	    return ResponseEntity.status(HttpStatus.OK).body("Reseña creada de manera exitosa");
 	}
 
 	@PostMapping("updateTitle")
-	public ResponseEntity<Object> updateTitle(@RequestParam("id") String idReview,
-			@RequestParam("newTitle") String newTitle) throws IOException {
+	public ResponseEntity<Object> updateTitle(@RequestBody String body) throws IOException {
 
-		Optional<Review> Oreview = reviewRepository.findById(idReview);
-		if (!Oreview.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+	    // Parsear el cuerpo del JSON usando JSONObject
+	    JSONObject json = new JSONObject(body);
 
-		Review review = Oreview.get();
-		review.setTitle(newTitle);
-		reviewRepository.save(review);
-		return ResponseEntity.status(HttpStatus.OK).body("Titulo actualizado de manera exitosa");
+	    String idReview = json.getString("idReview");
+	    String newTitle = json.getString("newTitle");
+
+	    // Buscar la reseña por ID
+	    Optional<Review> Oreview = reviewRepository.findById(idReview);
+	    if (!Oreview.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
+
+	    // Actualizar el título
+	    Review review = Oreview.get();
+	    review.setTitle(newTitle);
+	    reviewRepository.save(review);
+
+	    return ResponseEntity.status(HttpStatus.OK).body("Título actualizado de manera exitosa");
 	}
 
 	@PostMapping("updateComment")
-	public ResponseEntity<Object> updateComment(@RequestParam("id") String idComment,
-			@RequestParam("newText") String newText) throws IOException {
+	public ResponseEntity<Object> updateComment(@RequestBody String body) throws IOException {
 
-		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
-		if (!Ocomment.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+	    // Parsear el cuerpo del JSON usando JSONObject
+	    JSONObject json = new JSONObject(body);
 
-		Comments comment = Ocomment.get();
-		comment.setText(newText);
-		commentsRepository.save(comment);
-		return ResponseEntity.status(HttpStatus.OK).body("Comentario actualizado de manera exitosa");
+	    String idComment = json.getString("idComment");
+	    String newText = json.getString("newText");
+
+	    // Buscar el comentario por ID
+	    Optional<Comments> Ocomment = commentsRepository.findById(idComment);
+	    if (!Ocomment.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
+
+	    // Actualizar el texto del comentario
+	    Comments comment = Ocomment.get();
+	    comment.setText(newText);
+	    commentsRepository.save(comment);
+
+	    return ResponseEntity.status(HttpStatus.OK).body("Comentario actualizado de manera exitosa");
 	}
 
 	@PostMapping("/commentReview")
@@ -224,33 +251,43 @@ public class PrincipalController {
 	}
 
 	@PostMapping("deleteReview")
-	public ResponseEntity<Object> deleteReview(@RequestParam("id") String idReview) throws IOException {
-		Optional<Review> Oreview = reviewRepository.findById(idReview);
+	public ResponseEntity<Object> deleteReview(@RequestBody String body) throws IOException {
 
-		// Verificar si la reseña existe
-		if (!Oreview.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+	    // Parsear el cuerpo del JSON usando JSONObject
+	    JSONObject json = new JSONObject(body);
+	    String idReview = json.getString("idReview");
 
-		Review review = Oreview.get();
-		reviewRepository.delete(review);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	    // Verificar si la reseña existe
+	    Optional<Review> Oreview = reviewRepository.findById(idReview);
+	    if (!Oreview.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
 
+	    // Eliminar la reseña
+	    Review review = Oreview.get();
+	    reviewRepository.delete(review);
+
+	    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@PostMapping("deleteComment")
-	public ResponseEntity<Object> deleteComment(@RequestParam("id") String idComment) throws IOException {
-		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
+	public ResponseEntity<Object> deleteComment(@RequestBody String body) throws IOException {
 
-		// Verificar si la reseña existe
-		if (!Ocomment.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+	    // Parsear el cuerpo del JSON usando JSONObject
+	    JSONObject json = new JSONObject(body);
+	    String idComment = json.getString("idComment");
 
-		Comments comment = Ocomment.get();
-		commentsRepository.delete(comment);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	    // Verificar si el comentario existe
+	    Optional<Comments> Ocomment = commentsRepository.findById(idComment);
+	    if (!Ocomment.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
 
+	    // Eliminar el comentario
+	    Comments comment = Ocomment.get();
+	    commentsRepository.delete(comment);
+
+	    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@GetMapping("/user")
