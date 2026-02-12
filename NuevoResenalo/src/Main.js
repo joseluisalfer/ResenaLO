@@ -9,8 +9,7 @@ import Profile from "./editScreen/ProfileScreens";
 
 const Tab = createBottomTabNavigator();
 
-const App = () => (
-   <NavigationContainer>
+const Main = () => (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarShowLabel: false,
@@ -39,7 +38,6 @@ const App = () => (
       <Tab.Screen name="Notification" component={Notification} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
- </NavigationContainer>
 );
 
-export default App;
+export default Main;

@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import "../../../../assets/i18n/index"; // Asegúrate de que esto está en el directorio adecuado
 import { postData } from "../../../services/services"; // Asegúrate de que esta ruta sea correcta
+import Context from "../../../Context/Context"; 
 
 const PedirDatos = ({ navigation }) => {
+  const { setIsLoged } = useContext(Context); // Usamos el contexto para manejar el estado global
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { t } = useTranslation();
@@ -19,13 +21,13 @@ const PedirDatos = ({ navigation }) => {
   const handleOnPress = async () => {
     // Validar que los campos no estén vacíos
     if (email === "" || password === "") {
-      alert(t("loginScreen.emptyFields")); // Traducción de campos vacíos
+      alert(t("loginScreen.emptyFields"));
       return;
     }
 
     // Validar que el correo electrónico sea correcto
     if (!validateEmail(email)) {
-      alert(t("loginScreen.invalidEmail")); // Traducción de email no válido
+      alert(t("loginScreen.invalidEmail"));
       return;
     }
 
@@ -36,18 +38,25 @@ const PedirDatos = ({ navigation }) => {
 
     try {
       // Enviar datos al servidor con POST
-      const response = await postData("http://44.213.235.160:8080/first/login", data);
+      const response = await postData(
+        "http://44.213.235.160:8080/first/login",
+        data,
+      );
       console.log("Respuesta del servidor:", response);
 
-      // Si la respuesta es exitosa, redirigir a la pantalla principal
-      if (response.success) {
-        navigation.navigate("Main");
+      // Si la respuesta es exitosa (código 200 OK), redirigir a la pantalla principal
+      if (response.ok) {
+        // Actualiza el estado isLoged a true
+        setIsLoged(true);
+
+        // Navegar a la pantalla principal
+        navigation.navigate("Main"); // Cambiar de pantalla
       } else {
-        alert(t("loginScreen.loginFailed")); // Traducción si el login falla
+        alert(t("Error"));
       }
     } catch (error) {
       console.error("Error al enviar los datos:", error);
-      alert(t("loginScreen.loginError")); // Traducción para error de login
+      alert(t("loginScreen.loginError"));
     }
   };
 
