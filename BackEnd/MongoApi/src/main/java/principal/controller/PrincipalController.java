@@ -102,30 +102,30 @@ public class PrincipalController {
 
 			if (dbUser == null) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-						.body("Credenciales incorrectas o usuario no registrado");
+						.body("{\"error\": \"Credenciales incorrectas o usuario no registrado\"}");
 			}
 
 			// Comparar la contraseña proporcionada con el hash almacenado
 			boolean ok = BCrypt.checkpw(password, dbUser.getPassword());
 
 			if (!ok) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Credenciales incorrectas\"}");
 			}
 
 			// Comprobar si el usuario ya está logeado
 			if (dbUser.isLogged()) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"error\": \"El usuario ya está logueado\"}");
 			}
 
 			// Marcar al usuario como logeado
 			dbUser.setLogged(true);
 			userRepository.save(dbUser);
 
-			return ResponseEntity.status(HttpStatus.OK).build();
+			return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"Bienvenido " + dbUser.getUser() + "\"}");
 
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.build();
+					.body("{\"error\": \"Error en el servidor: " + e.getMessage() + "\"}");
 		}
 	}
 
