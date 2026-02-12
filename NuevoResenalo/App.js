@@ -7,6 +7,6 @@ import Language from "./src/Componentes/language/language";
 import Main from './src/Main'
 const Stack = createStackNavigator();
 const App = () => (
-  <Main/>
+  <Main />
 );
 export default App;
