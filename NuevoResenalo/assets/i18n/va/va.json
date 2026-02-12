@@ -16,13 +16,11 @@
         "date": "Data de naixement (DD/MM/AAAA)",
         "register": "Registrar"
     },
-    
     "home": {
         "places_week": "Llocs de la setmana",
         "buttonFriend": "Amics",
         "buttonExplorer": "Explorar"
     },
-    
     "publishScreen": {
         "new_place": "Afegir nou lloc",
         "name": "NOM",
@@ -35,7 +33,6 @@
         "new_description": "Descriu el lloc",
         "buttonAdd": "Afegir al mapa"
     },
-   
     "buttonAdd": {
         "add": "Afegir imatge",
         "option": "Tria una opció",
@@ -43,9 +40,21 @@
         "camera": "CÀMERA",
         "cancel": "CANCEL·LAR"
     },
-    
     "profile": {
         "buttonEdit": "Editar perfil",
-        "post": "Publicacions"
+        "post": "Publicacions",
+        "logout": "Tancar sessió",
+        "change_lang": "Canviar idioma",
+        "change_theme": "Canviar Tema",
+        "cancel": "Cancel·lar",
+        "comments": "Comentaris",
+        "friends": "Amics",
+        "save": "Guardar cavis",
+         "title": "Seleccionar idioma"
+    },
+    "language": {
+        "sp": "Espanyol",
+        "en": "Anglés",
+        "ca": "Valencià"
     }
 }

@@ -28,8 +28,8 @@ const Profile = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("Español");
   const [isLanguageChanged, setIsLanguageChanged] = useState(false);
   const navigation = useNavigation();  // Usar el hook para navegación
-   const { t } = useTranslation();
-   
+  const { t } = useTranslation();
+
 
   const renderPost = ({ item }) => (
     <Card style={styles.postCard}>
@@ -91,22 +91,22 @@ const Profile = () => {
                   <>
                     {/* Opciones generales como Cambiar Tema, Log Out */}
                     <Button onPress={handleLogOut} mode="outlined" style={styles.modalButton}>
-                      Log Out
+                      <Text>{t("profile.logout")}</Text>
                     </Button>
                     <Button onPress={handleChangeToLanguageSelection} mode="outlined" style={styles.modalButton}>
-                      Cambiar Idioma
+                      <Text>{t("profile.change_lang")}</Text>
                     </Button>
                     <Button mode="outlined" style={styles.modalButton}>
-                      Cambiar Tema
+                      <Text>{t("profile.change_theme")}</Text>
                     </Button>
                     <Button onPress={() => setModalVisible(false)} mode="outlined" style={styles.modalButton}>
-                      Cancelar
+                      <Text>{t("profile.cancel")}</Text>
                     </Button>
                   </>
                 ) : (
                   <>
                     {/* Solo mostrar idiomas y guardar */}
-                    <Text style={styles.modalTitle}>Seleccionar Idioma</Text>
+                    <Text style={styles.modalTitle}>{t("profile.title")} </Text>
                     <Pressable
                       onPress={() => handleChangeLanguage("Español")}
                       style={[
@@ -114,7 +114,7 @@ const Profile = () => {
                         selectedLanguage === "Español" && styles.selectedLanguage
                       ]}
                     >
-                      <Text>Español</Text>
+                      <Text>{t("language.sp")}</Text>
                     </Pressable>
                     <Pressable
                       onPress={() => handleChangeLanguage("Valenciano")}
@@ -123,7 +123,7 @@ const Profile = () => {
                         selectedLanguage === "Valenciano" && styles.selectedLanguage
                       ]}
                     >
-                      <Text>Valenciano</Text>
+                      <Text>{t("language.ca")}</Text>
                     </Pressable>
                     <Pressable
                       onPress={() => handleChangeLanguage("English")}
@@ -132,15 +132,15 @@ const Profile = () => {
                         selectedLanguage === "English" && styles.selectedLanguage
                       ]}
                     >
-                      <Text>English</Text>
+                      <Text>{t("language.en")}</Text>
                     </Pressable>
 
                     {isLanguageChanged && (
-                      <Button onPress={handleSaveLanguage}> <Text style={{ color: 'black' }} >Guardar cambios</Text> </Button>
+                      <Button onPress={handleSaveLanguage}> <Text style={{ color: 'black' }} >{t("profile.save")}</Text> </Button>
                     )}
 
                     <Pressable onPress={handleCancelLanguageChange}>
-                      <Text style={styles.cancelButton}>Cancelar</Text>
+                      <Text style={styles.cancelButton}>{t("profile.cancel")}</Text>
                     </Pressable>
                   </>
                 )}
@@ -185,15 +185,15 @@ const Profile = () => {
             <Card.Content style={styles.statsContainer}>
               <View style={styles.statItem}>
                 <Text variant="titleMedium">24</Text>
-                <Text variant="bodySmall">Posts</Text>
+                <Text variant="bodySmall">{t("profile.post")}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text variant="titleMedium">100</Text>
-                <Text variant="bodySmall">Comentarios</Text>
+                <Text variant="bodySmall">{t("profile.comments")}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text variant="titleMedium">30</Text>
-                <Text variant="bodySmall">Amigos</Text>
+                <Text variant="bodySmall">{t("profile.friends")}</Text>
               </View>
             </Card.Content>
           </Card>
