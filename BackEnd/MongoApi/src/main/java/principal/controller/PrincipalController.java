@@ -109,23 +109,23 @@ public class PrincipalController {
 			boolean ok = BCrypt.checkpw(password, dbUser.getPassword());
 
 			if (!ok) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 
 			// Comprobar si el usuario ya está logeado
 			if (dbUser.isLogged()) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya está logeado");
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			}
 
 			// Marcar al usuario como logeado
 			dbUser.setLogged(true);
 			userRepository.save(dbUser);
 
-			return ResponseEntity.status(HttpStatus.OK).body("Bienvenido " + dbUser.getUser());
+			return ResponseEntity.status(HttpStatus.OK).build();
 
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Error en el servidor: " + e.getMessage());
+					.build();
 		}
 	}
 
