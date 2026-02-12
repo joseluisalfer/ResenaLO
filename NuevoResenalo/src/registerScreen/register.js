@@ -17,12 +17,12 @@ const Register = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [birth, setBirth] = useState('');
-<<<<<<< HEAD
+
   const { t } = useTranslation();
-=======
+
   const [verificationCode, setVerificationCode] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
->>>>>>> Verificacion
+
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
