@@ -6,7 +6,13 @@ import Register from './src/registerScreen/register'
 import Main from './src/Main';
 const Stack = createStackNavigator();
 const App = () => (
-  <Main />
+  <NavigationContainer>
+    <Stack.Navigator options="false">
+      <Stack.Screen options={{headerShown: false}} name="Login" component={Login} />
+      <Stack.Screen name="Register" component={Register} />
+      <Stack.Screen name="Main" component={Main} />
+    </Stack.Navigator>
+  </NavigationContainer>
 );
 export default App;
 

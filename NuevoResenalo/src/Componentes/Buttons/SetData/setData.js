@@ -1,17 +1,41 @@
-import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import '../../../../assets/i18n/index';
-const PedirDatos = ({navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import "../../../../assets/i18n/index"; // Esto se asume que está en el directorio adecuado
+import { postData } from "../../../services/services"; // Asegúrate de que esta ruta sea correcta
+
+const PedirDatos = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { t } = useTranslation();
 
-  const handleOnpress = () => {
-    if (email === '' || password === '') {
-      alert('Datos en blanco.');
+  const handleOnPress = async () => {
+    // Validar que los campos no estén vacíos
+    if (email === "" || password === "") {
+      alert(t("loginScreen.emptyFields")); // Traducción de campos vacíos
+      return;
     }
-   navigation.navigate('Main')
+
+    const data = {
+      email: email,
+      password: password,
+    };
+
+    try {
+      // Enviar datos al servidor con POST
+      const response = await postData("https://api.ejemplo.com/login", data);
+      console.log("Respuesta del servidor:", response);
+
+      // Si la respuesta es exitosa, redirigir a la pantalla principal
+      if (response.success) {
+        navigation.navigate("Main");
+      } else {
+        alert(t("loginScreen.loginFailed")); // Traducción si el login falla
+      }
+    } catch (error) {
+      console.error("Error al enviar los datos:", error);
+      alert(t("loginScreen.loginError")); // Traducción para error de login
+    }
   };
 
   return (
@@ -19,7 +43,7 @@ const PedirDatos = ({navigation }) => {
       <View style={styles.space}>
         <TextInput
           style={styles.inputs}
-          placeholder="email@email.com"
+          placeholder={t("email@gmail.com")}
           onChangeText={(newText) => setEmail(newText)}
           value={email}
         />
@@ -27,26 +51,27 @@ const PedirDatos = ({navigation }) => {
       <View style={styles.space}>
         <TextInput
           style={styles.inputs}
-          placeholder="password"
+          placeholder={"password"}
           onChangeText={(newText) => setPassword(newText)}
           secureTextEntry={true}
           value={password}
         />
       </View>
       <View style={styles.space}>
-        <Pressable style={styles.buttom} onPress={() => handleOnpress()}>
+        <Pressable style={styles.buttom} onPress={handleOnPress}>
           <Text style={styles.text_buttom}>{t("loginScreen.login")}</Text>
         </Pressable>
       </View>
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          width: '80%',
-        }}>
-        <View style={{ flex: 1, height: 1, backgroundColor: 'black' }} />
+          flexDirection: "row",
+          alignItems: "center",
+          width: "80%",
+        }}
+      >
+        <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
         <Text style={{ marginHorizontal: 8 }}>o</Text>
-        <View style={{ flex: 1, height: 1, backgroundColor: 'black' }} />
+        <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
       </View>
     </View>
   );
@@ -54,8 +79,8 @@ const PedirDatos = ({navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 20,
   },
   inputs: {
@@ -64,25 +89,25 @@ const styles = StyleSheet.create({
     height: 50,
     width: 300,
     padding: 15,
-    borderColor: '#D1D1D1',
+    borderColor: "#D1D1D1",
     fontSize: 15,
   },
   space: {
     marginBottom: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttom: {
-    backgroundColor: 'black',
-    justifyContent: 'center',
+    backgroundColor: "black",
+    justifyContent: "center",
     padding: 15,
     height: 50,
     width: 300,
     borderRadius: 10,
   },
   text_buttom: {
-    color: 'white',
-    textAlign: 'center',
+    color: "white",
+    textAlign: "center",
     fontSize: 15,
   },
 });
