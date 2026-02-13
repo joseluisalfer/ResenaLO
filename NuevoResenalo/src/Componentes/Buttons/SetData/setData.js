@@ -3,7 +3,7 @@ import { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import "../../../../assets/i18n/index"; // Asegúrate de que esto está en el directorio adecuado
 import { postData } from "../../../services/services"; // Asegúrate de que esta ruta sea correcta
-import Context from "../../../Context/Context"; 
+import Context from "../../../Context/Context";
 
 const PedirDatos = ({ navigation }) => {
   const { setIsLoged } = useContext(Context); // Usamos el contexto para manejar el estado global
@@ -42,15 +42,15 @@ const PedirDatos = ({ navigation }) => {
         "http://44.213.235.160:8080/first/login",
         data,
       );
-      console.log("Respuesta del servidor:", response);
+      // Verificar si el campo 'message' contiene la palabra "Bienvenido"
+      if (
+        response &&
+        response.message &&
+        response.message.includes("Bienvenido")
+      ) {
+        // Si la respuesta contiene "Bienvenido", proceder con el inicio de sesión
+        setIsLoged(true); // Actualiza el estado isLoged a true
 
-      // Si la respuesta es exitosa (código 200 OK), redirigir a la pantalla principal
-      if (response.ok) {
-        // Actualiza el estado isLoged a true
-        setIsLoged(true);
-
-        // Navegar a la pantalla principal
-        navigation.navigate("Main"); // Cambiar de pantalla
       } else {
         alert(t("Error"));
       }

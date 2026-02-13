@@ -14,7 +14,6 @@ export const getData = async (url) => {
   }
 };
 
-// Función para hacer una petición POST
 export const postData = async (url, data) => {
   try {
     const response = await fetch(url, {
@@ -25,11 +24,31 @@ export const postData = async (url, data) => {
       body: JSON.stringify(data), // Convertimos el objeto en JSON
     });
 
+    // Verificar si la respuesta es exitosa
     if (response.ok) {
-      const result = await response.json();
-      return result;
+      const textResponse = await response.text(); // Leer como texto
+
+      console.log('Respuesta del servidor:', textResponse); // Imprimir lo que devuelve el servidor
+
+      // Si la respuesta no está vacía, intentamos convertirla en JSON
+      if (textResponse) {
+        try {
+          const result = JSON.parse(textResponse); // Intentamos convertir el texto en JSON
+          return result; // Devolvemos el resultado JSON
+        } catch (jsonError) {
+          console.log('Error al analizar JSON:', jsonError);
+          console.log('Respuesta no es JSON válido:', textResponse);
+          throw new Error('La respuesta no es un JSON válido');
+        }
+      } else {
+        console.log('Respuesta vacía del servidor');
+        throw new Error('Respuesta vacía del servidor');
+      }
     } else {
-      throw new Error('Error al enviar los datos');
+      // Si la respuesta no es exitosa, leer el cuerpo del error como texto
+      const errorText = await response.text();
+      console.log('Error en la solicitud:', errorText); // Depuración
+      throw new Error(`Error en la solicitud: ${errorText}`);
     }
   } catch (error) {
     console.log('Error en POST:', error);

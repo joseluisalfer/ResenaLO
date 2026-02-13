@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import Context from './Context/Context'; // Asegúrate de importar Context correctamente
 import Login from './loginScreen/login';
 import Register from './registerScreen/register';
@@ -11,6 +11,9 @@ const Stack = createStackNavigator();
 const App = () => {
   const { isLoged } = useContext(Context); // Usar el estado global del contexto
 
+  useEffect(() => {
+
+  }, [isLoged])
   return (
       <NavigationContainer>
         <Stack.Navigator>
