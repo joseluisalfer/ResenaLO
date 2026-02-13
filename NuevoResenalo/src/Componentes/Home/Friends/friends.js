@@ -36,7 +36,7 @@ const Friends = ({ navigation, friends }) => {
               styles.item,
               index !== friends.length - 1 && styles.itemGap,
             ]}
-            onPress={() => navigation.navigate("Friend", { friendId: item.id })}
+            onPress={() => navigation.navigate("FriendScreens", { friendId: item.id })}
           >
             <Image
               source={require("../../../../assets/images/Konoha.png")}
