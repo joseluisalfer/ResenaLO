@@ -3,7 +3,8 @@ import { View, StyleSheet, FlatList, Text, Image } from "react-native";
 import { Button, Card, Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-
+import { useTranslation } from 'react-i18next'
+import '../../assets/i18n/index';
 const mockPosts = [
   {
     id: "1",
@@ -24,6 +25,8 @@ const mockPosts = [
 
 const FriendProfile = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
+
 
   const renderPost = ({ item }) => (
     <Card style={styles.postCard}>
@@ -75,15 +78,15 @@ const FriendProfile = () => {
             <Card.Content style={styles.statsContainer}>
               <View style={styles.statItem}>
                 <Text variant="titleMedium">24</Text>
-                <Text variant="bodySmall">Posts</Text>
+                <Text variant="bodySmall">{t("profile.post")}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text variant="titleMedium">100</Text>
-                <Text variant="bodySmall">Comentarios</Text>
+                <Text variant="bodySmall">{t("profile.comments")}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text variant="titleMedium">180</Text>
-                <Text variant="bodySmall">Amigos</Text>
+                <Text variant="bodySmall">{t("profile.friends")}</Text>
               </View>
             </Card.Content>
           </Card>
@@ -91,7 +94,7 @@ const FriendProfile = () => {
           <Divider style={styles.divider} />
 
           <Text variant="titleLarge" style={{ marginBottom: 8 }}>
-            Publicaciones
+            {t("profile.post")}
           </Text>
         </View>
       }

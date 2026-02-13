@@ -56,5 +56,27 @@
         "sp": "Español",
         "en": "Ingles",
         "ca": "Valenciano"
+    },
+
+    "placeScreen": {
+        "podium": "Top  10 lugares mas valorados",
+        "anotherText": "Otros lugares"
+    },
+
+    "friends": {
+        "list": "Lista de Amigos",
+        "friends": "Amigos"
+    },
+
+    "buttonExplorer":{
+        "list": "Lista de sitios"
+    },
+
+    "modalReview":{
+        "location": "Ubicación:",
+        "calification": "Calicación",
+        "images": "Imagenes"
     }
+
+    
 }

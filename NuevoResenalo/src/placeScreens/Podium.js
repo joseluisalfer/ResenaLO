@@ -3,6 +3,9 @@ import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native
 import { useNavigation } from "@react-navigation/native";
 import { Card } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from 'react-i18next'
+import '../../assets/i18n/index';
+
 
 const mockPodium = [
   { id: "1", name: "Sevilla", rating: "4.8/5" },
@@ -19,7 +22,8 @@ const mockPodium = [
 
 const Podium = () => {
   const navigation = useNavigation();
-
+  const { t } = useTranslation();
+ 
   const renderPodiumItem = ({ item, index }) => {
     const podiumStyles = [styles.podiumItem];
     if (index === 0) {
@@ -69,16 +73,16 @@ const Podium = () => {
 
   return (
     <View style={styles.container}>
-          <Ionicons 
-            name="arrow-back" 
-            marginTop= "5%"
-            size={30} 
-            color="black" 
-            style={styles.backButton} 
-            onPress={() => navigation.goBack()} 
-          />
+      <Ionicons
+        name="arrow-back"
+        marginTop="5%"
+        size={30}
+        color="black"
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      />
 
-      <Text style={styles.title}>Top 10 Lugares Más Valorados</Text>
+      <Text style={styles.title}>{t("placeScreen.podium")}</Text>
 
       <View style={styles.podium}>
         <View style={styles.podiumRow}>
@@ -94,7 +98,7 @@ const Podium = () => {
         </View>
       </View>
 
-      <Text style={styles.subTitle}>Otros Lugares</Text>
+      <Text style={styles.subTitle}>{t("placeScreen.anotherText")}</Text>
 
       <FlatList
         data={mockPodium.slice(3)}
