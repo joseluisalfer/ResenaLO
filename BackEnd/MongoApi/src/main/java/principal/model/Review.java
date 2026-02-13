@@ -13,6 +13,9 @@ public class Review {
 	private String id;
 	private String title;
 	private String ubication;
+	private String type;
+	private double latitud;
+	private double longitud;
 	private List<byte[]> images;
 	private String user;
 	private double valoration;
@@ -22,13 +25,16 @@ public class Review {
 	public Review() {
 	}
 
-	public Review(String title, List<byte[]> images, String user, double valoration, String description, String ubication) {
+	public Review(String title, List<byte[]> images, String user, double valoration, String description, String ubication, String type, double latitud, double longitud) {
 		super();
 		this.title = title;
 		this.images = images;
 		this.user = user;
 		this.valoration = valoration;
 		this.description = description;
+		this.type = type;
+		this.latitud = latitud;
+		this.longitud = longitud;
 	}
 
 	public String getId() {
@@ -93,6 +99,30 @@ public class Review {
 
 	public void setUbication(String ubication) {
 		this.ubication = ubication;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public double getLatitud() {
+		return latitud;
+	}
+
+	public void setLatitud(double latitud) {
+		this.latitud = latitud;
+	}
+
+	public double getLongitud() {
+		return longitud;
+	}
+
+	public void setLongitud(double longitud) {
+		this.longitud = longitud;
 	}
 
 }

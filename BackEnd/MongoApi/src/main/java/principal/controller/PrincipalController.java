@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -28,8 +29,10 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,56 +65,56 @@ public class PrincipalController {
 		int cost = 12;
 		return BCrypt.hashpw(plainPassword, BCrypt.gensalt(cost));
 	}
-	//Funcion del email
+
+	// Funcion del email
 	public static void envioMail(String mensaje, String asunto, String email_remitente, String email_remitente_pass,
-			String host_email, String port_email, String[] emails_destino, String[] anexos) throws MessagingException,
-			IOException {
-			 Properties props = System.getProperties();
-			 props.put("mail.smtp.host", host_email);
-			 props.put("mail.smtp.auth", "true");
-			 props.put("mail.smtp.starttls.enable", "true");
-			 props.put("mail.smtp.port", port_email);
-			 Session session = Session.getDefaultInstance(props);
+			String host_email, String port_email, String[] emails_destino, String[] anexos)
+			throws MessagingException, IOException {
+		Properties props = System.getProperties();
+		props.put("mail.smtp.host", host_email);
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.port", port_email);
+		Session session = Session.getDefaultInstance(props);
 
-			 MimeMessage message = new MimeMessage(session);
-			 message.setFrom(new InternetAddress(email_remitente));
-			 for (String dest : emails_destino) {
+		MimeMessage message = new MimeMessage(session);
+		message.setFrom(new InternetAddress(email_remitente));
+		for (String dest : emails_destino) {
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
-			 }
-			 message.setSubject(asunto, "UTF-8");
+		}
+		message.setSubject(asunto, "UTF-8");
 
-			 //Cuerpo del mensaje
-			 MimeBodyPart textPart = new MimeBodyPart();
-			 textPart.setText(mensaje, "UTF-8");
-			 Multipart multipart = new MimeMultipart();
-			 multipart.addBodyPart(textPart);
+		// Cuerpo del mensaje
+		MimeBodyPart textPart = new MimeBodyPart();
+		textPart.setText(mensaje, "UTF-8");
+		Multipart multipart = new MimeMultipart();
+		multipart.addBodyPart(textPart);
 
-			 if (anexos != null) {
-			 for (String filePath : anexos) {
-			 MimeBodyPart attachmentPart = new MimeBodyPart();
-			 attachmentPart.attachFile(filePath);
-			 multipart.addBodyPart(attachmentPart);
-			 }
-			 }
-
-			 message.setContent(multipart);
-
-			 Transport transport = session.getTransport("smtp");
-			 transport.connect(host_email, email_remitente, email_remitente_pass);
-			 transport.sendMessage(message, message.getAllRecipients());
-			 transport.close();
+		if (anexos != null) {
+			for (String filePath : anexos) {
+				MimeBodyPart attachmentPart = new MimeBodyPart();
+				attachmentPart.attachFile(filePath);
+				multipart.addBodyPart(attachmentPart);
 			}
+		}
+
+		message.setContent(multipart);
+
+		Transport transport = session.getTransport("smtp");
+		transport.connect(host_email, email_remitente, email_remitente_pass);
+		transport.sendMessage(message, message.getAllRecipients());
+		transport.close();
+	}
 
 	@PostMapping("/register")
-	public ResponseEntity<Object> register(@RequestBody String body ) throws IOException, MessagingException {
+	public ResponseEntity<Object> register(@RequestBody String body) throws IOException, MessagingException {
 
 		JSONObject json = new JSONObject(body);
 		String email = json.getString("email");
 		String user = json.getString("user");
 		String password = json.getString("password");
-		String[] emails=  new String[1];
-		emails[0] = email;
-		String[] anexos = new String[1];
+		String[] emails = { email };
+		String[] anexos = {};
 		// Email ya registrado
 		if (userRepository.existsByEmail(email)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT) // 409
@@ -126,10 +129,9 @@ public class PrincipalController {
 		// Encriptar contraseña
 		String pass = hashPassword(password);
 
-		Random rnd = new Random();
-		int token = rnd.nextInt(100000,999999);
-		String message = ("Este es tu codigo de verificacion: "+token);
-		envioMail(message,"Verificacion de correo","resenalo.company@gmail.com","All_Roads_Lead_To_Indra_67","smtp.office365.com", "587", emails,anexos);
+//		int token = ThreadLocalRandom.current().nextInt(100000, 999999);
+//		String message = ("Este es tu codigo de verificacion: "+token);
+//		envioMail(message,"Verificacion de correo","resenalo.company@gmail.com","All_Roads_Lead_To_Indra_67", "smtp.gmail.com", "587", emails,anexos);
 		// Crear el objeto de usuario
 		User newUser = new User();
 		newUser.setUser(user);
@@ -137,8 +139,8 @@ public class PrincipalController {
 		newUser.setPassword(pass);
 		newUser.setVerified(false);
 		newUser.setDate(new Date());
-		newUser.setToken(token);
-		
+		// newUser.setToken(token);
+
 		String imagePath = "src/main/resources/foto_default.png";
 		byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
 		newUser.setImage(imageBytes);
@@ -212,106 +214,104 @@ public class PrincipalController {
 					.body("Error en el servidor: " + e.getMessage());
 		}
 	}
-	
+
 	@PostMapping("verifyEmail")
 	public ResponseEntity<Object> verifyEMail(@RequestBody String body) {
 		JSONObject json = new JSONObject(body);
 		int token = json.getInt("token");
 		String email = json.getString("email");
 		User user = userRepository.findByEmail(email);
-		
-		if(user == null) {
+
+		if (user == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body("Credenciales incorrectas o usuario no registrado");
-		} 
-		
-		if(user.getToken() != token) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("Token no valido"); 
-		}else {
+		}
+
+		if (user.getToken() != token) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token no valido");
+		} else {
 			user.setVerified(true);
 			userRepository.save(user);
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
-		
-		
-		
+
 	}
 
 	@PostMapping("/uploadReview")
 	public ResponseEntity<Object> uploadReview(@RequestBody String body) throws IOException {
 
-	    // Parsear el cuerpo del JSON usando JSONObject
-	    JSONObject json = new JSONObject(body);
+		// Parsear el cuerpo del JSON usando JSONObject
+		JSONObject json = new JSONObject(body);
 
-	    String title = json.getString("title");
-	    String user = json.getString("user");
-	    String ubication = json.getString("ubication");
-	    double valoration = json.getInt("valoration");
-	    String description = json.getString("description");
+		String title = json.getString("title");
+		String user = json.getString("user");
+		String ubication = json.getString("ubication");
+		double valoration = json.getInt("valoration");
+		String description = json.getString("description");
+		String type = json.getString("type");
+		double latitud = json.getDouble("latitud");
+		double longitud = json.getDouble("longitud");
+		// Procesar la lista de imágenes (en base64)
+		List<byte[]> imageBytesList = new ArrayList<>();
+		JSONArray files = json.getJSONArray("files");
+		for (int i = 0; i < files.length(); i++) {
+			String base64Image = files.getString(i);
+			byte[] imageBytes = Base64.getDecoder().decode(base64Image); // Convertir base64 a bytes
+			imageBytesList.add(imageBytes);
+		}
 
-	    // Procesar la lista de imágenes (en base64)
-	    List<byte[]> imageBytesList = new ArrayList<>();
-	    JSONArray files = json.getJSONArray("files");
-	    for (int i = 0; i < files.length(); i++) {
-	        String base64Image = files.getString(i);
-	        byte[] imageBytes = Base64.getDecoder().decode(base64Image); // Convertir base64 a bytes
-	        imageBytesList.add(imageBytes);
-	    }
+		// Crear la nueva reseña
+		Review resena = new Review(title, imageBytesList, user, valoration, description, ubication, type, latitud,
+				longitud);
 
-	    // Crear la nueva reseña
-	    Review resena = new Review(title, imageBytesList, user, valoration, description, ubication);
-	    
-	    // Guardar la reseña en la base de datos
-	    reviewRepository.save(resena);
+		// Guardar la reseña en la base de datos
+		reviewRepository.save(resena);
 
-	    return ResponseEntity.status(HttpStatus.OK).body("Reseña creada de manera exitosa");
+		return ResponseEntity.status(HttpStatus.OK).body("Reseña creada de manera exitosa");
 	}
 
-	@PostMapping("updateTitle")
+	@PutMapping("updateTitle")
 	public ResponseEntity<Object> updateTitle(@RequestBody String body) throws IOException {
+		// Parsear el cuerpo del JSON usando JSONObject
+		JSONObject json = new JSONObject(body);
 
-	    // Parsear el cuerpo del JSON usando JSONObject
-	    JSONObject json = new JSONObject(body);
+		String idReview = json.getString("idReview");
+		String newTitle = json.getString("newTitle");
 
-	    String idReview = json.getString("idReview");
-	    String newTitle = json.getString("newTitle");
+		// Buscar la reseña por ID
+		Optional<Review> Oreview = reviewRepository.findById(idReview);
+		if (!Oreview.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 
-	    // Buscar la reseña por ID
-	    Optional<Review> Oreview = reviewRepository.findById(idReview);
-	    if (!Oreview.isPresent()) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	    }
+		// Actualizar el título
+		Review review = Oreview.get();
+		review.setTitle(newTitle);
+		reviewRepository.save(review);
 
-	    // Actualizar el título
-	    Review review = Oreview.get();
-	    review.setTitle(newTitle);
-	    reviewRepository.save(review);
-
-	    return ResponseEntity.status(HttpStatus.OK).body("Título actualizado de manera exitosa");
+		return ResponseEntity.status(HttpStatus.OK).body("Título actualizado de manera exitosa");
 	}
 
-	@PostMapping("updateComment")
+	@PutMapping("updateComment")
 	public ResponseEntity<Object> updateComment(@RequestBody String body) throws IOException {
+		// Parsear el cuerpo del JSON usando JSONObject
+		JSONObject json = new JSONObject(body);
 
-	    // Parsear el cuerpo del JSON usando JSONObject
-	    JSONObject json = new JSONObject(body);
+		String idComment = json.getString("idComment");
+		String newText = json.getString("newText");
 
-	    String idComment = json.getString("idComment");
-	    String newText = json.getString("newText");
+		// Buscar el comentario por ID
+		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
+		if (!Ocomment.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 
-	    // Buscar el comentario por ID
-	    Optional<Comments> Ocomment = commentsRepository.findById(idComment);
-	    if (!Ocomment.isPresent()) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	    }
+		// Actualizar el texto del comentario
+		Comments comment = Ocomment.get();
+		comment.setText(newText);
+		commentsRepository.save(comment);
 
-	    // Actualizar el texto del comentario
-	    Comments comment = Ocomment.get();
-	    comment.setText(newText);
-	    commentsRepository.save(comment);
-
-	    return ResponseEntity.status(HttpStatus.OK).body("Comentario actualizado de manera exitosa");
+		return ResponseEntity.status(HttpStatus.OK).body("Comentario actualizado de manera exitosa");
 	}
 
 	@PostMapping("/commentReview")
@@ -328,44 +328,42 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body("Comentario creado de manera exitosa");
 	}
 
-	@PostMapping("deleteReview")
+	@DeleteMapping("deleteReview")
 	public ResponseEntity<Object> deleteReview(@RequestBody String body) throws IOException {
+		// Parsear el cuerpo del JSON usando JSONObject
+		JSONObject json = new JSONObject(body);
+		String idReview = json.getString("idReview");
 
-	    // Parsear el cuerpo del JSON usando JSONObject
-	    JSONObject json = new JSONObject(body);
-	    String idReview = json.getString("idReview");
+		// Verificar si la reseña existe
+		Optional<Review> Oreview = reviewRepository.findById(idReview);
+		if (!Oreview.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Devuelve 404 si no existe la reseña
+		}
 
-	    // Verificar si la reseña existe
-	    Optional<Review> Oreview = reviewRepository.findById(idReview);
-	    if (!Oreview.isPresent()) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	    }
+		// Eliminar la reseña
+		Review review = Oreview.get();
+		reviewRepository.delete(review);
 
-	    // Eliminar la reseña
-	    Review review = Oreview.get();
-	    reviewRepository.delete(review);
-
-	    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Devuelve 204 si se elimina correctamente
 	}
 
-	@PostMapping("deleteComment")
+	@DeleteMapping("deleteComment")
 	public ResponseEntity<Object> deleteComment(@RequestBody String body) throws IOException {
+		// Parsear el cuerpo del JSON usando JSONObject
+		JSONObject json = new JSONObject(body);
+		String idComment = json.getString("idComment");
 
-	    // Parsear el cuerpo del JSON usando JSONObject
-	    JSONObject json = new JSONObject(body);
-	    String idComment = json.getString("idComment");
+		// Verificar si el comentario existe
+		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
+		if (!Ocomment.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Devuelve 404 si no existe el comentario
+		}
 
-	    // Verificar si el comentario existe
-	    Optional<Comments> Ocomment = commentsRepository.findById(idComment);
-	    if (!Ocomment.isPresent()) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	    }
+		// Eliminar el comentario
+		Comments comment = Ocomment.get();
+		commentsRepository.delete(comment);
 
-	    // Eliminar el comentario
-	    Comments comment = Ocomment.get();
-	    commentsRepository.delete(comment);
-
-	    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Devuelve 204 si se elimina correctamente
 	}
 
 	@GetMapping("/user")
@@ -444,7 +442,9 @@ public class PrincipalController {
 		jsonP.put("user", review.getUser());
 		jsonP.put("valoration", review.getValoration());
 		jsonP.put("description", review.getDescription());
-
+		jsonP.put("latitud", review.getLatitud());
+		jsonP.put("longitud", review.getLongitud());
+		jsonP.put("type", review.getType());
 		// Verificar si hay imágenes
 		List<byte[]> images = review.getImages();
 		if (images != null && !images.isEmpty()) {
@@ -466,6 +466,58 @@ public class PrincipalController {
 
 		// Retornar la respuesta con la reseña en formato JSON
 		return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
+	}
+
+	@GetMapping("/reviewPlace")
+	public ResponseEntity<String> reviewPlace(@RequestParam(value = "ubication") String ubication) {
+		// Obtener las reseñas por ubicación
+		List<Review> listReviews = reviewRepository.findByUbication(ubication);
+
+		// Crear el objeto JSON para la respuesta
+		JSONObject jsonResponse = new JSONObject();
+		JSONArray jsonReviewsArray = new JSONArray();
+
+		// Iterar sobre las reseñas encontradas
+		for (Review review : listReviews) {
+			JSONObject jsonReview = new JSONObject();
+
+			// Agregar información básica de la reseña
+			jsonReview.put("id", review.getId());
+			jsonReview.put("title", review.getTitle());
+			jsonReview.put("user", review.getUser());
+			jsonReview.put("valoration", review.getValoration());
+			jsonReview.put("description", review.getDescription());
+			jsonReview.put("latitud", review.getLatitud());
+			jsonReview.put("longitud", review.getLongitud());
+			jsonReview.put("type", review.getType());
+
+			// Verificar si hay imágenes
+			List<byte[]> images = review.getImages();
+			if (images != null && !images.isEmpty()) {
+				// Convertir las imágenes a Base64
+				JSONArray jsonImagesArray = new JSONArray();
+				for (byte[] image : images) {
+					if (image != null) {
+						String encodedImage = Base64.getEncoder().encodeToString(image);
+						jsonImagesArray.put(encodedImage); // Agregar imagen codificada a la respuesta
+					}
+				}
+				jsonReview.put("images", jsonImagesArray);
+				jsonReview.put("mimeType", "image/jpeg");
+			} else {
+				// Si no hay imágenes, agregar un campo vacío o null
+				jsonReview.put("images", "No images available");
+			}
+
+			// Agregar la reseña al arreglo de reseñas
+			jsonReviewsArray.put(jsonReview);
+		}
+
+		// Agregar el arreglo de reseñas a la respuesta JSON
+		jsonResponse.put("reviews", jsonReviewsArray);
+
+		// Retornar la respuesta con las reseñas en formato JSON
+		return ResponseEntity.status(HttpStatus.OK).body(jsonResponse.toString());
 	}
 
 	@GetMapping("/users")
@@ -553,7 +605,9 @@ public class PrincipalController {
 			reviewJson.put("title", review.getTitle());
 			reviewJson.put("description", review.getDescription());
 			reviewJson.put("valoration", review.getValoration());
-
+			reviewJson.put("latitud", review.getLatitud());
+			reviewJson.put("longitud", review.getLongitud());
+			reviewJson.put("type", review.getType());
 			// Obtener el usuario asociado a la reseña usando el userId de la reseña
 			String userId = review.getUser();
 			User user = userRepository.findByUser(userId); // Asegúrate de que `getUser()` retorne el identificador
