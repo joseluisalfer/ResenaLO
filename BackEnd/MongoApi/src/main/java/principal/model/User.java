@@ -12,6 +12,7 @@ public class User {
 	@Id
 	private String id;
 	private String user;
+	private String name;
 	private String password;
 	private String email;
 	private byte[] image;
@@ -111,6 +112,14 @@ public class User {
 
 	public void setVerified(boolean verified) {
 		this.verified = verified;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

@@ -113,6 +113,7 @@ public class PrincipalController {
 		String email = json.getString("email");
 		String user = json.getString("user");
 		String password = json.getString("password");
+		String name = json.getString("name");
 		String[] emails = { email };
 		String[] anexos = {};
 		// Email ya registrado
@@ -139,6 +140,7 @@ public class PrincipalController {
 		newUser.setPassword(pass);
 		newUser.setVerified(false);
 		newUser.setDate(new Date());
+		newUser.setName(name);
 		// newUser.setToken(token);
 
 		String imagePath = "src/main/resources/foto_default.png";
@@ -246,28 +248,34 @@ public class PrincipalController {
 		String title = json.getString("title");
 		String user = json.getString("user");
 		String ubication = json.getString("ubication");
-		double valoration = json.getInt("valoration");
+		double valoration = json.getDouble("valoration");
 		String description = json.getString("description");
 		String type = json.getString("type");
-		double latitud = json.getDouble("latitud");
-		double longitud = json.getDouble("longitud");
+		String coords = json.getString("coords");
+		String[] coords2 = coords.split(",");
+		double latitud = Double.parseDouble(coords2[0].trim());
+		double longitud = Double.parseDouble(coords2[1].trim());
+
 		// Procesar la lista de imágenes (en base64)
 		List<byte[]> imageBytesList = new ArrayList<>();
+
 		JSONArray files = json.getJSONArray("files");
-		for (int i = 0; i < files.length(); i++) {
-			String base64Image = files.getString(i);
-			byte[] imageBytes = Base64.getDecoder().decode(base64Image); // Convertir base64 a bytes
-			imageBytesList.add(imageBytes);
+		if (json.has("files") && !json.isNull("files")) {
+			for (int i = 0; i < files.length(); i++) {
+				String base64Image = files.getString(i);
+				byte[] imageBytes = Base64.getDecoder().decode(base64Image); // Convertir base64 a bytes
+				imageBytesList.add(imageBytes);
+			}
+
+			// Crear la nueva reseña
+			Review resena = new Review(title, imageBytesList, user, valoration, description, ubication, type, latitud,
+					longitud);
+
+			// Guardar la reseña en la base de datos
+			reviewRepository.save(resena);
 		}
+		return ResponseEntity.status(HttpStatus.OK).build();
 
-		// Crear la nueva reseña
-		Review resena = new Review(title, imageBytesList, user, valoration, description, ubication, type, latitud,
-				longitud);
-
-		// Guardar la reseña en la base de datos
-		reviewRepository.save(resena);
-
-		return ResponseEntity.status(HttpStatus.OK).body("Reseña creada de manera exitosa");
 	}
 
 	@PutMapping("updateTitle")
@@ -289,7 +297,7 @@ public class PrincipalController {
 		review.setTitle(newTitle);
 		reviewRepository.save(review);
 
-		return ResponseEntity.status(HttpStatus.OK).body("Título actualizado de manera exitosa");
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PutMapping("updateComment")
@@ -311,7 +319,48 @@ public class PrincipalController {
 		comment.setText(newText);
 		commentsRepository.save(comment);
 
-		return ResponseEntity.status(HttpStatus.OK).body("Comentario actualizado de manera exitosa");
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+
+	@PutMapping("updateUsername")
+	public ResponseEntity<Object> updateUsername(@RequestBody String body) throws IOException {
+		// Parsear el cuerpo del JSON usando JSONObject
+		JSONObject json = new JSONObject(body);
+
+		String email = json.getString("email");
+		String newUsername = json.getString("newUsername");
+
+		User user = userRepository.findByEmail(email);
+		if (user != null) {
+			User user2 = userRepository.findByUser(newUsername);
+			if (user2 == null) {
+				user.setUser(newUsername);
+				userRepository.save(user);
+				return ResponseEntity.status(HttpStatus.OK).build();
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+			}
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
+
+	@PutMapping("updateName")
+	public ResponseEntity<Object> updateName(@RequestBody String body) throws IOException {
+		// Parsear el cuerpo del JSON usando JSONObject
+		JSONObject json = new JSONObject(body);
+
+		String email = json.getString("email");
+		String newName = json.getString("newName");
+
+		User user = userRepository.findByEmail(email);
+		if (user != null) {
+			user.setName(newName);
+			userRepository.save(user);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 	}
 
 	@PostMapping("/commentReview")
@@ -326,6 +375,26 @@ public class PrincipalController {
 
 		commentsRepository.save(comment);
 		return ResponseEntity.status(HttpStatus.OK).body("Comentario creado de manera exitosa");
+	}
+
+	@PutMapping("updatePhoto")
+	public ResponseEntity<Object> updatePhoto(@RequestBody String body) throws IOException {
+		// Parsear el cuerpo del JSON usando JSONObject
+		JSONObject json = new JSONObject(body);
+
+		String email = json.getString("email");
+		String newImage = json.getString("newImage");
+
+		User user = userRepository.findByEmail(email);
+
+		if (user != null) {
+			byte[] imageBytes = Files.readAllBytes(Paths.get(newImage));
+			user.setImage(imageBytes);
+			userRepository.save(user);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 	}
 
 	@DeleteMapping("deleteReview")
