@@ -6,13 +6,12 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "resenas")
+@Document(collection = "reviews")
 public class Review {
 
 	@Id
 	private String id;
 	private String title;
-	private String ubication;
 	private String type;
 	private double latitud;
 	private double longitud;
@@ -25,7 +24,7 @@ public class Review {
 	public Review() {
 	}
 
-	public Review(String title, List<byte[]> images, String user, double valoration, String description, String ubication, String type, double latitud, double longitud) {
+	public Review(String title, List<byte[]> images, String user, double valoration, String description,String type, double latitud, double longitud) {
 		super();
 		this.title = title;
 		this.images = images;
@@ -91,14 +90,6 @@ public class Review {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-
-	public String getUbication() {
-		return ubication;
-	}
-
-	public void setUbication(String ubication) {
-		this.ubication = ubication;
 	}
 
 	public String getType() {
