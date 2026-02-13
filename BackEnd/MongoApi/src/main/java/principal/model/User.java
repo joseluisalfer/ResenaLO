@@ -14,7 +14,6 @@ public class User {
 	private String user;
 	private String password;
 	private String email;
-	private boolean logged;
 	private byte[] image;
 	private Date date;
 	private List<String> followeds;
@@ -58,14 +57,6 @@ public class User {
 		this.email = email;
 	}
 
-	public boolean isLogged() {
-		return logged;
-	}
-
-	public void setLogged(boolean logged) {
-		this.logged = logged;
-	}
-
 	public byte[] getImage() {
 		return image;
 	}
@@ -104,6 +95,22 @@ public class User {
 
 	public void setFriends(List<String> friends) {
 		this.friends = friends;
+	}
+
+	public int getToken() {
+		return token;
+	}
+
+	public void setToken(int token) {
+		this.token = token;
+	}
+
+	public boolean isVerified() {
+		return verified;
+	}
+
+	public void setVerified(boolean verified) {
+		this.verified = verified;
 	}
 
 }

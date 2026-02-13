@@ -8,7 +8,20 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
+import java.util.Random;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import org.apache.catalina.valves.JsonAccessLogValve;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mindrot.jbcrypt.BCrypt;
@@ -49,11 +62,56 @@ public class PrincipalController {
 		int cost = 12;
 		return BCrypt.hashpw(plainPassword, BCrypt.gensalt(cost));
 	}
+	//Funcion del email
+	public static void envioMail(String mensaje, String asunto, String email_remitente, String email_remitente_pass,
+			String host_email, String port_email, String[] emails_destino, String[] anexos) throws MessagingException,
+			IOException {
+			 Properties props = System.getProperties();
+			 props.put("mail.smtp.host", host_email);
+			 props.put("mail.smtp.auth", "true");
+			 props.put("mail.smtp.starttls.enable", "true");
+			 props.put("mail.smtp.port", port_email);
+			 Session session = Session.getDefaultInstance(props);
+
+			 MimeMessage message = new MimeMessage(session);
+			 message.setFrom(new InternetAddress(email_remitente));
+			 for (String dest : emails_destino) {
+			message.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
+			 }
+			 message.setSubject(asunto, "UTF-8");
+
+			 //Cuerpo del mensaje
+			 MimeBodyPart textPart = new MimeBodyPart();
+			 textPart.setText(mensaje, "UTF-8");
+			 Multipart multipart = new MimeMultipart();
+			 multipart.addBodyPart(textPart);
+
+			 if (anexos != null) {
+			 for (String filePath : anexos) {
+			 MimeBodyPart attachmentPart = new MimeBodyPart();
+			 attachmentPart.attachFile(filePath);
+			 multipart.addBodyPart(attachmentPart);
+			 }
+			 }
+
+			 message.setContent(multipart);
+
+			 Transport transport = session.getTransport("smtp");
+			 transport.connect(host_email, email_remitente, email_remitente_pass);
+			 transport.sendMessage(message, message.getAllRecipients());
+			 transport.close();
+			}
 
 	@PostMapping("/register")
-	public ResponseEntity<Object> register(@RequestParam("user") String user, @RequestParam("password") String password,
-			@RequestParam("email") String email) throws IOException {
+	public ResponseEntity<Object> register(@RequestBody String body ) throws IOException, MessagingException {
 
+		JSONObject json = new JSONObject(body);
+		String email = json.getString("email");
+		String user = json.getString("user");
+		String password = json.getString("password");
+		String[] emails=  new String[1];
+		emails[0] = email;
+		String[] anexos = new String[1];
 		// Email ya registrado
 		if (userRepository.existsByEmail(email)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT) // 409
@@ -65,20 +123,22 @@ public class PrincipalController {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Este nombre de usuario ya existe");
 		}
 
-		boolean logged = false;
-
 		// Encriptar contraseña
 		String pass = hashPassword(password);
 
+		Random rnd = new Random();
+		int token = rnd.nextInt(100000,999999);
+		String message = ("Este es tu codigo de verificacion: "+token);
+		envioMail(message,"Verificacion de correo","resenalo.company@gmail.com","All_Roads_Lead_To_Indra_67","smtp.office365.com", "587", emails,anexos);
 		// Crear el objeto de usuario
 		User newUser = new User();
 		newUser.setUser(user);
 		newUser.setEmail(email);
 		newUser.setPassword(pass);
-		newUser.setLogged(logged);
-
+		newUser.setVerified(false);
 		newUser.setDate(new Date());
-
+		newUser.setToken(token);
+		
 		String imagePath = "src/main/resources/foto_default.png";
 		byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
 		newUser.setImage(imageBytes);
@@ -113,15 +173,15 @@ public class PrincipalController {
 			}
 
 			// Comprobar si el usuario ya está logeado
-			if (dbUser.isLogged()) {
+			if (dbUser.isVerified()) {
 				return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"error\": \"El usuario ya está logueado\"}");
 			}
 
-			// Marcar al usuario como logeado
-			dbUser.setLogged(true);
+			// Marcar al usuario como verificado
+			dbUser.setVerified(true);
 			userRepository.save(dbUser);
 
-			return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"Bienvenido " + dbUser.getUser() + "\"}");
+			return ResponseEntity.status(HttpStatus.OK).build();
 
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -143,13 +203,6 @@ public class PrincipalController {
 						.body("Credenciales incorrectas o usuario no registrado");
 			}
 
-			// Comprobar si el usuario ya está logeado
-			if (!dbUser.isLogged()) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya se ha salido del logout");
-			}
-
-			// Marcar al usuario como logeado
-			dbUser.setLogged(false);
 			userRepository.save(dbUser);
 
 			return ResponseEntity.status(HttpStatus.OK).build();
@@ -158,6 +211,31 @@ public class PrincipalController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("Error en el servidor: " + e.getMessage());
 		}
+	}
+	
+	@PostMapping("verifyEmail")
+	public ResponseEntity<Object> verifyEMail(@RequestBody String body) {
+		JSONObject json = new JSONObject(body);
+		int token = json.getInt("token");
+		String email = json.getString("email");
+		User user = userRepository.findByEmail(email);
+		
+		if(user == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body("Credenciales incorrectas o usuario no registrado");
+		} 
+		
+		if(user.getToken() != token) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body("Token no valido"); 
+		}else {
+			user.setVerified(true);
+			userRepository.save(user);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		
+		
+		
 	}
 
 	@PostMapping("/uploadReview")
