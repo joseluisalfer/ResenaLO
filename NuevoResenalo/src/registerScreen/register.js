@@ -41,8 +41,6 @@ const Register = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Banner />
-
       <Text style={styles.title}>{t("registerScreen.createAccount")}</Text>
       <Text style={styles.subtitle}>
        {t("registerScreen.footer")}
