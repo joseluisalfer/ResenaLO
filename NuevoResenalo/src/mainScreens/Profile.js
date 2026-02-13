@@ -28,7 +28,7 @@ const Profile = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("Español");
   const [isLanguageChanged, setIsLanguageChanged] = useState(false);
   const navigation = useNavigation();  // Usar el hook para navegación
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
 
   const renderPost = ({ item }) => (
@@ -48,19 +48,14 @@ const Profile = () => {
   };
 
   const handleChangeLanguage = (language) => {
-    setSelectedLanguage(language);
-    setIsLanguageChanged(true);
+    i18n.changeLanguage(language);
+    setSelectedLanguage(language); // Actualiza el idioma seleccionado
+    setIsLanguageChanged(true); // Marca que el idioma ha cambiado
   };
 
-  const handleSaveLanguage = () => {
-    console.log("Idioma guardado:", selectedLanguage);
-    setModalVisible(false); // Cierra el modal al guardar el idioma
-    setShowLanguageOptions(false)
-  };
-
-  const handleCancelLanguageChange = () => {
-    setModalVisible(false); // Cierra el modal
-    setShowLanguageOptions(false); // Restablece las opciones para mostrar las opciones generales
+  const handleExitLanguageChange = () => {
+    setModalVisible(false);
+    setShowLanguageOptions(false); 
   };
 
   const handleChangeToLanguageSelection = () => {
@@ -108,38 +103,34 @@ const Profile = () => {
                     {/* Solo mostrar idiomas y guardar */}
                     <Text style={styles.modalTitle}>{t("profile.title")} </Text>
                     <Pressable
-                      onPress={() => handleChangeLanguage("Español")}
+                      onPress={() => handleChangeLanguage("es")}
                       style={[
                         styles.languageOption,
-                        selectedLanguage === "Español" && styles.selectedLanguage
+                        selectedLanguage === "es" && styles.selectedLanguage
                       ]}
                     >
                       <Text>{t("language.sp")}</Text>
                     </Pressable>
                     <Pressable
-                      onPress={() => handleChangeLanguage("Valenciano")}
+                      onPress={() => handleChangeLanguage("ca")}
                       style={[
                         styles.languageOption,
-                        selectedLanguage === "Valenciano" && styles.selectedLanguage
+                        selectedLanguage === "ca" && styles.selectedLanguage
                       ]}
                     >
                       <Text>{t("language.ca")}</Text>
                     </Pressable>
                     <Pressable
-                      onPress={() => handleChangeLanguage("English")}
+                      onPress={() => handleChangeLanguage("en")}
                       style={[
                         styles.languageOption,
-                        selectedLanguage === "English" && styles.selectedLanguage
+                        selectedLanguage === "en" && styles.selectedLanguage
                       ]}
                     >
                       <Text>{t("language.en")}</Text>
                     </Pressable>
 
-                    {isLanguageChanged && (
-                      <Button onPress={handleSaveLanguage}> <Text style={{ color: 'black' }} >{t("profile.save")}</Text> </Button>
-                    )}
-
-                    <Pressable onPress={handleCancelLanguageChange}>
+                    <Pressable onPress={handleExitLanguageChange}>
                       <Text style={styles.cancelButton}>{t("profile.cancel")}</Text>
                     </Pressable>
                   </>
