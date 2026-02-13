@@ -3,8 +3,10 @@ import { View, StyleSheet, TextInput, Text, FlatList, Image, Pressable, ScrollVi
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import ProfileImage from "../../Componentes/Profile/ProfileImage/ProfileImage";
-
+import { useTranslation } from 'react-i18next'
+import '../../../assets/i18n/index';
 const EditPlace = () => {
+
   const navigation = useNavigation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -16,6 +18,8 @@ const EditPlace = () => {
     require('../../../assets/images/Konoha.png'),
     require('../../../assets/images/Konoha.png'),
   ]);
+
+  const { t } = useTranslation();
 
   const handleRemoveImage = (index) => {
     const updatedImages = images.filter((_, i) => i !== index);

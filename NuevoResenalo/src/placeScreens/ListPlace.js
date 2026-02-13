@@ -8,8 +8,11 @@ import {
   Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
-
+import { useTranslation } from 'react-i18next'
+import '../../assets/i18n/index';
 const ListPlace = ({ navigation }) => {
+  const { t } = useTranslation();
+
   const [places, setPlaces] = useState([
     {
       id: "1",
@@ -78,9 +81,9 @@ const ListPlace = ({ navigation }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         />
-        <Text style={styles.title}>Lista de Sitios</Text>
+        <Text style={styles.title}>{t("buttonExplorer.list")}</Text>
       </View>
-      <View style={{width: "100%" }}>
+      <View style={{ width: "100%" }}>
         <FlatList
           data={places}
           keyExtractor={(item) => item.id}

@@ -8,8 +8,12 @@ import {
   Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
-
+import { useTranslation } from 'react-i18next'
+import '../../assets/i18n/index';
 const AllFriends = ({ navigation }) => {
+
+  const { t } = useTranslation();
+
   const [friends, setFriends] = useState([
     {
       id: "1",
@@ -87,7 +91,7 @@ const AllFriends = ({ navigation }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         />
-        <Text style={styles.title}>Lista de Amigos</Text>
+        <Text style={styles.title}>{t("friends.list")}</Text>
       </View>
       <View style={{ width: "100%" }}>
         <FlatList
@@ -105,7 +109,7 @@ const AllFriends = ({ navigation }) => {
                   {/* Amigos y número */}
                   <View style={styles.friendsContainer}>
                     <Ionicons name="people" size={16} color="black" />
-                    <Text style={styles.friendsText}> Amigos: {item.friendsCount}</Text>
+                    <Text style={styles.friendsText}>{t("friennd.friends")}{item.friendsCount}</Text>
                   </View>
                 </View>
               </View>

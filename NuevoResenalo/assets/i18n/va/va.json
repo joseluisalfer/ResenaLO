@@ -50,11 +50,27 @@
         "comments": "Comentaris",
         "friends": "Amics",
         "save": "Guardar cavis",
-         "title": "Seleccionar idioma"
+        "title": "Seleccionar idioma"
     },
     "language": {
         "sp": "Espanyol",
         "en": "Anglés",
         "ca": "Valencià"
+    },
+    "placeScreen": {
+        "podium": "Top 10 Llocs Més Valorats",
+        "anotherText": "Altres Llocs"
+    },
+    "friends": {
+        "list": "Llista d'Amics",
+        "friends": "Amics"
+    },
+    "buttonExplorer": {
+        "list": "Llista de Llocs"
+    },
+    "modalReview": {
+        "location": "Ubicació:",
+        "calification": "Valoració",
+        "images": "Imatges"
     }
 }

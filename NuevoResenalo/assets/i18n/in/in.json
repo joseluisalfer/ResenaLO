@@ -50,11 +50,27 @@
         "comments": "Comments",
         "friends": "Friends",
         "save": "Save changes",
-         "title": "Select language"
+        "title": "Select language"
     },
     "language": {
         "sp": "Spanish",
         "en": "English",
         "ca": "Valencian"
+    },
+    "placeScreen": {
+        "podium": "Top 10 Most Valued Places",
+        "anotherText": "Other Places"
+    },
+    "friends": {
+        "list": "Friends List",
+        "friends": "Friends"
+    },
+    "buttonExplorer": {
+        "list": "List of Sites"
+    },
+    "modalReview": {
+        "location": "Location:",
+        "calification": "Rating",
+        "images": "Images"
     }
 }

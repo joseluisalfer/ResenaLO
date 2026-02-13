@@ -12,6 +12,9 @@ import Friend from "./Friend"
 const Stack = createStackNavigator();
 
 const App = () => {
+
+
+
     return (
         <Stack.Navigator initialRouteName="Home">
             <Stack.Screen
