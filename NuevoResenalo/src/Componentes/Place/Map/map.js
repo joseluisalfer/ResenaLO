@@ -2,14 +2,21 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-const Map = ({ region }) => {
+const Map = ({ latitud, longitud }) => {
+  const region = {
+    latitude: parseFloat(latitud),
+    longitude: parseFloat(longitud),
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  };
+
   return (
     <View style={styles.mapContainer}>
       <MapView
         style={styles.map}
-        region={region}
-        scrollEnabled={false} 
-        zoomEnabled={true} 
+        initialRegion={region} // Fijamos la región sin permitir cambios
+        scrollEnabled={false}  // Deshabilitamos el desplazamiento
+        zoomEnabled={false}    // Deshabilitamos el zoom
       >
         <Marker
           coordinate={{

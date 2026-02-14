@@ -11,15 +11,7 @@ const Place = ({ navigation, route }) => {
   const [placeData, setPlaceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
-
-  const { title } = "Unai";
-
-  const [region, setRegion] = useState({
-    latitude: 0,
-    longitude: 0,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  });
+  const [title, setTitle] = useState("Unai");
 
   useEffect(() => {
     const fetchPlaceData = async () => {
@@ -30,15 +22,6 @@ const Place = ({ navigation, route }) => {
         if (data) {
           const result = Array.isArray(data) ? data[0] : data;
           setPlaceData(result);
-
-          if (result.latitud && result.longitud) {
-            setRegion({
-              latitude: parseFloat(result.latitud),
-              longitude: parseFloat(result.longitud),
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
-          }
         }
       } catch (error) {
         Alert.alert("Error", "No se pudo cargar el lugar");
@@ -95,12 +78,12 @@ const Place = ({ navigation, route }) => {
       />
 
       <PlaceInfo
-        name={title}
+        name={apiTitle}
         description={type}
         averageRating={valoration}
       />
 
-      <Map region={region} />
+      <Map latitud={latitud} longitud={longitud} />
 
       <Pressable style={styles.addButton} onPress={() => navigation.navigate('Review')}>
         <Text style={styles.addButtonText}>Añadir reseña</Text>
