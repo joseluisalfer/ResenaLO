@@ -7,10 +7,12 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -22,11 +24,12 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import principal.model.Comments;
 import principal.model.Review;
 import principal.model.User;
@@ -46,6 +48,9 @@ import principal.repository.CommentsRepository;
 import principal.repository.ReviewRepository;
 import principal.repository.UserRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 @RestController
 @RequestMapping("first")
 public class PrincipalController {
@@ -58,6 +63,7 @@ public class PrincipalController {
 
 	@Autowired
 	private ReviewRepository reviewRepository;
+
 
 	// Genera la contraseña encriptada
 	public static String hashPassword(String plainPassword) {
@@ -312,7 +318,7 @@ public class PrincipalController {
 		}
 
 		// Verificar si ambos usuarios se siguen mutuamente
-		
+
 		if (listFollow.contains(userFollow.getId()) && listFollowers.contains(user.getId())) {
 			// Añadir los usuarios a la lista de amigos si no están ya en ella
 			List<String> userFriends = user.getFriends();
@@ -417,18 +423,52 @@ public class PrincipalController {
 	}
 
 	@PostMapping("/commentReview")
-	public ResponseEntity<Object> commentReview(@RequestBody Comments comment) throws IOException {
+	public ResponseEntity<Object> commentReview(@RequestBody String body) throws IOException {
 
-		// Verificar si la reseña con el id proporcionado existe
-		Review resena = reviewRepository.findById(comment.getResenaId()).orElse(null);
+	    JSONObject json = new JSONObject(body);
+	    String reviewId = json.getString("reviewId");
+	    String user = json.getString("user");
+	    String text = json.getString("text");
+	    Date date = new Date();
+	    Double valoration = json.getDouble("valoration");
 
-		if (resena == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reseña no encontrada.");
-		}
+	    // Verificar si la reseña con el id proporcionado existe
+	    Optional<Review> Oreview = reviewRepository.findById(reviewId);
 
-		commentsRepository.save(comment);
-		return ResponseEntity.status(HttpStatus.OK).body("Comentario creado de manera exitosa");
+	    if (Oreview.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reseña no encontrada.");
+	    }
+
+	    // Crear el nuevo comentario
+	    Comments comment = new Comments(reviewId, user, text, date, valoration);
+
+	    // Guardar el comentario en la colección de comentarios
+	    commentsRepository.save(comment);
+
+	    // Obtener la reseña de la base de datos
+	    Review review = Oreview.get();
+
+	    // Sumar la valoración del comentario a la reseña
+	    List<Comments> commentsList = commentsRepository.findByReviewId(reviewId);
+	    double totalValoration = review.getValoration(); // Valoracion de la reseña
+	    int totalCount = 1; 
+
+	    // Sumamos las valoraciones de todos los comentarios
+	    for (Comments c : commentsList) {
+	        totalValoration += c.getValoration();
+	        totalCount++;
+	    }
+
+	    double newValoration = totalValoration / totalCount;
+	    review.setValoration(newValoration);
+
+	    // Guardar la reseña con la nueva valoración
+	    reviewRepository.save(review);
+
+	    // Responder con éxito
+	    return ResponseEntity.status(HttpStatus.OK).build();
 	}
+
 
 	@PutMapping("updatePhoto")
 	public ResponseEntity<Object> updatePhoto(@RequestBody String body) throws IOException {
@@ -494,89 +534,88 @@ public class PrincipalController {
 	}
 
 	@GetMapping("/user")
-	public ResponseEntity<String> user(@RequestParam(value = "user") String us) {
-	    try {
-	        // Obtener el usuario
-	        User user = userRepository.findByUser(us);
-	        if (user == null) {
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
-	        }
+	public ResponseEntity<String> user(@RequestParam(value = "email") String em) {
+		try {
+			// Obtener el usuario
+			User user = userRepository.findByEmail(em);
+			if (user == null) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+			}
 
-	        // Obtener las reseñas del usuario
-	        List<Review> listReviews = reviewRepository.findByUser(user.getUser());
+			// Obtener las reseñas del usuario
+			List<Review> listReviews = reviewRepository.findByUser(user.getUser());
 
-	        // Crear el objeto JSON principal
-	        JSONObject jsonP = new JSONObject();
-	        JSONObject jsonR = new JSONObject();
-	        JSONArray jsonA = new JSONArray();
+			// Crear el objeto JSON principal
+			JSONObject jsonP = new JSONObject();
+			JSONObject jsonR = new JSONObject();
+			JSONArray jsonA = new JSONArray();
 
-	        // Agregar datos del usuario al JSON
-	        jsonR.put("id", user.getId());
-	        jsonR.put("user", user.getUser());
+			// Agregar datos del usuario al JSON
+			jsonR.put("id", user.getId());
+			jsonR.put("user", user.getUser());
 
-	        // Verificar si el usuario tiene imagen y agregarla a Base64
-	        if (user.getImage() != null) {
-	            String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
-	            jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
-	        } else {
-	            jsonR.put("photo", "null"); // Si no hay imagen, poner null o una imagen predeterminada
-	        }
+			// Verificar si el usuario tiene imagen y agregarla a Base64
+			if (user.getImage() != null) {
+				String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
+				jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
+			} else {
+				jsonR.put("photo", "null"); // Si no hay imagen, poner null o una imagen predeterminada
+			}
 
-	        // Convertir reseñas en links (solo enlaces como strings)
-	        if (listReviews != null && !listReviews.isEmpty()) {
-	            for (Review review : listReviews) {
-	                String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId();
-	                jsonA.put(reviewLink);  // Agregar solo el enlace como un string
-	            }
-	            jsonR.put("reviews", jsonA);
-	        } else {
-	            jsonR.put("reviews", new JSONArray()); // Si no hay reseñas, agregar un array vacío
-	        }
+			// Convertir reseñas en links (solo enlaces como strings)
+			if (listReviews != null && !listReviews.isEmpty()) {
+				for (Review review : listReviews) {
+					String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId();
+					jsonA.put(reviewLink); // Agregar solo el enlace como un string
+				}
+				jsonR.put("reviews", jsonA);
+			} else {
+				jsonR.put("reviews", new JSONArray()); // Si no hay reseñas, agregar un array vacío
+			}
 
-	        // Formatear la fecha de creación
-	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        String formattedDate = sdf.format(user.getDate());
-	        jsonR.put("created", formattedDate);
+			// Formatear la fecha de creación
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String formattedDate = sdf.format(user.getDate());
+			jsonR.put("created", formattedDate);
 
-	        // Crear arrays con los enlaces de followeds, followers y friends como strings
-	        JSONArray followedsArray = new JSONArray();
-	        if (user.getFolloweds() != null && !user.getFolloweds().isEmpty()) {
-	            for (String followedId : user.getFolloweds()) {
-	                String followedLink = "http://44.213.235.160:8080/user?user=" + followedId;
-	                followedsArray.put(followedLink);  // Agregar solo el enlace como string
-	            }
-	        }
-	        jsonR.put("followeds", followedsArray);
+			// Crear arrays con los enlaces de followeds, followers y friends como strings
+			JSONArray followedsArray = new JSONArray();
+			if (user.getFolloweds() != null && !user.getFolloweds().isEmpty()) {
+				for (String followedId : user.getFolloweds()) {
+					String followedLink = "http://44.213.235.160:8080/user?user=" + followedId;
+					followedsArray.put(followedLink); // Agregar solo el enlace como string
+				}
+			}
+			jsonR.put("followeds", followedsArray);
 
-	        JSONArray followersArray = new JSONArray();
-	        if (user.getFollowers() != null && !user.getFollowers().isEmpty()) {
-	            for (String followerId : user.getFollowers()) {
-	                String followerLink = "http://44.213.235.160:8080/user?user=" + followerId;
-	                followersArray.put(followerLink);  // Agregar solo el enlace como string
-	            }
-	        }
-	        jsonR.put("followers", followersArray);
+			JSONArray followersArray = new JSONArray();
+			if (user.getFollowers() != null && !user.getFollowers().isEmpty()) {
+				for (String followerId : user.getFollowers()) {
+					String followerLink = "http://44.213.235.160:8080/user?user=" + followerId;
+					followersArray.put(followerLink); // Agregar solo el enlace como string
+				}
+			}
+			jsonR.put("followers", followersArray);
 
-	        JSONArray friendsArray = new JSONArray();
-	        if (user.getFriends() != null && !user.getFriends().isEmpty()) {
-	            for (String friendId : user.getFriends()) {
-	                String friendLink = "http://44.213.235.160:8080/user?user=" + friendId;
-	                friendsArray.put(friendLink);  // Agregar solo el enlace como string
-	            }
-	        }
-	        jsonR.put("friends", friendsArray);
+			JSONArray friendsArray = new JSONArray();
+			if (user.getFriends() != null && !user.getFriends().isEmpty()) {
+				for (String friendId : user.getFriends()) {
+					String friendLink = "http://44.213.235.160:8080/user?user=" + friendId;
+					friendsArray.put(friendLink); // Agregar solo el enlace como string
+				}
+			}
+			jsonR.put("friends", friendsArray);
 
-	        // Agregar el objeto JSON de este usuario
-	        jsonP.put("results", jsonR);
+			// Agregar el objeto JSON de este usuario
+			jsonP.put("results", jsonR);
 
-	        // Retornar la respuesta con el JSON
-	        return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                             .body("Hubo un error al procesar la solicitud: " + e.getMessage());
-	    }
+			// Retornar la respuesta con el JSON
+			return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Hubo un error al procesar la solicitud: " + e.getMessage());
+		}
 	}
-
 
 	@GetMapping("/review")
 	public ResponseEntity<String> review(@RequestParam(value = "id") String id) {
@@ -676,147 +715,71 @@ public class PrincipalController {
 	}
 
 	@GetMapping("/users")
-	public ResponseEntity<String> getAllUsers() {
+	public ResponseEntity<String> getAllUsers(
+	        @RequestParam(defaultValue = "0") int page, // Página actual, predeterminado es 0 (la primera página)
+	        @RequestParam(defaultValue = "10") int size // Número de usuarios por página, predeterminado es 10
+	) {
 	    try {
-	        // Obtener todos los usuarios de la base de datos
-	        List<User> users = userRepository.findAll();
+	        // Crear el objeto Pageable para la paginación
+	        Pageable pageable = PageRequest.of(page, size);
 
-	        // Crear el objeto JSON principal para la respuesta
-	        JSONObject jsonP = new JSONObject();
+	        // Obtener los usuarios de la base de datos con la paginación
+	        Page<User> pageUsers = userRepository.findAll(pageable);
+
+	        // Crear el array JSON que contendrá los enlaces a los usuarios
 	        JSONArray jsonUsers = new JSONArray();
 
 	        // Recorrer todos los usuarios
-	        for (User user : users) {
-	            // Obtener las reseñas del usuario
-	            List<Review> listReviews = reviewRepository.findByUser(user.getUser());
-
-	            // Crear un objeto JSON para cada usuario
-	            JSONObject jsonR = new JSONObject();
-	            JSONArray jsonA = new JSONArray();
-
-	            // Agregar datos del usuario al JSON
-	            jsonR.put("id", user.getId());
-	            jsonR.put("user", user.getUser());
-
-	            // Verificar si el usuario tiene imagen y agregarla a Base64
-	            if (user.getImage() != null) {
-	                String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
-	                jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
-	            } else {
-	                jsonR.put("photo", "null"); // Si no hay imagen, poner null o una imagen predeterminada
-	            }
-
-	            // Convertir reseñas en links (solo enlaces como strings)
-	            if (listReviews != null && !listReviews.isEmpty()) {
-	                for (Review review : listReviews) {
-	                    String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId();
-	                    jsonA.put(reviewLink);  // Agregar solo el enlace como un string
-	                }
-	                jsonR.put("reviews", jsonA);
-	            } else {
-	                jsonR.put("reviews", new JSONArray()); // Si no hay reseñas, agregar un array vacío
-	            }
-
-	            // Formatear la fecha de creación
-	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	            String formattedDate = sdf.format(user.getDate());
-	            jsonR.put("created", formattedDate);
-
-	            // Crear arrays con los enlaces de followeds, followers y friends como strings
-	            JSONArray followedsArray = new JSONArray();
-	            if (user.getFolloweds() != null && !user.getFolloweds().isEmpty()) {
-	                for (String followedId : user.getFolloweds()) {
-	                    String followedLink = "http://44.213.235.160:8080/user?user=" + followedId;
-	                    followedsArray.put(followedLink);  // Agregar solo el enlace como string
-	                }
-	            }
-	            jsonR.put("followeds", followedsArray);
-
-	            JSONArray followersArray = new JSONArray();
-	            if (user.getFollowers() != null && !user.getFollowers().isEmpty()) {
-	                for (String followerId : user.getFollowers()) {
-	                    String followerLink = "http://44.213.235.160:8080/user?user=" + followerId;
-	                    followersArray.put(followerLink);  // Agregar solo el enlace como string
-	                }
-	            }
-	            jsonR.put("followers", followersArray);
-
-	            JSONArray friendsArray = new JSONArray();
-	            if (user.getFriends() != null && !user.getFriends().isEmpty()) {
-	                for (String friendId : user.getFriends()) {
-	                    String friendLink = "http://44.213.235.160:8080/user?user=" + friendId;
-	                    friendsArray.put(friendLink);  // Agregar solo el enlace como string
-	                }
-	            }
-	            jsonR.put("friends", friendsArray);
-
-	            // Agregar el objeto JSON de este usuario al array de usuarios
-	            jsonUsers.put(jsonR);
+	        for (User user : pageUsers.getContent()) {
+	            // Crear el enlace para cada usuario
+	            String userLink = "http://44.213.235.160:8080/user?user=" + user.getUser();
+	            jsonUsers.put(userLink); // Agregar solo el enlace al array
 	        }
 
-	        // Agregar los usuarios al objeto JSON principal
-	        jsonP.put("results", jsonUsers);
+	        // Crear el objeto JSON con la información de paginación: total de páginas, página actual, etc.
+	        JSONObject jsonResponse = new JSONObject();
+	        jsonResponse.put("users", jsonUsers);
+	        jsonResponse.put("totalPages", pageUsers.getTotalPages());
+	        jsonResponse.put("currentPage", pageUsers.getNumber());
+	        jsonResponse.put("totalElements", pageUsers.getTotalElements());
 
-	        // Retornar la respuesta con el JSON
-	        return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
+	        // Retornar la respuesta con los enlaces de los usuarios y la paginación
+	        return ResponseEntity.status(HttpStatus.OK).body(jsonResponse.toString());
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                             .body("Hubo un error al procesar la solicitud: " + e.getMessage());
+	                .body("Hubo un error al procesar la solicitud: " + e.getMessage());
 	    }
 	}
 
-
-
 	@GetMapping("/reviews")
-	public ResponseEntity<String> reviews() {
-		// Obtener todas las reseñas
-		List<Review> listReviews = reviewRepository.findAll();
+	public ResponseEntity<String> reviews(
+	        @RequestParam(defaultValue = "0") int page, // Página actual, predeterminado es 0 (la primera página)
+	        @RequestParam(defaultValue = "10") int size // Número de elementos por página, predeterminado es 10
+	) {
+	    // Crear el objeto Pageable para la paginación
+	    Pageable pageable = PageRequest.of(page, size);
 
-		// Crear el array JSON que contendrá todas las reseñas
-		JSONArray jsonReviews = new JSONArray();
+	    // Obtener las reseñas de la base de datos con la paginación
+	    Page<Review> pageReviews = reviewRepository.findAll(pageable);
 
-		// Recorrer todas las reseñas y agregar el enlace al usuario y las imágenes en
-		// Base64
-		for (Review review : listReviews) {
-			// Crear un objeto JSON para cada reseña
-			JSONObject reviewJson = new JSONObject();
-			reviewJson.put("id", review.getId());
-			reviewJson.put("title", review.getTitle());
-			reviewJson.put("description", review.getDescription());
-			reviewJson.put("valoration", review.getValoration());
-			reviewJson.put("latitud", review.getLatitud());
-			reviewJson.put("longitud", review.getLongitud());
-			reviewJson.put("type", review.getType());
-			// Obtener el usuario asociado a la reseña usando el userId de la reseña
-			String userId = review.getUser();
-			User user = userRepository.findByUser(userId); // Asegúrate de que `getUser()` retorne el identificador
-															// adecuado
+	    // Crear el array JSON que contendrá los enlaces a las reseñas
+	    JSONArray jsonReviews = new JSONArray();
 
-			// Generar el enlace al usuario
-			String userLink = (user != null) ? "http://localhost:8080/user?id=" + user.getId() : null;
+	    // Recorrer todas las reseñas de la página actual y agregar el enlace
+	    for (Review review : pageReviews.getContent()) {
+	        String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId();
+	        jsonReviews.put(reviewLink);
+	    }
 
-			// Agregar el enlace del usuario a la reseña
-			reviewJson.put("userLink", userLink);
+	    // Crear el objeto JSON con la paginación: número total de páginas, página actual, etc.
+	    JSONObject jsonResponse = new JSONObject();
+	    jsonResponse.put("reviews", jsonReviews);
+	    jsonResponse.put("totalPages", pageReviews.getTotalPages());
+	    jsonResponse.put("currentPage", pageReviews.getNumber());
+	    jsonResponse.put("totalElements", pageReviews.getTotalElements());
 
-			// Convertir las imágenes de la reseña a Base64
-			if (review.getImages() != null && !review.getImages().isEmpty()) {
-				JSONArray imagesArray = new JSONArray();
-				for (byte[] image : review.getImages()) {
-					// Convertir cada imagen a Base64
-					String encodedImage = Base64.getEncoder().encodeToString(image);
-					imagesArray.put(encodedImage); // Agregar cada imagen codificada en Base64
-				}
-				reviewJson.put("images", imagesArray); // Agregar el array de imágenes a la reseña
-			} else {
-				reviewJson.put("images", new JSONArray()); // Si no hay imágenes, agregar un array vacío
-			}
-
-			// Agregar la reseña con el enlace al usuario y las imágenes al array de reseñas
-			jsonReviews.put(reviewJson);
-		}
-
-		// Devolver la respuesta como un string JSON
-		return ResponseEntity.status(HttpStatus.OK).body(jsonReviews.toString());
+	    // Devolver la respuesta con la paginación y los enlaces
+	    return ResponseEntity.status(HttpStatus.OK).body(jsonResponse.toString());
 	}
 
 	@GetMapping("comments")
@@ -863,7 +826,7 @@ public class PrincipalController {
 
 	@GetMapping("/comment")
 	public ResponseEntity<String> comment(@RequestParam(value = "idReview") String idReview) {
-		List<Comments> listComments = commentsRepository.findByResenaId(idReview);
+		List<Comments> listComments = commentsRepository.findByReviewId(idReview);
 		JSONArray jsonComments = new JSONArray();
 		for (Comments comment : listComments) {
 			JSONObject commentJson = new JSONObject();
@@ -887,7 +850,7 @@ public class PrincipalController {
 			if (!Oreview.isPresent()) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
 			}
- 
+
 			Review review = Oreview.get();
 			String linkReview = "http://localhost:8080/review?id=" + review.getId();
 			commentJson.put("review", linkReview);
@@ -895,5 +858,20 @@ public class PrincipalController {
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(jsonComments.toString());
 	}
+
+	 @GetMapping("/randomReviews")
+	    public ResponseEntity<List<Review>> randomReviews() {
+	        // Obtener todas las reseñas de la base de datos
+	        List<Review> allReviews = reviewRepository.findAll();
+
+	        // Barajar las reseñas de manera aleatoria
+	        Collections.shuffle(allReviews);
+
+	        // Tomar solo los primeros 4 resultados
+	        List<Review> randomReviews = allReviews.stream().limit(4).collect(Collectors.toList());
+
+	        // Devolver los resultados
+	        return ResponseEntity.status(HttpStatus.OK).body(randomReviews);
+	    }
 
 }

@@ -10,13 +10,20 @@ public class Comments {
 
 	@Id
 	private String id;
-    private String resenaId; // Referencia a la reseña a la que pertenece el comentario
+    private String reviewId; // Referencia a la reseña a la que pertenece el comentario
     private String user;   // Usuario que hace el comentario
     private String text;     // El contenido del comentario
     private Date date;       // Fecha de creación del comentario
-    
-	public Comments() {
-
+    private double valoration;
+    public Comments() {
+    	
+    }
+	public Comments(String reviewId, String user, String text, Date date, double valoration) {
+		this.reviewId = reviewId;
+		this.user = user;
+		this.text = text;
+		this.date = date;
+		this.valoration = valoration;
 	}
 
 	public String getId() {
@@ -27,12 +34,12 @@ public class Comments {
 		this.id = id;
 	}
 
-	public String getResenaId() {
-		return resenaId;
+	public String getReviewId() {
+		return reviewId;
 	}
 
-	public void setResenaId(String resenaId) {
-		this.resenaId = resenaId;
+	public void setReviewId(String resenaId) {
+		this.reviewId = resenaId;
 	}
 
 	public String getUser() {
@@ -57,6 +64,12 @@ public class Comments {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+	public double getValoration() {
+		return valoration;
+	}
+	public void setValoration(double valoration) {
+		this.valoration = valoration;
 	}
 	
 }
