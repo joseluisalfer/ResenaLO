@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         width: 200,
         alignSelf: "center",
+        backgroundColor: '#1748ce'
     },
     username: {
         color: "gray",
