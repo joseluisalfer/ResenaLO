@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   addReviewButton: {
-    backgroundColor: '#2654d1',
+    backgroundColor: '#1748ce',
     padding: 12,
     borderRadius: 8,
     width: '80%',
