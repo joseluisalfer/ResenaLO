@@ -11,20 +11,24 @@ const Images = ({ images, imagePos, nextImage, prevImage }) => {
     );
   }
 
+  const currentImage = images[imagePos];
+  const imageUri = currentImage.startsWith('data:image')
+    ? currentImage
+    : `data:image/jpeg;base64,${currentImage}`;
+
   return (
     <View style={styles.container}>
-      <Image 
-        source={{ uri: images[imagePos] }} 
-        style={styles.image} 
-        resizeMode="cover" 
+      <Image
+        source={{ uri: imageUri }}
+        style={styles.image}
+        resizeMode="cover"
       />
-      
+
       {images.length > 1 && (
         <>
           <TouchableOpacity style={styles.arrowLeft} onPress={prevImage}>
             <Ionicons name="chevron-back" size={28} color="#fff" />
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.arrowRight} onPress={nextImage}>
             <Ionicons name="chevron-forward" size={28} color="#fff" />
           </TouchableOpacity>
@@ -35,38 +39,11 @@ const Images = ({ images, imagePos, nextImage, prevImage }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    width: '100%', 
-    height: 250, 
-    backgroundColor: '#f4f4f4', 
-    borderRadius: 15, 
-    overflow: 'hidden',
-    position: 'relative' 
-  },
-  center: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: { 
-    width: '100%', 
-    height: '100%' 
-  },
-  arrowLeft: {
-    position: 'absolute', 
-    top: '45%', 
-    left: 10,
-    backgroundColor: 'rgba(0,0,0,0.3)', 
-    borderRadius: 20, 
-    padding: 5
-  },
-  arrowRight: {
-    position: 'absolute', 
-    top: '45%', 
-    right: 10,
-    backgroundColor: 'rgba(0,0,0,0.3)', 
-    borderRadius: 20, 
-    padding: 5
-  },
+  container: { width: '100%', height: 250, backgroundColor: '#f4f4f4', borderRadius: 15, overflow: 'hidden', position: 'relative' },
+  center: { justifyContent: 'center', alignItems: 'center' },
+  image: { width: '100%', height: '100%' },
+  arrowLeft: { position: 'absolute', top: '45%', left: 10, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 20, padding: 5 },
+  arrowRight: { position: 'absolute', top: '45%', right: 10, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 20, padding: 5 },
 });
 
 export default Images;

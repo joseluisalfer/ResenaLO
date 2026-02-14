@@ -2,16 +2,17 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const PlaceInfo = ({ name, description, averageRating }) => {
+const PlaceInfo = ({ name, description, type, averageRating }) => {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
         <Text style={styles.name}>{name}</Text>
         <View style={styles.ratingContainer}>
           <Text style={styles.rating}>{averageRating}</Text>
-          <Ionicons name="star" size={18} color="#FFD700" /> 
+          <Ionicons name="star" size={18} color="#000000" /> 
         </View>
       </View>
+      <Text style={styles.type}>{type}</Text>
       <Text style={styles.description}>{description}</Text>
     </View>
   );
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 22,
   },
+  type: { fontSize: 14, color: '#1748ce', fontWeight: '600', textTransform: 'uppercase', marginTop: 2 },
 });
 
 export default PlaceInfo;
