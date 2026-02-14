@@ -1,5 +1,6 @@
 package principal.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,9 +18,9 @@ public class User {
 	private String email;
 	private byte[] image;
 	private Date date;
-	private List<String> followeds;
-	private List<String> followers;
-	private List<String> friends;
+	private List<String> followeds = new ArrayList<>();
+	private List<String> followers = new ArrayList<>();
+	private List<String> friends = new ArrayList<>();
 	private int token;
 	private boolean verified;
 	

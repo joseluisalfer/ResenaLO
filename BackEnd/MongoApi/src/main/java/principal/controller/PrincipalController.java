@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -23,7 +22,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.catalina.valves.JsonAccessLogValve;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mindrot.jbcrypt.BCrypt;
@@ -38,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import principal.model.Comments;
 import principal.model.Review;
@@ -496,76 +495,88 @@ public class PrincipalController {
 
 	@GetMapping("/user")
 	public ResponseEntity<String> user(@RequestParam(value = "user") String us) {
-	    // Obtener el usuario y las reseñas
-	    User user = userRepository.findByUser(us);
-	    List<Review> listReviews = reviewRepository.findByUser(user.getUser());
+	    try {
+	        // Obtener el usuario
+	        User user = userRepository.findByUser(us);
+	        if (user == null) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+	        }
 
-	    // Crear el objeto JSON principal
-	    JSONObject jsonP = new JSONObject();
-	    JSONObject jsonR = new JSONObject();
-	    JSONArray jsonA = new JSONArray();
+	        // Obtener las reseñas del usuario
+	        List<Review> listReviews = reviewRepository.findByUser(user.getUser());
 
-	    // Agregar datos del usuario al JSON
-	    jsonR.put("id", user.getId());
-	    jsonR.put("user", user.getUser());
+	        // Crear el objeto JSON principal
+	        JSONObject jsonP = new JSONObject();
+	        JSONObject jsonR = new JSONObject();
+	        JSONArray jsonA = new JSONArray();
 
-	        String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
-	        jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
+	        // Agregar datos del usuario al JSON
+	        jsonR.put("id", user.getId());
+	        jsonR.put("user", user.getUser());
 
-	    // Convertir reseñas en links 
-	    for (Review review : listReviews) {
-	        JSONObject reviewJson = new JSONObject();
+	        // Verificar si el usuario tiene imagen y agregarla a Base64
+	        if (user.getImage() != null) {
+	            String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
+	            jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
+	        } else {
+	            jsonR.put("photo", "null"); // Si no hay imagen, poner null o una imagen predeterminada
+	        }
 
-	        // Generar el link de la reseña
-	        String reviewLink = "http://44.213.235.160:8080/first/review?id=" + review.getId(); // Cambia a la URL de tu
-	                                                                                             // API
-	        reviewJson.put("link", reviewLink);
+	        // Convertir reseñas en links (solo enlaces como strings)
+	        if (listReviews != null && !listReviews.isEmpty()) {
+	            for (Review review : listReviews) {
+	                String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId();
+	                jsonA.put(reviewLink);  // Agregar solo el enlace como un string
+	            }
+	            jsonR.put("reviews", jsonA);
+	        } else {
+	            jsonR.put("reviews", new JSONArray()); // Si no hay reseñas, agregar un array vacío
+	        }
 
-	        jsonA.put(reviewJson);
-	    }
-
-	    // Si no hay reseñas, agregar un array vacío
-	    if (jsonA.isEmpty()) {
-	        jsonR.put("reviews", new JSONArray()); // Poner array vacío si no hay reseñas
-	    } else {
-	        jsonR.put("reviews", jsonA);
-	    }
-
-	        String formattedDate = user.getDate().toString(); 
+	        // Formatear la fecha de creación
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	        String formattedDate = sdf.format(user.getDate());
 	        jsonR.put("created", formattedDate);
-	    
 
-	    // Agregar los enlaces de los followeds, followers y friends
-	    JSONArray followedsArray = new JSONArray();
-	    for (String followedId : user.getFolloweds()) {
-	        String followedLink = "http://44.213.235.160:8080/first/user?user=" + followedId;
-	        JSONObject followedJson = new JSONObject();
-	        followedJson.put("link", followedLink);
-	        followedsArray.put(followedJson);
+	        // Crear arrays con los enlaces de followeds, followers y friends como strings
+	        JSONArray followedsArray = new JSONArray();
+	        if (user.getFolloweds() != null && !user.getFolloweds().isEmpty()) {
+	            for (String followedId : user.getFolloweds()) {
+	                String followedLink = "http://44.213.235.160:8080/user?user=" + followedId;
+	                followedsArray.put(followedLink);  // Agregar solo el enlace como string
+	            }
+	        }
+	        jsonR.put("followeds", followedsArray);
+
+	        JSONArray followersArray = new JSONArray();
+	        if (user.getFollowers() != null && !user.getFollowers().isEmpty()) {
+	            for (String followerId : user.getFollowers()) {
+	                String followerLink = "http://44.213.235.160:8080/user?user=" + followerId;
+	                followersArray.put(followerLink);  // Agregar solo el enlace como string
+	            }
+	        }
+	        jsonR.put("followers", followersArray);
+
+	        JSONArray friendsArray = new JSONArray();
+	        if (user.getFriends() != null && !user.getFriends().isEmpty()) {
+	            for (String friendId : user.getFriends()) {
+	                String friendLink = "http://44.213.235.160:8080/user?user=" + friendId;
+	                friendsArray.put(friendLink);  // Agregar solo el enlace como string
+	            }
+	        }
+	        jsonR.put("friends", friendsArray);
+
+	        // Agregar el objeto JSON de este usuario
+	        jsonP.put("results", jsonR);
+
+	        // Retornar la respuesta con el JSON
+	        return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body("Hubo un error al procesar la solicitud: " + e.getMessage());
 	    }
-	    jsonR.put("followeds", followedsArray);
-
-	    JSONArray followersArray = new JSONArray();
-	    for (String followerId : user.getFollowers()) {
-	        String followerLink = "http://44.213.235.160:8080/first/user?user=" + followerId;
-	        JSONObject followerJson = new JSONObject();
-	        followerJson.put("link", followerLink);
-	        followersArray.put(followerJson);
-	    }
-	    jsonR.put("followers", followersArray);
-
-	    JSONArray friendsArray = new JSONArray();
-	    for (String friendId : user.getFriends()) {
-	        String friendLink = "http://44.213.235.160:8080/first/user?user=" + friendId;
-	        JSONObject friendJson = new JSONObject();
-	        friendJson.put("link", friendLink);
-	        friendsArray.put(friendJson);
-	    }
-	    jsonR.put("friends", friendsArray);
-	    jsonP.put("results", jsonR);
-
-	    return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
 	}
+
 
 	@GetMapping("/review")
 	public ResponseEntity<String> review(@RequestParam(value = "id") String id) {
@@ -613,9 +624,9 @@ public class PrincipalController {
 	}
 
 	@GetMapping("/reviewPlace")
-	public ResponseEntity<String> reviewPlace(@RequestParam(value = "ubication") String ubication) {
+	public ResponseEntity<String> reviewPlace(@RequestParam(value = "title") String title) {
 		// Obtener las reseñas por ubicación
-		List<Review> listReviews = reviewRepository.findByUbication(ubication);
+		List<Review> listReviews = reviewRepository.findByTitle(title);
 
 		// Crear el objeto JSON para la respuesta
 		JSONObject jsonResponse = new JSONObject();
@@ -666,85 +677,95 @@ public class PrincipalController {
 
 	@GetMapping("/users")
 	public ResponseEntity<String> getAllUsers() {
-	    // Obtener todos los usuarios de la base de datos
-	    List<User> users = userRepository.findAll();
+	    try {
+	        // Obtener todos los usuarios de la base de datos
+	        List<User> users = userRepository.findAll();
 
-	    // Crear el objeto JSON principal para la respuesta
-	    JSONObject jsonP = new JSONObject();
-	    JSONArray jsonUsers = new JSONArray();
+	        // Crear el objeto JSON principal para la respuesta
+	        JSONObject jsonP = new JSONObject();
+	        JSONArray jsonUsers = new JSONArray();
 
-	    // Recorrer todos los usuarios
-	    for (User user : users) {
-	        // Obtener las reseñas del usuario
-	        List<Review> listReviews = reviewRepository.findByUser(user.getUser());
+	        // Recorrer todos los usuarios
+	        for (User user : users) {
+	            // Obtener las reseñas del usuario
+	            List<Review> listReviews = reviewRepository.findByUser(user.getUser());
 
-	        // Crear un objeto JSON para cada usuario
-	        JSONObject jsonR = new JSONObject();
-	        JSONArray jsonA = new JSONArray();
+	            // Crear un objeto JSON para cada usuario
+	            JSONObject jsonR = new JSONObject();
+	            JSONArray jsonA = new JSONArray();
 
-	        // Agregar datos del usuario al JSON
-	        jsonR.put("id", user.getId());
-	        jsonR.put("user", user.getUser());
-	            String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
-	            jsonR.put("photo", encodedImage);
-	       
-	       
-	        for (Review review : listReviews) {
-	            JSONObject reviewJson = new JSONObject();
+	            // Agregar datos del usuario al JSON
+	            jsonR.put("id", user.getId());
+	            jsonR.put("user", user.getUser());
 
-	            // Generar el link de la reseña
-	            String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId(); 
-	            reviewJson.put("link", reviewLink); 
+	            // Verificar si el usuario tiene imagen y agregarla a Base64
+	            if (user.getImage() != null) {
+	                String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
+	                jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
+	            } else {
+	                jsonR.put("photo", "null"); // Si no hay imagen, poner null o una imagen predeterminada
+	            }
 
-	            
-	            jsonA.put(reviewJson);
-	        }
+	            // Convertir reseñas en links (solo enlaces como strings)
+	            if (listReviews != null && !listReviews.isEmpty()) {
+	                for (Review review : listReviews) {
+	                    String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId();
+	                    jsonA.put(reviewLink);  // Agregar solo el enlace como un string
+	                }
+	                jsonR.put("reviews", jsonA);
+	            } else {
+	                jsonR.put("reviews", new JSONArray()); // Si no hay reseñas, agregar un array vacío
+	            }
 
-	        // Si no hay reseñas, agregar un array vacío
-	        if (jsonA.isEmpty()) {
-	            jsonR.put("reviews", new JSONArray()); 
-	        } else {
-	            jsonR.put("reviews", jsonA); 
-	        }
-
-	            String formattedDate = user.getDate().toString(); //
+	            // Formatear la fecha de creación
+	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	            String formattedDate = sdf.format(user.getDate());
 	            jsonR.put("created", formattedDate);
-	        
 
-	        // Agregar los enlaces de los followeds, followers y friends
-	        JSONArray followedsArray = new JSONArray();
-	        for (String followedId : user.getFolloweds()) {
-	            String followedLink = "http://44.213.235.160:8080/user?user=" + followedId;
-	            JSONObject followedJson = new JSONObject();
-	            followedJson.put("link", followedLink);
-	            followedsArray.put(followedJson);
+	            // Crear arrays con los enlaces de followeds, followers y friends como strings
+	            JSONArray followedsArray = new JSONArray();
+	            if (user.getFolloweds() != null && !user.getFolloweds().isEmpty()) {
+	                for (String followedId : user.getFolloweds()) {
+	                    String followedLink = "http://44.213.235.160:8080/user?user=" + followedId;
+	                    followedsArray.put(followedLink);  // Agregar solo el enlace como string
+	                }
+	            }
+	            jsonR.put("followeds", followedsArray);
+
+	            JSONArray followersArray = new JSONArray();
+	            if (user.getFollowers() != null && !user.getFollowers().isEmpty()) {
+	                for (String followerId : user.getFollowers()) {
+	                    String followerLink = "http://44.213.235.160:8080/user?user=" + followerId;
+	                    followersArray.put(followerLink);  // Agregar solo el enlace como string
+	                }
+	            }
+	            jsonR.put("followers", followersArray);
+
+	            JSONArray friendsArray = new JSONArray();
+	            if (user.getFriends() != null && !user.getFriends().isEmpty()) {
+	                for (String friendId : user.getFriends()) {
+	                    String friendLink = "http://44.213.235.160:8080/user?user=" + friendId;
+	                    friendsArray.put(friendLink);  // Agregar solo el enlace como string
+	                }
+	            }
+	            jsonR.put("friends", friendsArray);
+
+	            // Agregar el objeto JSON de este usuario al array de usuarios
+	            jsonUsers.put(jsonR);
 	        }
-	        jsonR.put("followeds", followedsArray);
 
-	        JSONArray followersArray = new JSONArray();
-	        for (String followerId : user.getFollowers()) {
-	            String followerLink = "http://44.213.235.160:8080/user?user=" + followerId;
-	            JSONObject followerJson = new JSONObject();
-	            followerJson.put("link", followerLink);
-	            followersArray.put(followerJson);
-	        }
-	        jsonR.put("followers", followersArray);
+	        // Agregar los usuarios al objeto JSON principal
+	        jsonP.put("results", jsonUsers);
 
-	        JSONArray friendsArray = new JSONArray();
-	        for (String friendId : user.getFriends()) {
-	            String friendLink = "http://44.213.235.160:8080/user?user=" + friendId;
-	            JSONObject friendJson = new JSONObject();
-	            friendJson.put("link", friendLink);
-	            friendsArray.put(friendJson);
-	        }
-	        jsonR.put("friends", friendsArray);
-
-	        jsonUsers.put(jsonR);
+	        // Retornar la respuesta con el JSON
+	        return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body("Hubo un error al procesar la solicitud: " + e.getMessage());
 	    }
-
-	    jsonP.put("results", jsonUsers);
-	    return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
 	}
+
+
 
 	@GetMapping("/reviews")
 	public ResponseEntity<String> reviews() {
@@ -866,7 +887,7 @@ public class PrincipalController {
 			if (!Oreview.isPresent()) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
 			}
-
+ 
 			Review review = Oreview.get();
 			String linkReview = "http://localhost:8080/review?id=" + review.getId();
 			commentJson.put("review", linkReview);

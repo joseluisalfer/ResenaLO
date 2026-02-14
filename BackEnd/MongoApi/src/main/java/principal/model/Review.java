@@ -1,5 +1,6 @@
 package principal.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class Review {
 	private String type;
 	private double latitud;
 	private double longitud;
-	private List<byte[]> images;
+	private List<byte[]> images = new ArrayList<>();
 	private String user;
 	private double valoration;
 	private String description;
