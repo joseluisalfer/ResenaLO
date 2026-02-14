@@ -565,7 +565,7 @@ public class PrincipalController {
 			// Convertir reseñas en links (solo enlaces como strings)
 			if (listReviews != null && !listReviews.isEmpty()) {
 				for (Review review : listReviews) {
-					String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId();
+					String reviewLink = "http://44.213.235.160:8080/first/review?id=" + review.getId();
 					jsonA.put(reviewLink); // Agregar solo el enlace como un string
 				}
 				jsonR.put("reviews", jsonA);
@@ -732,7 +732,7 @@ public class PrincipalController {
 	        // Recorrer todos los usuarios
 	        for (User user : pageUsers.getContent()) {
 	            // Crear el enlace para cada usuario
-	            String userLink = "http://44.213.235.160:8080/user?user=" + user.getUser();
+	            String userLink = "http://44.213.235.160:8080/first/user?user=" + user.getUser();
 	            jsonUsers.put(userLink); // Agregar solo el enlace al array
 	        }
 
@@ -767,7 +767,7 @@ public class PrincipalController {
 
 	    // Recorrer todas las reseñas de la página actual y agregar el enlace
 	    for (Review review : pageReviews.getContent()) {
-	        String reviewLink = "http://44.213.235.160:8080/review?id=" + review.getId();
+	        String reviewLink = "http://44.213.235.160:8080/first/review?id=" + review.getId();
 	        jsonReviews.put(reviewLink);
 	    }
 
@@ -802,7 +802,7 @@ public class PrincipalController {
 			User user = userRepository.findByUser(userId);
 
 			// Generar el enlace al usuario
-			String userLink = (user != null) ? "http://localhost:8080/user?id=" + user.getId() : null;
+			String userLink = (user != null) ? "http://localhost:8080/first/user?id=" + user.getId() : null;
 
 			// Agregar el enlace del usuario a la reseña
 			commentJson.put("user", userLink);
@@ -816,7 +816,7 @@ public class PrincipalController {
 			}
 
 			Review review = Oreview.get();
-			String linkReview = "http://localhost:8080/review?id=" + review.getId();
+			String linkReview = "http://localhost:8080/first/review?id=" + review.getId();
 			commentJson.put("review", linkReview);
 			jsonComments.put(commentJson);
 		}
@@ -839,7 +839,7 @@ public class PrincipalController {
 			User user = userRepository.findByUser(userId);
 
 			// Generar el enlace al usuario
-			String userLink = (user != null) ? "http://localhost:8080/user?id=" + user.getId() : null;
+			String userLink = (user != null) ? "http://localhost:8080/first/user?id=" + user.getId() : null;
 
 			// Agregar el enlace del usuario a la reseña
 			commentJson.put("user", userLink);
