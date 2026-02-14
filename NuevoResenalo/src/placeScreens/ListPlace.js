@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,67 +8,52 @@ import {
   Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
-import { useTranslation } from 'react-i18next'
-import '../../assets/i18n/index';
+import { useTranslation } from "react-i18next";
+import "../../assets/i18n/index";
+import { getData } from "../services/services"; // Asegúrate de que esta función exista en tus servicios
+
 const ListPlace = ({ navigation }) => {
   const { t } = useTranslation();
+  const [places, setPlaces] = useState([]);
 
-  const [places, setPlaces] = useState([
-    {
-      id: "1",
-      name: "Catarroja Plaza",
-      image: require("../../assets/images/CatarrojaPlaza.jpg"),
-      rating: 4.5,
-    },
-    {
-      id: "2",
-      name: "Catarroja Parque",
-      image: require("../../assets/images/CatarrojaParque.jpg"),
-      rating: 4.0,
-    },
-    {
-      id: "3",
-      name: "Catarroja Fuente",
-      image: require("../../assets/images/CatarrojaFuente.jpg"),
-      rating: 3.8,
-    },
-    {
-      id: "4",
-      name: "Catarroja Plaza",
-      image: require("../../assets/images/CatarrojaPlaza.jpg"),
-      rating: 4.5,
-    },
-    {
-      id: "5",
-      name: "Catarroja Parque",
-      image: require("../../assets/images/CatarrojaParque.jpg"),
-      rating: 4.0,
-    },
-    {
-      id: "6",
-      name: "Catarroja Fuente",
-      image: require("../../assets/images/CatarrojaFuente.jpg"),
-      rating: 3.8,
-    },
-    {
-      id: "7",
-      name: "Catarroja Plaza",
-      image: require("../../assets/images/CatarrojaPlaza.jpg"),
-      rating: 4.5,
-    },
-    {
-      id: "8",
-      name: "Catarroja Parque",
-      image: require("../../assets/images/CatarrojaParque.jpg"),
-      rating: 4.0,
-    },
-    {
-      id: "9",
-      name: "Catarroja Fuente",
-      image: require("../../assets/images/CatarrojaFuente.jpg"),
-      rating: 3.8,
-    },
-  ]);
+  useEffect(() => {
+    // Función para obtener las URLs de las reseñas desde la API
+    const fetchReviews = async () => {
+      try {
+        const data = await getData("http://44.213.235.160:8080/first/reviews");
+        console.log(data);
+        const reviewUrls = data.reviews; // Array de URLs de reseñas
+        
+        // Usamos Promise.all para hacer todas las solicitudes concurrentemente
+        const reviewDetails = await Promise.all(
+          reviewUrls.map(async (url) => {
+            try {
+              const reviewData = await getData(url); // Obtener los datos de cada URL
+              const imageBase64 = `data:image/jpeg;base64,${reviewData.images}`; // Convertir la imagen base64
+              
+              return {
+                id: reviewData.id, // Usamos el ID único de la reseña
+                name: reviewData.name,
+                image: { uri: imageBase64 },
+                rating: reviewData.valoration,
+              };
+            } catch (error) {
+              console.error("Error al obtener los datos de la reseña:", error);
+              return null; // Si hay un error, retorna null (esto puede ser manejado posteriormente)
+            }
+          })
+        );
+
+        // Filtramos los valores null (si alguna reseña falló)
+        setPlaces(reviewDetails.filter(item => item !== null));
+
+      } catch (error) {
+        console.error("Error al obtener las URLs de las reseñas:", error);
+      }
+    };
+
+    fetchReviews();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -86,7 +71,7 @@ const ListPlace = ({ navigation }) => {
       <View style={{ width: "100%" }}>
         <FlatList
           data={places}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()} // Usar ID único como string
           renderItem={({ item }) => (
             <Pressable onPress={() => navigation.navigate("Place")}>
               <View style={styles.item}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { ScrollView, View, StyleSheet, Text, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Images from '../Componentes/Place/Images/images';
@@ -11,8 +11,7 @@ const Place = ({ navigation, route }) => {
   const [placeData, setPlaceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
-
-  const { title } = route.params || { title: 'ParkingMcDonaldsAlbal' };
+  const [title, setTitle] = useState('Clase de DAM2');
 
   const [region, setRegion] = useState({
     latitude: 0,
