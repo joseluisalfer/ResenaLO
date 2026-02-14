@@ -38,11 +38,11 @@ export const postData = async (url, data) => {
         } catch (jsonError) {
           console.log('Error al analizar JSON:', jsonError);
           console.log('Respuesta no es JSON válido:', textResponse);
-          throw new Error('La respuesta no es un JSON válido');
+          return null; // Si no es JSON válido, devolvemos null
         }
       } else {
         console.log('Respuesta vacía del servidor');
-        throw new Error('Respuesta vacía del servidor');
+        return null; // Si la respuesta está vacía, devolvemos null
       }
     } else {
       // Si la respuesta no es exitosa, leer el cuerpo del error como texto
@@ -55,6 +55,7 @@ export const postData = async (url, data) => {
     throw error;
   }
 };
+
 
 // Función para hacer una petición PUT (actualización de datos)
 export const updateData = async (url, data) => {

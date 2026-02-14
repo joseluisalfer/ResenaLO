@@ -42,17 +42,16 @@ const PedirDatos = ({ navigation }) => {
         "http://44.213.235.160:8080/first/login",
         data,
       );
-      // Verificar si el campo 'message' contiene la palabra "Bienvenido"
-      if (
-        response &&
-        response.message &&
-        response.message.includes("Bienvenido")
-      ) {
-        // Si la respuesta contiene "Bienvenido", proceder con el inicio de sesión
-        setIsLoged(true); // Actualiza el estado isLoged a true
 
+      // Verificar si la respuesta es exitosa (status 200 OK)
+      if (response === null) {
+        // Si la respuesta es null (vacía), consideramos que el login es exitoso
+        setIsLoged(true); // Actualiza el estado isLoged a true@
       } else {
-        alert(t("Error"));
+        // Si la respuesta contiene un error
+        const errorMessage =
+          response && response.error ? response.error : t("Error");
+        alert(errorMessage); // Mostrar el mensaje de error
       }
     } catch (error) {
       console.error("Error al enviar los datos:", error);
