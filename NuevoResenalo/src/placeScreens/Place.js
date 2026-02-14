@@ -12,7 +12,7 @@ const Place = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
 
-  const { title } = route.params || { title: 'Unai' };
+  const { title } = route.params || { title: 'ParkingMcDonaldsAlbal' };
 
   const [region, setRegion] = useState({
     latitude: 0,

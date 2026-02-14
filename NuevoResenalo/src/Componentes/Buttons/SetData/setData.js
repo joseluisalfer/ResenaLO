@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
 import { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import "../../../../assets/i18n/index"; // Asegúrate de que esto está en el directorio adecuado
-import { postData } from "../../../services/services"; // Asegúrate de que esta ruta sea correcta
+import { getData, postData } from "../../../services/services"; // Asegúrate de que esta ruta sea correcta
 import Context from "../../../Context/Context";
 
 const PedirDatos = ({ navigation }) => {
@@ -10,7 +10,7 @@ const PedirDatos = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { t } = useTranslation();
-
+  const {emailLogged, setEmailLogged} = useContext(Context);
   // Función para validar si el email tiene un formato correcto
   const validateEmail = (email) => {
     // Expresión regular básica para email
@@ -43,7 +43,12 @@ const PedirDatos = ({ navigation }) => {
         data,
       );
 
-      // Verificar si la respuesta es exitosa (status 200 OK)
+      const dataEmail = await getData(`http://44.213.235.160:8080/first/user?email=${email}`);
+      
+      console.log(dataEmail.results.user);
+      setEmailLogged(dataEmail);
+
+      // Verificar si la respuesta es exitosa (status 200 OK)oscarmartorellg@gmail.com
       if (response === null) {
         // Si la respuesta es null (vacía), consideramos que el login es exitoso
         setIsLoged(true); // Actualiza el estado isLoged a true@

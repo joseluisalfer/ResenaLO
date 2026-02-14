@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text } from 'react-native';
 import Banner from '../Componentes/Banner/Banner';
-import PedirDatos from '../Componentes/Buttons/SetData/setData';
+import SetData from '../Componentes/Buttons/SetData/setData';
 import Registrarse from '../Componentes/Buttons/RegisterButton/registerButton';
 import { useTranslation } from 'react-i18next';
 import '../../assets/i18n/index';
@@ -15,7 +15,7 @@ const Login = ({ navigation }) => {
       <Text style={styles.descripcion}>
         {t('loginScreen.footer')}
       </Text>
-      <PedirDatos navigation={navigation} />
+      <SetData navigation={navigation} />
       <Text style={styles.titulo}>{t('loginScreen.createAccount')}</Text>
       <Text style={styles.descripcion}>
         {t('loginScreen.textAccount')}

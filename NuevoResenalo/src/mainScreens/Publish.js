@@ -19,6 +19,7 @@ const Publish = () => {
   const [imagenes, setImagenes] = useState([null]); // Estado para almacenar las imágenes
   const { t } = useTranslation();
   const { publishInfo, setPublishInfo } = useContext(Context);
+  const { emailLogged} = useContext(Context);
 
   // Función para convertir las imágenes a base64
   const convertImageToBase64 = async (uri) => {
@@ -75,7 +76,7 @@ const Publish = () => {
     // Crear el objeto con todos los datos del formulario usando `publishInfo` y las imágenes convertidas a base64
     const data = {
       title: title,
-      user: "exampleUser", // Aquí puedes obtener el usuario de alguna forma, tal vez del contexto o autenticación
+      user: emailLogged.results.user, // Aquí puedes obtener el usuario de alguna forma, tal vez del contexto o autenticación
       valoration: valoration,
       description: description,
       type: type,
