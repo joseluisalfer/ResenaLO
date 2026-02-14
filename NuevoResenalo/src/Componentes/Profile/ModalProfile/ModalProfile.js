@@ -44,8 +44,13 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
                                 <Button mode="outlined" style={styles.modalButton}>
                                     Cambiar Tema
                                 </Button>
-                                <Button onPress={() => setModalVisible(false)} mode="outlined" style={styles.modalButton}>
-                                    Cancelar
+                                <Button
+                                  onPress={() => setModalVisible(false)}
+                                  mode="contained"
+                                  style={styles.cancelButton}
+                                  labelStyle={styles.cancelButtonText}
+                                >
+                                  Cancelar
                                 </Button>
                             </>
                         ) : (
@@ -54,7 +59,14 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
                                 <Button onPress={() => handleChangeLanguage("es")}>Español</Button>
                                 <Button onPress={() => handleChangeLanguage("ca")}>Valenciano</Button>
                                 <Button onPress={() => handleChangeLanguage("en")}>English</Button>
-                                <Button onPress={handleCancelLanguageChange}>Salir</Button>
+                                {/* Botón Salir con color rojo y texto blanco */}
+                                <Button
+                                  style={styles.exitButton}
+                                  onPress={handleCancelLanguageChange}
+                                  labelStyle={styles.exitButtonText}
+                                >
+                                  Salir
+                                </Button>
                             </>
                         )}
                     </View>
@@ -72,13 +84,8 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     iconContainer: {
-        backgroundColor: "#fff",
         padding: 10,
         borderRadius: 30,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.8,
-        shadowRadius: 3,
     },
     modalOverlay: {
         flex: 1,
@@ -94,6 +101,21 @@ const styles = StyleSheet.create({
     },
     modalButton: {
         marginBottom: 10,
+    },
+    cancelButton: {
+        backgroundColor: "#DC3545",
+        borderColor: "#DC3545",
+        marginBottom: 10,
+    },
+    cancelButtonText: {
+        color: "white",
+    },
+    exitButton: {
+        backgroundColor: "#DC3545",
+        borderColor: "#DC3545",
+    },
+    exitButtonText: {
+        color: "white",
     },
 });
 

@@ -16,9 +16,9 @@ const Profile = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       {/* ModalProfile que maneja el modal y las opciones */}
-      <View style={{ flex: 2 }}>
+      <View style={styles.section}>
         <ModalProfile
           handleLogOut={handleLogOut}
           handleChangeLanguage={handleChangeLanguage}
@@ -26,22 +26,22 @@ const Profile = ({ navigation }) => {
       </View>
 
       {/* Información personal */}
-      <View style={{ flex: 3 }}>
+      <View style={styles.section}>
         <OwnInfo />
       </View>
 
       {/* Estadísticas o información adicional */}
-      <View style={{ flex: 4 }}>
+      <View style={styles.section}>
         <CardInfo />
       </View>
 
       {/* Divisor entre la información del perfil y las publicaciones */}
-      <View style={{ alignItems: "center" }}>
-        <Divider style={{ marginVertical: 16, width: "80%" }} />
+      <View style={styles.divider}>
+        <Divider style={styles.dividerLine} />
       </View>
 
       {/* Publicaciones */}
-      <View style={{ flex: 5 }}>
+      <View style={styles.postsSection}>
         <Posts navigation={navigation} />
       </View>
     </ScrollView>
@@ -50,9 +50,22 @@ const Profile = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
-    marginTop: 40,
     backgroundColor: "white",
+    paddingBottom: 16,
+    paddingTop: 20
+  },
+  section: {
+    marginBottom: 16,
+  },
+  postsSection: {
+    paddingHorizontal: 16,
+  },
+  divider: {
+    alignItems: "center",
+  },
+  dividerLine: {
+    marginVertical: 16,
+    width: "80%",
   },
 });
 
