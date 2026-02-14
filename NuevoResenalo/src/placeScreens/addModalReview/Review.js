@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     addReviewButton: {
-        backgroundColor: '#2654d1',
+        backgroundColor: '#1748ce',
         padding: 12,
         borderRadius: 8,
         marginTop: 20,
