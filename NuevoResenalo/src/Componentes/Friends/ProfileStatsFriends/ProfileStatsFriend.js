@@ -1,24 +1,22 @@
 import React from "react";
-import { View, Text, Card, StyleSheet } from "react-native";
-import { useTranslation } from 'react-i18next';
+import { View, Text, StyleSheet } from "react-native";
+import { Card } from "react-native-paper";
 
-const ProfileStats = ({ postsCount, commentsCount, friendsCount }) => {
-  const { t } = useTranslation();
-  
+const ProfileStatsFriend = () => {
   return (
     <Card style={styles.statsCard}>
       <Card.Content style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text variant="titleMedium">{postsCount}</Text>
-          <Text variant="bodySmall">{t("profile.post")}</Text>
+          <Text variant="titleMedium" style={styles.statText}>24</Text>
+          <Text variant="bodySmall" style={styles.statText}>Posts</Text>
         </View>
         <View style={styles.statItem}>
-          <Text variant="titleMedium">{commentsCount}</Text>
-          <Text variant="bodySmall">{t("profile.comments")}</Text>
+          <Text variant="titleMedium" style={styles.statText}>100</Text>
+          <Text variant="bodySmall" style={styles.statText}>Comments</Text>
         </View>
         <View style={styles.statItem}>
-          <Text variant="titleMedium">{friendsCount}</Text>
-          <Text variant="bodySmall">{t("profile.friends")}</Text>
+          <Text variant="titleMedium" style={styles.statText}>180</Text>
+          <Text variant="bodySmall" style={styles.statText}>Friends</Text>
         </View>
       </Card.Content>
     </Card>
@@ -27,12 +25,14 @@ const ProfileStats = ({ postsCount, commentsCount, friendsCount }) => {
 
 const styles = StyleSheet.create({
   statsCard: {
-    marginTop: 20,
+    
+    marginTop: 10,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#ddd",
     marginHorizontal: 16,
     width: "90%",
+    backgroundColor: "#2654d1",
   },
   statsContainer: {
     flexDirection: "row",
@@ -43,6 +43,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
   },
+
+  statText: {
+    color: "white",
+    fontSize: 18,
+    
+  }
 });
 
-export default ProfileStats;
+export default ProfileStatsFriend;

@@ -1,17 +1,10 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  FlatList,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
 import { useTranslation } from 'react-i18next';
 import '../../../../assets/i18n/index';
-const Friends = ({ navigation, friends }) => {
 
+const Friends = ({ navigation, friends }) => {
   const { t } = useTranslation();
 
   return (
@@ -32,10 +25,7 @@ const Friends = ({ navigation, friends }) => {
         contentContainerStyle={styles.row}
         renderItem={({ item, index }) => (
           <Pressable
-            style={[
-              styles.item,
-              index !== friends.length - 1 && styles.itemGap,
-            ]}
+            style={[styles.item, index !== friends.length - 1 && styles.itemGap]}
             onPress={() => navigation.navigate("FriendScreens", { friendId: item.id })}
           >
             <Image
@@ -51,8 +41,6 @@ const Friends = ({ navigation, friends }) => {
     </View>
   );
 };
-
-export default Friends;
 
 const styles = StyleSheet.create({
   wrapper: { flex: 1 },
@@ -97,3 +85,4 @@ const styles = StyleSheet.create({
     maxWidth: 74,
   },
 });
+export default Friends;
