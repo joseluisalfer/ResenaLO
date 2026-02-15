@@ -7,8 +7,7 @@ import Place from "../placeScreens/addModalReview/ModalReview";
 import ListPlace from "./ListPlace";
 import Podium from "./Podium";
 import AllFriends from "./AllFriends"
-import Friend from "./Friend"
-
+import FriendScreens from "../FriendScreens/FriendScreens";
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -43,8 +42,8 @@ const App = () => {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="Friend"
-                component={Friend}
+                name="FriendScreens"
+                component={FriendScreens}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>
