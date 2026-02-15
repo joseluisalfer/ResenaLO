@@ -121,8 +121,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#DC3545",
-    padding: 20,
-    width: "100%"
+    padding: 50,
+    width: "200%"
   },
 
   containerText: {
