@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -12,73 +12,81 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
 import { getData } from "../services/services";
+import { keyFromSelector } from "i18next";
+import Context from "../Context/Context";
+
 
 const ListPlace = ({ navigation }) => {
   const { t } = useTranslation();
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { setSearchUrl } = useContext(Context);
+
+  const changePageAndSendUri = (uri) => {
+    navigation.navigate("Place");
+    setSearchUrl(uri);
+  }
+
+  const fetchReviews = async () => {
+    try {
+      setLoading(true);
+
+      const data = await getData("http://44.213.235.160:8080/first/reviews");
+      const reviewUrls = data?.reviews ?? [];
+
+      // Si no hay reviews, salimos
+      if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {
+        setPlaces([]);
+        return;
+      }
+      const reviewDetails = await Promise.all(
+        reviewUrls.map(async (url) => {
+          console.log(url);
+          try {
+            const reviewData = await getData(url);
+
+            // Puede venir como array o string
+            const imgRaw = reviewData?.images;
+
+            // Pillamos la primera si es array
+            const currentImage = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
+
+            if (!currentImage) {
+              throw new Error("No hay imagen en la review");
+            }
+
+            // Si ya viene con data:image..., lo usamos tal cual.
+            // Si viene solo base64, asumimos jpeg (como en tu componente Images).
+            const imageUri =
+              typeof currentImage === "string" &&
+              currentImage.startsWith("data:image")
+                ? currentImage
+                : `data:image/jpeg;base64,${currentImage}`;
+
+            return {
+              id: reviewData?.id ?? Math.random().toString(), // fallback por si acaso
+              name: reviewData?.title ?? "Sin título",
+              image: { uri: imageUri },
+              rating: reviewData?.valoration ?? 0,
+              ruta: url,
+            };
+          } catch (error) {
+            console.error("❌ Error al obtener la reseña:", url);
+            return null;
+          }
+        }),
+      );
+
+      setPlaces(reviewDetails.filter((item) => item !== null));
+    } catch (error) {
+      console.error("❌ Error al obtener las URLs de las reseñas:", error);
+      setPlaces([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        setLoading(true);
-
-        const data = await getData("http://44.213.235.160:8080/first/reviews");
-        const reviewUrls = data?.reviews ?? [];
-
-        // Si no hay reviews, salimos
-        if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {
-          setPlaces([]);
-          return;
-        }
-
-        const reviewDetails = await Promise.all(
-          reviewUrls.map(async (url) => {
-            try {
-              const reviewData = await getData(url);
-
-              // Puede venir como array o string
-              const imgRaw = reviewData?.images;
-
-              // Pillamos la primera si es array
-              const currentImage = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
-
-              if (!currentImage) {
-                throw new Error("No hay imagen en la review");
-              }
-
-              // Si ya viene con data:image..., lo usamos tal cual.
-              // Si viene solo base64, asumimos jpeg (como en tu componente Images).
-              const imageUri =
-                typeof currentImage === "string" &&
-                currentImage.startsWith("data:image")
-                  ? currentImage
-                  : `data:image/jpeg;base64,${currentImage}`;
-
-              return {
-                id: reviewData?.id ?? Math.random().toString(), // fallback por si acaso
-                name: reviewData?.title ?? "Sin título",
-                image: { uri: imageUri },
-                rating: reviewData?.valoration ?? 0,
-                raw: reviewData, // opcional: por si quieres debug
-              };
-            } catch (error) {
-              console.error("❌ Error al obtener la reseña:", url);
-              console.error("   ->", error?.message ?? error);
-              return null;
-            }
-          })
-        );
-
-        setPlaces(reviewDetails.filter((item) => item !== null));
-      } catch (error) {
-        console.error("❌ Error al obtener las URLs de las reseñas:", error);
-        setPlaces([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchReviews();
   }, []);
 
@@ -100,20 +108,14 @@ const ListPlace = ({ navigation }) => {
           <ActivityIndicator size="large" />
         </View>
       ) : (
-        <View style={{ width: "100%" }}>
+        <View style={{ width: "100%", marginBottom: "10%" }}>
           <FlatList
             data={places}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={{ paddingBottom: 30 }}
             renderItem={({ item }) => (
               <Pressable
-                onPress={() =>
-                  navigation.navigate("Place", {
-                    // pásale lo que necesites
-                    id: item.id,
-                    title: item.name,
-                  })
-                }
+                onPress={() => changePageAndSendUri(item.ruta)}
               >
                 <View style={styles.item}>
                   <Image source={item.image} style={styles.image} />
@@ -128,7 +130,9 @@ const ListPlace = ({ navigation }) => {
             ListEmptyComponent={
               <View style={styles.emptyBox}>
                 <Ionicons name="image-outline" size={50} color="#ccc" />
-                <Text style={styles.emptyText}>No hay reseñas para mostrar</Text>
+                <Text style={styles.emptyText}>
+                  No hay reseñas para mostrar
+                </Text>
               </View>
             }
           />
