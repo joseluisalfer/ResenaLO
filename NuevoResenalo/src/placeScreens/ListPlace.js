@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
     width: "100%",
-    paddingTop: 10, // en vez de marginTop: "30%"
+    paddingTop: '12%', // en vez de marginTop: "30%"
   },
   backButton: { width: 30 },
 
