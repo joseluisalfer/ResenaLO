@@ -31,12 +31,13 @@ const Register = ({ navigation }) => {
     }
 
     console.log({ email, password, username, birth });
-    navigation.navigate('Login');
+    setModalVisible(true);
   };
 
     const handleModalConfirm = () => {
     console.log("Código de verificación confirmado:", verificationCode);
     setModalVisible(false);
+    
   };
 
   return (
@@ -54,7 +55,7 @@ const Register = ({ navigation }) => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Introduce el código de verificación</Text>
+            <Text style={styles.modalText}>Introduce el código de verificación enviado a su correo electrónico</Text>
             <TextInput
               style={styles.input}
               placeholder="Código de verificacion"
