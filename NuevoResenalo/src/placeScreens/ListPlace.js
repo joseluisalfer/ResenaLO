@@ -7,6 +7,7 @@ import {
   Image,
   Pressable,
   ActivityIndicator,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -63,12 +64,12 @@ const ListPlace = ({ navigation }) => {
           } catch {
             return null;
           }
-        }),
+        })
       );
 
       setPlaces(reviewDetails.filter(Boolean));
     } catch (error) {
-      console.error(" Error al obtener las reseñas:", error);
+      console.error("Error al obtener las reseñas:", error);
       setPlaces([]);
     } finally {
       setLoading(false);
@@ -88,7 +89,7 @@ const ListPlace = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Ionicons
           name="arrow-back"
@@ -97,10 +98,14 @@ const ListPlace = ({ navigation }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         />
+
         <Text style={styles.title}>{t("buttonExplorer.list")}</Text>
+
+        {/* Spacer para centrar el título (equilibra el icono de la izquierda) */}
+        <View style={styles.rightSpacer} />
       </View>
 
-      <View style={{ width: "100%", marginBottom: "10%" }}>
+      <View style={styles.listWrapper}>
         <FlatList
           data={places}
           keyExtractor={(item) => item.id.toString()}
@@ -110,7 +115,9 @@ const ListPlace = ({ navigation }) => {
               <View style={styles.item}>
                 <Image source={item.image} style={styles.image} />
                 <View style={styles.textContainer}>
-                  <Text style={styles.placeName}>{item.name}</Text>
+                  <Text style={styles.placeName} numberOfLines={2}>
+                    {item.name}
+                  </Text>
                   <Text style={styles.rating}>⭐ {item.rating}</Text>
                 </View>
               </View>
@@ -124,27 +131,41 @@ const ListPlace = ({ navigation }) => {
           }
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     backgroundColor: "#fff",
-    padding: 10,
+    paddingHorizontal: 10,
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
-    marginTop: "30%",
     width: "100%",
+    paddingTop: 10, // en vez de marginTop: "30%"
   },
-  backButton: { marginRight: 10 },
-  title: { fontSize: 28, fontWeight: "bold", color: "#000", marginLeft: "18%" },
+  backButton: { width: 30 },
+
+  // centrado real del título
+  title: {
+    flex: 1,
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#000",
+    textAlign: "center",
+  },
+
+  // mismo ancho que el icono para centrar el título
+  rightSpacer: { width: 30 },
+
+  listWrapper: { width: "100%", marginBottom: "10%" },
+
   item: {
     flexDirection: "row",
     alignItems: "center",
@@ -159,9 +180,9 @@ const styles = StyleSheet.create({
   image: { width: "50%", height: 100, borderRadius: 10, marginRight: 15 },
   textContainer: { flex: 1 },
   placeName: { fontSize: 18, fontWeight: "bold", color: "#000" },
-  rating: { fontSize: 16, color: "#777" },
+  rating: { fontWeight: 'bold', fontSize: 20, color: "#777" },
   emptyBox: { alignItems: "center", padding: 30 },
   emptyText: { marginTop: 10, color: "#666" },
 });
-
+//oscarmartorellg@gmail.com
 export default ListPlace;

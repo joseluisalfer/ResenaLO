@@ -78,7 +78,6 @@ const Place = ({ navigation }) => {
     };
   }, [searchUrl]);
 
-  // ✅ Siempre loading hasta que placeData esté listo
   if (loading || !placeData) {
     return (
       <View style={styles.center}>
@@ -115,7 +114,6 @@ const Place = ({ navigation }) => {
           }
         />
       </View>
-.
       <Images
         images={images}
         imagePos={imagePos}
