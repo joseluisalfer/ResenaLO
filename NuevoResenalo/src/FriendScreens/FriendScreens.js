@@ -11,7 +11,7 @@ const FriendScreens = () => {
   
   return (
     <View style={styles.container}>
-      <ProfileHeaderFriend navigation={navigation}/>
+      <ProfileHeaderFriend navigation={navigation} />
       <ProfileStatsFriend/>
       <PostList/>
     </View>

@@ -68,7 +68,7 @@ const Place = ({ navigation, route }) => {
         <Ionicons name="arrow-back" size={28} onPress={() => navigation.goBack()} />
         <Ionicons name="create-outline" size={28} onPress={() => navigation.navigate('EditPlace', { place: placeData })} />
       </View>
-
+.
       <Images
         images={images}
         imagePos={imagePos}
