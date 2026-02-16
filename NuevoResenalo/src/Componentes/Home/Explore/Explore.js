@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, StyleSheet, Text, Image, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, Image, ActivityIndicator, Pressable } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
 
-const Explore = () => {
+const Explore = ({ navigation }) => {
   const [reviewsUrls, setReviewsUrls] = useState([]);
   const [reviewsData, setReviewsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,105 +10,131 @@ const Explore = () => {
   useEffect(() => {
     fetch('http://44.213.235.160:8080/resenalo/randomReviews')
       .then(response => response.json())
-      .then(data => {
-        setReviewsUrls(data);
-      })
+      .then(data => setReviewsUrls(data))
       .catch(error => {
-        console.error("Error fetching reviews URLs:", error);
+        console.error("Error:", error);
+        setLoading(false);
       });
   }, []);
 
   useEffect(() => {
     if (reviewsUrls.length > 0) {
       const fetchReviewDetails = async () => {
-        const reviews = await Promise.all(
-          reviewsUrls.map(async (url) => {
-            const response = await fetch(url);
-            const data = await response.json();
-            return data;
-          })
-        );
-        setReviewsData(reviews);
-        setLoading(false);
+        try {
+          const reviews = await Promise.all(
+            reviewsUrls.map(async (url) => {
+              const response = await fetch(url);
+              return await response.json();
+            })
+          );
+          setReviewsData(reviews);
+        } catch (error) {
+          console.error("Error details:", error);
+        } finally {
+          setLoading(false);
+        }
       };
-
       fetchReviewDetails();
     }
   }, [reviewsUrls]);
 
   if (loading) {
     return (
-      <View style={styles.wrapper}>
+      <View style={styles.loadingWrapper}>
         <ActivityIndicator size="large" color="#2654d1" />
       </View>
     );
   }
 
   return (
+    <View style={styles.container}>
+      <Pressable 
+        style={styles.header} 
+        onPress={() => navigation?.navigate("ListPlace")} 
+      >
+        <Text style={styles.title}>Explorar</Text>
+        <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
+      </Pressable>
+
       <View style={styles.grid}>
         {reviewsData.map((review, index) => (
           <View key={index} style={styles.card}>
             <Image 
-              source={review.image} 
+              source={{ uri: `data:${review.mimeType};base64,${review.image}` }} 
               style={styles.image}
+              resizeMode="cover"
             />
             <View style={styles.footer}>
-              <View style={styles.infoWrapper}>
-                <Text style={styles.rating}>{review.valoration} ⭐</Text>
-                <Text style={styles.place}>{review.title}</Text>
-              </View>
+              <Text style={styles.place} numberOfLines={1}>{review.title}</Text>
+              <Text style={styles.rating}>{review.valoration}/5</Text>
             </View>
           </View>
         ))}
       </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
+  container: {
     flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 60,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+    paddingHorizontal: '4%',
+  },
+  title: {
+    fontSize: 22, 
+    fontWeight: "700",
+    color: "#000",
   },
   grid: {
-    flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    paddingBottom: 10,
+    paddingHorizontal: '4%',
   },
   card: {
     width: "48%",
-    marginBottom: 10,
-    borderRadius: 12,
+    marginBottom: 15,
+    borderRadius: 15,
     overflow: "hidden",
-    backgroundColor: "#eee",
-    aspectRatio: 1.2,
-    marginVertical: 10,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   image: {
     width: '100%',
-    height: '60%',
-    borderRadius: 12,
+    height: 120, 
   },
   footer: {
-    paddingHorizontal: '6%',
-    paddingVertical: '5%',
-    backgroundColor: "#2654d1",
-    borderRadius: 12,
-  },
-  infoWrapper: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: "#2654d1",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   place: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "bold",
     color: "#ffffff",
+    flex: 1,
   },
   rating: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 14,  
+    fontWeight: "bold", 
     color: "#ffffff",
-    marginBottom: 5,
+    marginLeft: 5,
+  },
+  loadingWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

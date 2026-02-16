@@ -13,12 +13,6 @@ const HomeScreen = ({ navigation }) => {
     { id: "5", name: "David" },
   ];
 
-  const places = [
-    { id: "p1", title: "Sevilla", rating: "4.5/5" },
-    { id: "p2", title: "Sevilla", rating: "4.5/5" },
-    { id: "p3", title: "Sevilla", rating: "4.5/5" },
-    { id: "p4", title: "Sevilla", rating: "4.5/5" },
-  ];
 
   return (
     <View style={styles.container}>
@@ -31,7 +25,7 @@ const HomeScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.bottom}>
-        <Explore navigation={navigation} places={places} />
+        <Explore navigation={navigation}  />
       </View>
     </View>
   );
