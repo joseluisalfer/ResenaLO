@@ -40,7 +40,7 @@ const Place = ({ navigation }) => {
       setLoading(true);
       setPlaceData(null);
       console.log("3");
-      // 🔁 Reintento infinito hasta que haya datos válidos
+      // Reintento infinito hasta que haya datos válidos
       while (isMounted) {
         try {
           const raw = await getData(searchUrl);
@@ -61,13 +61,12 @@ const Place = ({ navigation }) => {
             console.log("4");
             setImagePos(0);
             setLoading(false);
-            return; // ✅ ya lo tenemos
+            return; 
           }
         } catch (e) {
-          // ❌ No hacemos nada: seguimos intentando
+          
         }
 
-        // espera antes de reintentar (para no freír el servidor)
         await sleep(1000);
       }
     };
@@ -144,9 +143,7 @@ const Place = ({ navigation }) => {
       <View style={styles.reviewSection}>
         <Text style={styles.sectionTitle}>Reseña de {user}</Text>
         <Review name={user} comment={description} stars={valoration} />
-        <Text style={styles.coords}>
-          {latitud}, {longitud}
-        </Text>
+        
       </View>
     </ScrollView>
   );

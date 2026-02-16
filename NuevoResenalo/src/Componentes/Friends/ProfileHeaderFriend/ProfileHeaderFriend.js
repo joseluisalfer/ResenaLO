@@ -16,10 +16,10 @@ const ProfileHeaderFriend = ({ navigation }) => {
 const obtainData = async () => {
       
         const data = await getData(
-          "http://44.213.235.160:8080/first/userEmail?email=serranotarazonadavid@gmail.com"
+          "http://44.213.235.160:8080/resenalo/userEmailOther?email=oscarmartorellg@gmail.com"
         );
         setUser(data.results);
-        
+        console.log(data);
      
     };
 

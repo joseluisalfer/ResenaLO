@@ -29,7 +29,7 @@ const ListPlace = ({ navigation }) => {
     try {
       setLoading(true);
 
-      const data = await getData("http://44.213.235.160:8080/first/reviews");
+      const data = await getData("http://44.213.235.160:8080/resenalo/reviews");
       const reviewUrls = data?.reviews ?? [];
 
       if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {

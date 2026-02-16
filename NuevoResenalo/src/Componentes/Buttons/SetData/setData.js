@@ -39,13 +39,13 @@ const PedirDatos = ({ navigation }) => {
     try {
       // Enviar datos al servidor con POST
       const response = await postData(
-        "http://44.213.235.160:8080/first/login",
+        "http://44.213.235.160:8080/resenalo/login",
         data,
       );
 
-      const dataEmail = await getData(`http://44.213.235.160:8080/first/user?email=${email}`);
+      const dataEmail = await getData(`http://44.213.235.160:8080/resenalo/userEmail?email=${email}`);
       
-      console.log(dataEmail.results.user);
+      console.log(dataEmail.results);
       setEmailLogged(dataEmail);
 
       // Verificar si la respuesta es exitosa (status 200 OK)oscarmartorellg@gmail.com
