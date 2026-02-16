@@ -21,8 +21,10 @@ public class User {
 	private List<String> followeds = new ArrayList<>();
 	private List<String> followers = new ArrayList<>();
 	private List<String> friends = new ArrayList<>();
+	private List<String> notifications = new ArrayList<String>();
 	private int token;
 	private boolean verified;
+	private String description;
 	
 	public User() {
 	}
@@ -121,6 +123,22 @@ public class User {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public List<String> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(List<String> notifications) {
+		this.notifications = notifications;
 	}
 
 }
