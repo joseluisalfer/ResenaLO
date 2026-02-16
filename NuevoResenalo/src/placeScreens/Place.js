@@ -116,7 +116,7 @@ const Place = ({ navigation }) => {
           }
         />
       </View>
-
+.
       <Images
         images={images}
         imagePos={imagePos}

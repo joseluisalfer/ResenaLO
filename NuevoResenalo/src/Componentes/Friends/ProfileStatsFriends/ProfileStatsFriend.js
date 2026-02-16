@@ -1,8 +1,24 @@
-import React from "react";
+import React, { useState, useEffect} from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "react-native-paper";
 
 const ProfileStatsFriend = () => {
+const [user, setUser] = useState({});
+ useEffect(() => {
+
+    obtainData();
+  }, []);
+
+const obtainData = async () => {
+      
+        const data = await getData(
+          "http://44.213.235.160:8080/first/userEmail?email=oscarmartorellg@gmail.com"
+        );
+        setUser(data.results);
+        
+     
+    };
+
   return (
     <Card style={styles.statsCard}>
       <Card.Content style={styles.statsContainer}>
@@ -11,11 +27,7 @@ const ProfileStatsFriend = () => {
           <Text variant="bodySmall" style={styles.statText}>Posts</Text>
         </View>
         <View style={styles.statItem}>
-          <Text variant="titleMedium" style={styles.statText}>100</Text>
-          <Text variant="bodySmall" style={styles.statText}>Comments</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text variant="titleMedium" style={styles.statText}>180</Text>
+          <Text variant="titleMedium" style={styles.statText}>100{user.friends}</Text>
           <Text variant="bodySmall" style={styles.statText}>Friends</Text>
         </View>
       </Card.Content>

@@ -31,157 +31,132 @@ import { useState } from "react";
 const PostList = () => {
   const { t } = useTranslation();
   const [places, setPlaces] = useState([
-    {
-      id: "1",
-      name: "Catarroja Plaza",
-      image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
-      rating: 4.5,
-    },
-    {
-      id: "2",
-      name: "Catarroja Parque",
-      image: require("../../../../assets/images/CatarrojaParque.jpg"),
-      rating: 4.0,
-    },
-    {
-      id: "3",
-      name: "Catarroja Fuente",
-      image: require("../../../../assets/images/CatarrojaFuente.jpg"),
-      rating: 3.8,
-    },
-    {
-      id: "4",
-      name: "Catarroja Plaza",
-      image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
-      rating: 4.5,
-    },
-    {
-      id: "5",
-      name: "Catarroja Parque",
-      image: require("../../../../assets/images/CatarrojaParque.jpg"),
-      rating: 4.0,
-    },
-    {
-      id: "6",
-      name: "Catarroja Fuente",
-      image: require("../../../../assets/images/CatarrojaFuente.jpg"),
-      rating: 3.8,
-    },
-    {
-      id: "7",
-      name: "Catarroja Plaza",
-      image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
-      rating: 4.5,
-    },
-    {
-      id: "8",
-      name: "Catarroja Parque",
-      image: require("../../../../assets/images/CatarrojaParque.jpg"),
-      rating: 4.0,
-    },
-    {
-      id: "9",
-      name: "Catarroja Fuente",
-      image: require("../../../../assets/images/CatarrojaFuente.jpg"),
-      rating: 3.8,
-    },
-  ]);
-
-  return (
-    <View style={styles.containerText}>
-      <Text style={styles.postText} >Publicaciones</Text>
-      {/* Contenedor para la flecha y el título */}
-      <View style={styles.container}>
-        <FlatList
-          data={places}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Pressable >{/*onPress={() => navigation.navigate("Place")}*/}
-              <View style={styles.item}>
-                {/* Imagen rectangular con borde redondeado */}
-                <Image source={item.image} style={styles.image} />
-
-                <View style={styles.textContainer}>
-                  {/* Título de la ubicación */}
-                  <Text style={styles.placeName}>{item.name}</Text>
-                  {/* Estrellas debajo del título */}
-                  <Text style={styles.rating}>⭐ {item.rating}</Text>
-                </View>
-              </View>
-            </Pressable>
-          )}
-        />
-      </View>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#DC3545",
-    padding: 50,
-    width: "200%"
-  },
-
-  containerText: {
-    justifyContent: "center",
-    alignItems: 'center',
-    marginTop: 15
-  },
-
-  postText: {
-    fontSize: 18,
-    textAlign: "center",
-    fontWeight: "bold"
-  },
-
-  header: {
-    flexDirection: "row", // Alinea la flecha y el título en una fila
-    alignItems: "center",
-    marginBottom: 20,
-    marginTop: "30%",
-    width: "100%",
-  },
-  backButton: {
-    marginRight: 10, // Espacio entre la flecha y el título
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#000",
-    marginLeft: "18%",
-  },
-  item: {
-    flexDirection: "row", // Coloca imagen y texto en fila
-    alignItems: "center",
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    width: "100%", // Asegura que ocupe todo el ancho
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  image: {
-    width: "50%",
-    height: 100,
-    borderRadius: 10, // Borde redondeado de la imagen
-    marginRight: 15,
-  },
-  textContainer: {
-    flex: 1, // Asegura que el texto ocupe el espacio restante
-  },
-  placeName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  rating: {
-    fontSize: 16,
-    color: "#777",
-  },
-});
-
+     {
+       id: "1",
+       name: "Catarroja Plaza",
+       image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
+       rating: "4.5/5",
+     },
+     {
+       id: "2",
+       name: "Catarroja Parque",
+       image: require("../../../../assets/images/CatarrojaParque.jpg"),
+       rating: "4.0/5",
+     },
+     {
+       id: "3",
+       name: "Catarroja Fuente",
+       image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
+       rating: "3.8/5",
+     },
+     {
+       id: "4",
+       name: "Catarroja Playa",
+       image: require("../../../../assets/images/CatarrojaParque.jpg"),
+       rating: "4.7/5",
+     },
+     {
+       id: "5",
+       name: "Catarroja Estadio",
+       image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
+       rating: "4.2/5",
+     }, {
+       id: "6",
+       name: "Catarroja Estadio",
+       image: require("../../../../assets/images/CatarrojaParque.jpg"),
+       rating: "4.2/5",
+     }
+   ]);
+ 
+   return (
+     <View style={styles.wrapper}>
+       {/* Título y botón de navegación */}
+       <Pressable
+         style={styles.header}
+         onPress={() => navigation.navigate("Place")}
+       >
+         <Text style={styles.title}>Publicaciones</Text>
+         <Ionicons name="chevron-forward-outline" size={25} color="#000" style={{marginTop: 20}} />
+       </Pressable>
+ 
+       {/* Grid de publicaciones con 2 columnas */}
+       <FlatList
+         data={places}
+         keyExtractor={(item) => item.id}
+         numColumns={2} // Mostrar en 2 columnas
+         renderItem={({ item, index }) => {
+ 
+           const backgroundColor = index % 3 === 0 ? "#1748ce" : index % 3 === 1 ? "#DC3545" : 'white';
+           const textColor = backgroundColor === 'white' ? 'black' : 'white';
+ 
+           
+           return (
+             <Pressable
+               key={item.id}
+               style={styles.card}
+               onPress={() => navigation.navigate("Place", { placeId: item.id })}
+             >
+               <Card style={[styles.cardContainer, { backgroundColor }]}>
+                 {/* Imagen dentro del Card */}
+                 <Card.Cover source={item.image} style={styles.image} resizeMode="cover" />
+ 
+                 {/* Contenido del Card */}
+                 <Card.Content style={styles.cardContent}>
+                   <Text style={[styles.placeName, { color: textColor }]}>{item.name}</Text>
+                   <Text style={[styles.rating, { color: textColor }]}>Calificación: {item.rating}</Text>
+                 </Card.Content>
+               </Card>
+             </Pressable>
+           );
+         }}
+       />
+     </View>
+   );
+ };
+ 
+ const styles = StyleSheet.create({
+   wrapper: {
+     flex: 1,
+     paddingHorizontal: 8,
+   },
+   header: {
+     flexDirection: "row",
+     alignItems: "center",
+     marginBottom: 10,
+   },
+   title: {
+     fontSize: 18,
+     fontWeight: "700",
+     color: "#000",
+     marginTop: 20
+   },
+   cardContainer: {
+     flex: 1, // Asegura que cada tarjeta ocupe el mismo espacio en su columna
+     margin: 8,
+     borderRadius: 12,
+     overflow: "hidden",
+     backgroundColor: "#1748ce", // Fondo de la tarjeta
+     height: "100%"
+   },
+   image: {
+     height: 100, // Imagen con una altura consistente
+     width: "100%",
+     borderRadius: 10,
+     aspectRatio: 1.5,
+   },
+   cardContent: {
+     padding: 8,
+     justifyContent: "space-between",
+ 
+   },
+   placeName: {
+     fontSize: 14, // Tamaño de fuente más pequeño
+     fontWeight: "bold",
+     color: "#fff", // Texto blanco para mayor contraste
+   },
+   rating: {
+     fontSize: 12, // Tamaño de fuente más pequeño
+     color: "#fff", // Texto blanco para mayor contraste
+   },
+ });
 export default PostList;
