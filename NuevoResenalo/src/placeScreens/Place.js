@@ -1,18 +1,27 @@
-import React, { useState, useEffect, use } from 'react';
-import { ScrollView, View, StyleSheet, Text, ActivityIndicator, Alert, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import Images from '../Componentes/Place/Images/images';
-import PlaceInfo from '../Componentes/Place/PlaceInfo/placeInfo';
-import Map from '../Componentes/Place/Map/map';
-import Review from '../Componentes/Place/Review/review';
-import { getData } from '../services/services';
+import React, { useState, useEffect, useContext } from "react";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import Images from "../Componentes/Place/Images/images";
+import PlaceInfo from "../Componentes/Place/PlaceInfo/placeInfo";
+import Map from "../Componentes/Place/Map/map";
+import Review from "../Componentes/Place/Review/review";
+import { getData } from "../services/services";
+import Context from "../Context/Context";
 
-const Place = ({ navigation, route }) => {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const Place = ({ navigation }) => {
   const [placeData, setPlaceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
-  const [title, setTitle] = useState('Clase de DAM2');
-
+  const { searchUrl } = useContext(Context);
+  console.log("URL recibida:", searchUrl);
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
@@ -20,36 +29,65 @@ const Place = ({ navigation, route }) => {
     longitudeDelta: 0.01,
   });
 
+  console.log(searchUrl);
   useEffect(() => {
-    const fetchPlaceData = async () => {
-      try {
-        setLoading(true);
-        const data = await getData(`http://44.213.235.160:8080/first/reviewPlace?title=${title}`);
+    let isMounted = true;
 
-        if (data && data.reviews && data.reviews.length > 0) {
-          const item = data.reviews[0];
-          setPlaceData(item);
+    const fetchUntilReady = async () => {
+      // Si no hay URL, no hay nada que hacer: se queda cargando (como pediste)
+      if (!searchUrl) return;
 
-          if (item.latitud && item.longitud) {
-            setRegion({
-              latitude: parseFloat(item.latitud),
-              longitude: parseFloat(item.longitud),
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
+      setLoading(true);
+      setPlaceData(null);
+      console.log("3");
+      // 🔁 Reintento infinito hasta que haya datos válidos
+      while (isMounted) {
+        try {
+          const raw = await getData(searchUrl);
+          console.log(raw);
+          if (raw) {
+            if (!isMounted) return;
+
+            setPlaceData(raw);
+
+            if (raw.latitud && raw.longitud) {
+              setRegion({
+                latitude: parseFloat(raw.latitud),
+                longitude: parseFloat(raw.longitud),
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              });
+            }
+            console.log("4");
+            setImagePos(0);
+            setLoading(false);
+            return; // ✅ ya lo tenemos
           }
+        } catch (e) {
+          // ❌ No hacemos nada: seguimos intentando
         }
-        setLoading(false);
-      } catch (error) {
-        Alert.alert("Error", "No se pudo obtener la información");
+
+        // espera antes de reintentar (para no freír el servidor)
+        await sleep(1000);
       }
     };
 
-    fetchPlaceData();
-  }, [title]);
+    fetchUntilReady();
 
-  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#1748ce" /></View>;
-  if (!placeData) return <View style={styles.center}><Text>No se encontraron reviews</Text></View>;
+    return () => {
+      isMounted = false;
+    };
+  }, [searchUrl]);
+
+  // ✅ Siempre loading hasta que placeData esté listo
+  if (loading || !placeData) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#1748ce" />
+        <Text style={styles.loadingText}>Cargando reseña...</Text>
+      </View>
+    );
+  }
 
   const {
     title: apiTitle,
@@ -59,70 +97,74 @@ const Place = ({ navigation, route }) => {
     valoration,
     description,
     latitud,
-    longitud
+    longitud,
   } = placeData;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Ionicons name="arrow-back" size={28} onPress={() => navigation.goBack()} />
-        <Ionicons name="create-outline" size={28} onPress={() => navigation.navigate('EditPlace', { place: placeData })} />
+        <Ionicons
+          name="arrow-back"
+          size={28}
+          onPress={() => navigation.goBack()}
+        />
+        <Ionicons
+          name="create-outline"
+          size={28}
+          onPress={() =>
+            navigation.navigate("EditPlace", { place: placeData, searchUrl })
+          }
+        />
       </View>
 
       <Images
         images={images}
         imagePos={imagePos}
-        nextImage={() => setImagePos((imagePos + 1) % images.length)}
-        prevImage={() => setImagePos((imagePos - 1 + images.length) % images.length)}
+        nextImage={() =>
+          setImagePos((prev) =>
+            images.length ? (prev + 1) % images.length : 0,
+          )
+        }
+        prevImage={() =>
+          setImagePos((prev) =>
+            images.length ? (prev - 1 + images.length) % images.length : 0,
+          )
+        }
       />
 
       <PlaceInfo
-        name={apiTitle || title}
+        name={apiTitle || "Sin título"}
         type={type}
         description={description}
         averageRating={valoration}
       />
 
-      <Map
-        latitud={placeData.latitud}
-        longitud={placeData.longitud}
-      />
-
-      <Pressable style={styles.addButton} onPress={() => navigation.navigate('Review')}>
-        <Text style={styles.addButtonText}>Añadir reseña</Text>
-        <Ionicons name="add-circle-outline" size={24} color="#fff" />
-      </Pressable>
+      <Map latitud={latitud} longitud={longitud} region={region} />
 
       <View style={styles.reviewSection}>
         <Text style={styles.sectionTitle}>Reseña de {user}</Text>
-        <Review
-          name={user}
-          comment={description}
-          stars={valoration}
-        />
-        <Text style={styles.coords}>{latitud}, {longitud}</Text>
+        <Review name={user} comment={description} stars={valoration} />
+        <Text style={styles.coords}>
+          {latitud}, {longitud}
+        </Text>
       </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 20 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 50, marginBottom: 20 },
-  addButton: {
-    backgroundColor: "#1748ce",
-    paddingVertical: 12,
-    borderRadius: 25,
-    marginTop: 20,
+  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 20 },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  loadingText: { marginTop: 10, color: "#333" },
+  header: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    marginTop: 50,
+    marginBottom: 20,
   },
-  addButtonText: { color: "#fff", fontSize: 16, fontWeight: "600", marginRight: 10 },
   reviewSection: { marginTop: 30, marginBottom: 50 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold' },
-  coords: { fontSize: 10, color: '#eee', textAlign: 'center', marginTop: 10 }
+  sectionTitle: { fontSize: 18, fontWeight: "bold" },
+  coords: { fontSize: 10, color: "#eee", textAlign: "center", marginTop: 10 },
 });
 
 export default Place;

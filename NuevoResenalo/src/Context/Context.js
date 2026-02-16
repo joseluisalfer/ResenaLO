@@ -13,9 +13,10 @@ export const Provider = ({ children }) => {
     type: "",
     coords: "",
   });
+  const [searchUrl, setSearchUrl] = useState('');
   return (
     <Context.Provider
-      value={{ isLoged, setIsLoged, publishInfo, setPublishInfo, emailLogged, setEmailLogged }}
+      value={{ isLoged, setIsLoged, publishInfo, setPublishInfo, emailLogged, setEmailLogged, searchUrl, setSearchUrl }}
     >
       {children}
     </Context.Provider>
