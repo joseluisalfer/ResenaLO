@@ -1,68 +1,71 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable, Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
-import { useTranslation } from 'react-i18next'
-import '../../../../assets/i18n/index';
-const Explore = ({ navigation, places }) => {
-  const items = places.slice(0, 4);
-  const { t } = useTranslation();
+import React, { useState, useEffect } from 'react';
+import { ScrollView, View, StyleSheet, Text, Image, ActivityIndicator } from 'react-native';
+
+const Explore = () => {
+  const [reviewsUrls, setReviewsUrls] = useState([]);
+  const [reviewsData, setReviewsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://44.213.235.160:8080/resenalo/randomReviews')
+      .then(response => response.json())
+      .then(data => {
+        setReviewsUrls(data);
+      })
+      .catch(error => {
+        console.error("Error fetching reviews URLs:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (reviewsUrls.length > 0) {
+      const fetchReviewDetails = async () => {
+        const reviews = await Promise.all(
+          reviewsUrls.map(async (url) => {
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
+          })
+        );
+        setReviewsData(reviews);
+        setLoading(false);
+      };
+
+      fetchReviewDetails();
+    }
+  }, [reviewsUrls]);
+
+  if (loading) {
+    return (
+      <View style={styles.wrapper}>
+        <ActivityIndicator size="large" color="#2654d1" />
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.wrapper}>
-      <Pressable
-        style={styles.header}
-        onPress={() => navigation.navigate("ListPlace")}
-      >
-        <Text style={styles.title}>{t("home.buttonExplorer")}</Text>
-        <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
-      </Pressable>
-
       <View style={styles.grid}>
-        {items.map((p) => (
-          <Pressable
-            key={p.id}
-            style={styles.card}
-            onPress={() => navigation.navigate("Place")}
-          >
-            <Image
-              source={require("../../../../assets/images/Konoha.png")}
+        {reviewsData.map((review, index) => (
+          <View key={index} style={styles.card}>
+            <Image 
+              source={review.image} 
               style={styles.image}
-              resizeMode="cover"
             />
             <View style={styles.footer}>
-              <Text style={styles.place} numberOfLines={1}>
-                {p.title}
-              </Text>
-              <Text style={styles.rating}>{p.rating}</Text>
+              <View style={styles.infoWrapper}>
+                <Text style={styles.rating}>{review.valoration} ⭐</Text>
+                <Text style={styles.place}>{review.title}</Text>
+              </View>
             </View>
-          </Pressable>
+          </View>
         ))}
       </View>
-    </View>
   );
 };
-
-export default Explore;
 
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#000",
-  },
-  arrow: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#000",
-    marginLeft: 6,
   },
   grid: {
     flex: 1,
@@ -78,19 +81,22 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#eee",
     aspectRatio: 1.2,
+    marginVertical: 10,
   },
   image: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '60%',
+    borderRadius: 12,
   },
   footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: "6%",
-    paddingVertical: "5%",
+    paddingHorizontal: '6%',
+    paddingVertical: '5%',
     backgroundColor: "#2654d1",
+    borderRadius: 12,
+  },
+  infoWrapper: {
+    justifyContent: 'space-between',
+    flexDirection: 'column',
   },
   place: {
     fontSize: 12,
@@ -101,5 +107,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     color: "#ffffff",
+    marginBottom: 5,
   },
 });
+
+export default Explore;
