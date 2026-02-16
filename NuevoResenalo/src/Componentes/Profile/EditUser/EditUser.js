@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, StyleSheet, TextInput, Button, Text, ScrollView, Pressable } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import { getData } from "../../../services/services";
 
 const EditUser = () => {
     const [name, setName] = useState("Samuel Rodriguez");
@@ -20,6 +21,11 @@ const EditUser = () => {
         navigation.goBack(); // Redirige a la pantalla anterior sin guardar cambios
     };
 
+    const updateData = async () => {
+        const data = await getData();
+    }
+
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.inputContainer}>
@@ -35,12 +41,6 @@ const EditUser = () => {
                     placeholder="Nombre de usuario"
                     value={username}
                     onChangeText={setUsername}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Ubicación"
-                    value={location}
-                    onChangeText={setLocation}
                 />
                 <TextInput
                     style={styles.bioInput}

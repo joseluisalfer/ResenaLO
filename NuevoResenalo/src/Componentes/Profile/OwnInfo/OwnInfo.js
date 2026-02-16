@@ -26,11 +26,7 @@ const OwnInfo = () => {
                 <Text variant="headlineSmall" style={styles.name}>
                     Samuel Rodriguez
                 </Text>
-
-                <Text variant="bodyMedium" style={styles.ubication}>
-                    Valencia, España
-                </Text>
-
+                
                 <Text variant="bodyMedium" style={styles.bio}>
                     Desarrollador móvil | Amante de las mujeres | LOL player
                 </Text>
