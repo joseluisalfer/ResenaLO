@@ -1,34 +1,59 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Podium from "../../../placeScreens/Podium";
 import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
+import { getData } from "../../../services/services";
 import { useTranslation } from 'react-i18next'
 import '../../../../assets/i18n/index';
 const WeekPlace = ({ navigation }) => {
 
   const { t } = useTranslation();
 
+  const [top3, setTop3] = useState([]);
+
+  const obtainData = async () => {
+    const response = await fetch("http://44.213.235.160:8080/resenalo/top3Reviews");
+    const data = await response.json();
+
+    console.log("Enlaces recibidos:", data);
+
+    const details = await Promise.all(
+      data.map(async (data) => {
+        const res = await fetch(data);
+        const detailsData = await res.json();
+        console.log("Detalles recibidos para el enlace:", detailsData)
+        return detailsData;
+      })
+    );
+
+    setTop3(details);
+  }
+
+  useEffect(() => {
+    obtainData();
+  }, []);
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.card}>
         <View style={styles.podiumRow}>
-          <View style={styles.podiumItem}>
-            <Text style={styles.rank}>2</Text>
-            <View style={[styles.bar, styles.silver]} />
-            <Text style={styles.place}>Murcia</Text>
-          </View>
 
-          <View style={styles.podiumItem}>
-            <Text style={styles.rank}>1</Text>
-            <View style={[styles.bar, styles.gold]} />
-            <Text style={styles.place}>Sevilla</Text>
-          </View>
+          {top3.map((place, index) => {
+            const rank = index + 1;  // Para determinar el rango (1, 2, 3)
+            let barStyle = styles.bronze;
 
-          <View style={styles.podiumItem}>
-            <Text style={styles.rank}>3</Text>
-            <View style={[styles.bar, styles.bronze]} />
-            <Text style={styles.place}>Alfafar</Text>
-          </View>
+            // Cambiar el estilo según el rank
+            if (rank === 1) barStyle = styles.gold;
+            else if (rank === 2) barStyle = styles.silver;
+
+            return (
+              <View key={rank} style={styles.podiumItem}>
+                <Text style={styles.rank}>{rank}</Text>
+                <View style={[styles.bar, barStyle]} />
+                <Text style={styles.place}>{place.title}</Text> {/* Muestra el título del lugar */}
+              </View>
+            );
+          })}
         </View>
 
         <Pressable
