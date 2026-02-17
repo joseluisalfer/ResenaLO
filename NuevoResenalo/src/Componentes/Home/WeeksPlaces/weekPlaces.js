@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../../services/services";
 import Context from "../../../Context/Context";
@@ -51,19 +51,24 @@ const WeekPlace = ({ navigation }) => {
         ) : (
           <View style={styles.podiumRow}>
             {podiumData.map((item, index) => {
-              let barStyle = styles.bronze;
-              if (item.rank === 1) barStyle = styles.gold;
-              else if (item.rank === 2) barStyle = styles.silver;
+              let barHeight = 65;
+              let borderColor = "#d48332";
+              if (item.rank === 1) { barHeight = 115; borderColor = "#ffd549"; }
+              else if (item.rank === 2) { barHeight = 90; borderColor = "#e7e7e7"; }
 
               return (
                 <Pressable 
                   key={index} 
                   style={styles.podiumItem}
-                  onPress={() => handlePressPlace(item.review)}
+                  onPress={() => handlePressPlace(item.data.review)}
                 >
-                  <Text style={styles.rank}>{item.rank}</Text>
-                  <View style={styles.barContainer}>
-                    <View style={[styles.bar, barStyle]} />
+                  <Text style={styles.rankTop}>{item.rank}</Text>
+                  <View style={[styles.bar, { height: barHeight, borderColor: borderColor }]}>
+                    <Image 
+                      source={{ uri: `data:${item.data.mimeType};base64,${item.data.image}` }} 
+                      style={styles.image}
+                      resizeMode="cover"
+                    />
                   </View>
                   <Text style={styles.place} numberOfLines={1}>{item.data.title}</Text>
                 </Pressable>
@@ -95,7 +100,7 @@ const styles = StyleSheet.create({
     padding: "4%",
     justifyContent: "space-between",
     marginTop: 15, 
-    minHeight: 180,
+    minHeight: 230,
   },
   loadingContainer: {
     flex: 1,
@@ -108,51 +113,41 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     paddingHorizontal: "2%",
     flex: 1,
-    marginBottom: 10, 
+    marginBottom: 5, 
   },
   podiumItem: {
     width: "30%",
     alignItems: "center",
   },
-  rank: {
+  rankTop: {
     color: "#fff",
-    fontWeight: "800",
-    fontSize: 14,
-    marginBottom: 6,
-  },
-  barContainer: {
-    width: "100%",
-    height: 100,
-    justifyContent: "flex-end",
+    fontSize: 26,
+    fontWeight: "900",
+    marginBottom: 4,
   },
   bar: {
     width: "100%",
-    borderRadius: 10,
+    borderRadius: 12,
+    borderWidth: 3,
+    overflow: 'hidden',
+    backgroundColor: '#1a3a8f',
   },
-  gold: {
-    height: 100, 
-    backgroundColor: "#ffd549",
-  },
-  silver: {
-    height: 70,
-    backgroundColor: "#e7e7e7",
-  },
-  bronze: {
-    height: 45,
-    backgroundColor: "#d48332",
+  image: {
+    width: '100%',
+    height: '100%',
   },
   place: {
     color: "#fff",
     fontSize: 11,
     fontWeight: "700",
-    marginTop: 6,
+    marginTop: 8,
     textAlign: 'center',
     width: '100%',
   },
   titleWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 5,
+    paddingTop: 10,
   },
   title: {
     fontSize: 18,
