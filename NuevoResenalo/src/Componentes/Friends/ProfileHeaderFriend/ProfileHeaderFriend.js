@@ -1,89 +1,105 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import React, { useContext, useState, useEffect } from "react";
+import { View, Text, Image, StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getData } from "../../../services/services";
+import Context from "../../../Context/Context"; // Importamos el contexto
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileHeaderFriend = ({ navigation }) => {
-  const [user, setUser] = useState({});
-  const [isChecked, setIsChecked] = useState(true);
-  const [follow, setFollow] = useState(true);
+  const { selectedFriend } = useContext(Context); // Usamos el contexto para obtener el amigo seleccionado
+  const [loading, setLoading] = useState(false); // Estado para controlar si los datos están cargando
+  const [isFollowing, setIsFollowing] = useState(false); // Estado para controlar si el usuario sigue o no al amigo
 
-  useEffect(() => {
 
-    obtainData();
-  }, []);
-
-const obtainData = async () => {
-      
-        const data = await getData(
-          "http://44.213.235.160:8080/resenalo/userEmailOther?email=oscarmartorellg@gmail.com"
-        );
-        setUser(data.results);
-        console.log(data);
-     
-    };
-
-  const following = () => {
-    setIsChecked((prev) => !prev);
-    setFollow((prev) => !prev);
+  // Función para obtener el estado de seguimiento desde AsyncStorage
+  const getFollowStatus = async () => {
+    try {
+      const storedStatus = await AsyncStorage.getItem(`followStatus_${selectedFriend.user}`);
+      if (storedStatus !== null) {
+        setIsFollowing(JSON.parse(storedStatus)); // Establecemos el estado si ya estaba guardado
+      }
+    } catch (error) {
+      console.error("Error getting follow status", error);
+    }
   };
 
-  // 1) Si viene URL jpg en results.photo la usamos
-  // 2) Si viene base64, lo detectamos y añadimos prefijo
-  const rawPhoto = user?.results?.photo || user?.photo || "";
+  // Función para guardar el estado de seguimiento en AsyncStorage
+  const saveFollowStatus = async (status) => {
+    try {
+      await AsyncStorage.setItem(`followStatus_${selectedFriend.user}`, JSON.stringify(status)); // Guardamos el estado
+    } catch (error) {
+      console.error("Error saving follow status", error);
+    }
+  };
 
-  const imageUri = rawPhoto
-    ? rawPhoto.startsWith("data:image")
-      ? rawPhoto
-      : rawPhoto.startsWith("http")
-      ? rawPhoto
-      : `data:image/jpeg;base64,${rawPhoto}`
+  useEffect(() => {
+    // Cargar el estado de seguimiento cuando se monta el componente
+    getFollowStatus();
+  }, [selectedFriend]);
+
+  // Si no hay un amigo seleccionado, se muestra un indicador de carga
+  if (!selectedFriend) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  const { name, user, description, photo } = selectedFriend;
+
+  // Aseguramos que la foto esté bien formateada (base64 o URL)
+  const imageUri = photo
+    ? photo.startsWith("data:image")
+      ? photo
+      : photo.startsWith("http")
+      ? photo
+      : `data:image/jpeg;base64,${photo}`
     : null;
+
+  const handleFollow = () => {
+    const newFollowStatus = !isFollowing;
+    setIsFollowing(newFollowStatus); // Cambiar el estado de seguir a no seguir o viceversa
+    saveFollowStatus(newFollowStatus); // Guardar el nuevo estado en AsyncStorage
+  };
 
   return (
     <View style={styles.container}>
+      {/* Flecha de regreso siempre visible */}
       <Ionicons
         name="arrow-back"
         size={30}
         color="black"
         style={styles.backButton}
-        onPress={() => navigation.goBack()}
+        onPress={() => navigation.navigate("Home")} // Navega directamente a la pantalla Home
       />
 
-      <View style={styles.containerFollowing}>
-        <Text style={styles.textFollowing}>{follow ? "SEGUIR" : "SIGUIENDO"}</Text>
-      </View>
-
-      <Ionicons
-        name={isChecked ? "checkmark" : "close"}
-        size={30}
-        color={isChecked ? "green" : "red"}
-        style={styles.checkmarkIcon}
-        onPress={following}
-      />
+      {/* Botón de Seguir ubicado arriba a la derecha */}
+      <TouchableOpacity style={styles.followButton} onPress={handleFollow}>
+        <Ionicons
+          name={isFollowing ? "close-circle" : "checkmark-circle"} // Cambia el ícono basado en el estado
+          size={30}
+          color={isFollowing ? "red" : "green"} // Cambia el color según si está siguiendo o no
+        />
+        <Text style={styles.followText}>{isFollowing ? "Siguiendo" : "Seguir"}</Text>
+      </TouchableOpacity>
 
       <View style={styles.profileImageContainer}>
         {imageUri ? (
-          <Image
-            source={{ uri: imageUri }}
-            style={styles.profileImage}
-          />
+          <Image source={{ uri: imageUri }} style={styles.profileImage} />
         ) : (
           <View style={[styles.profileImage, styles.placeholder]} />
         )}
       </View>
 
-      <View style={{ alignItems: "center" }}>
-        <Text style={styles.username}>@{user.user}</Text>
-      </View>
+      <Text style={styles.username}>@{name}</Text>
+      <Text style={styles.name}>{user}</Text>
 
-      <View style={{ alignItems: "center" }}>
-        <Text style={styles.name}>Aymane El Hamoudi</Text>
-        <Text style={styles.ubication}>Catarroja, España</Text>
-        <Text style={styles.bio}>
-          Amante de ChatGPT | Portatil Nº8 | ¡Hazme un bizzum payo!
-        </Text>
-      </View>
+      {/* Mostrar la descripción solo si existe */}
+      {description ? (
+        <Text style={styles.bio}>{description}</Text>
+      ) : (
+        <Text style={styles.bio}>No description available</Text> // Mensaje por defecto si no hay descripción
+      )}
     </View>
   );
 };
@@ -98,12 +114,23 @@ const styles = StyleSheet.create({
   backButton: {
     position: "absolute",
     top: 10,
-    left: 10,
+    right: 280,
   },
-  checkmarkIcon: {
+  followButton: {
     position: "absolute",
-    marginTop: 35,
-    right: 23,
+    top: 10,
+    left: 190,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ddd",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  followText: {
+    marginLeft: 8,
+    fontSize: 18,
+    color: "#333",
   },
   profileImageContainer: {
     justifyContent: "center",
@@ -117,7 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
   },
   placeholder: {
-    backgroundColor: "#ddd",
+    backgroundColor: "#ddd", // Esto será usado si no hay imagen
   },
   name: {
     marginTop: 12,
@@ -129,26 +156,11 @@ const styles = StyleSheet.create({
     marginTop: 3,
     fontSize: 20,
   },
-  ubication: {
-    color: "gray",
-    marginTop: 0,
-    fontSize: 20,
-  },
   bio: {
     textAlign: "center",
     marginTop: 8,
     paddingHorizontal: 20,
     fontSize: 20,
-  },
-  containerFollowing: {
-    right: 10,
-    position: "absolute",
-    marginTop: 8,
-  },
-  textFollowing: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "black",
   },
 });
 

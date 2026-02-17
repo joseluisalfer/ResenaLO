@@ -7,16 +7,17 @@ export const Provider = ({ children }) => {
   const [emailLogged, setEmailLogged] = useState({}); 
   const [publishInfo, setPublishInfo] = useState({
     title: "",
-    user: "", 
+    user: "",
     valoration: "",
     description: "",
     type: "",
     coords: "",
   });
   const [searchUrl, setSearchUrl] = useState('');
+  const [selectedFriend, setSelectedFriend] = useState(null);
   return (
     <Context.Provider
-      value={{ isLoged, setIsLoged, publishInfo, setPublishInfo, emailLogged, setEmailLogged, searchUrl, setSearchUrl }}
+      value={{ isLoged, setIsLoged, publishInfo, setPublishInfo, emailLogged, setEmailLogged, searchUrl, setSearchUrl, selectedFriend, setSelectedFriend }}
     >
       {children}
     </Context.Provider>

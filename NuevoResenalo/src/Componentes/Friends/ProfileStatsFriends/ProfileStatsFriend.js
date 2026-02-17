@@ -1,33 +1,38 @@
-import React, { useState, useEffect} from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "react-native-paper";
+import Context from "../../../Context/Context"; // Asegúrate de que el contexto esté importado correctamente
 
 const ProfileStatsFriend = () => {
-const [user, setUser] = useState({});
- useEffect(() => {
+  const { selectedFriend } = useContext(Context); // Obtener los datos del amigo seleccionado desde el contexto
+  const [loading, setLoading] = useState(false);
 
-    obtainData();
-  }, []);
+  // Si no hay un amigo seleccionado, muestra un mensaje de carga
+  if (!selectedFriend) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
-const obtainData = async () => {
-      
-        const data = await getData(
-          "http://44.213.235.160:8080/first/userEmail?email=oscarmartorellg@gmail.com"
-        );
-        setUser(data.results);
-        
-     
-    };
+  // Obtenemos las reviews y amigos del contexto
+  const reviews = selectedFriend.reviews || [];
+  const friends = selectedFriend.friends || [];
+
+  // Obtener la cantidad de reviews y amigos
+  const reviewCount = reviews.length;
+  const friendCount = friends.length;
 
   return (
     <Card style={styles.statsCard}>
       <Card.Content style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text variant="titleMedium" style={styles.statText}>24</Text>
+          <Text variant="titleMedium" style={styles.statText}>{reviewCount}</Text>
           <Text variant="bodySmall" style={styles.statText}>Posts</Text>
         </View>
         <View style={styles.statItem}>
-          <Text variant="titleMedium" style={styles.statText}>100{user.friends}</Text>
+          <Text variant="titleMedium" style={styles.statText}>{friendCount}</Text>
           <Text variant="bodySmall" style={styles.statText}>Friends</Text>
         </View>
       </Card.Content>
@@ -37,7 +42,6 @@ const obtainData = async () => {
 
 const styles = StyleSheet.create({
   statsCard: {
-    
     marginTop: 10,
     borderRadius: 10,
     borderWidth: 1,
@@ -55,11 +59,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
   },
-
   statText: {
     color: "white",
     fontSize: 18,
-    
   }
 });
 

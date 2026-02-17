@@ -1,19 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
-import { useTranslation } from 'react-i18next';
-import '../../../../assets/i18n/index';
+import { Ionicons } from "@expo/vector-icons"; 
+import Context from "../../../Context/Context"; // Importamos el contexto
 
-const Friends = ({ navigation, friends }) => {
-  const { t } = useTranslation();
-
+const Friends = ({ navigation, friends, setSelectedFriend }) => {
   return (
     <View style={styles.wrapper}>
       <Pressable
         style={styles.header}
         onPress={() => navigation.navigate("AllFriends")}
       >
-        <Text style={styles.title}>{t("home.buttonFriend")}</Text>
+        <Text style={styles.title}>Friends</Text>
         <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
       </Pressable>
 
@@ -26,13 +23,21 @@ const Friends = ({ navigation, friends }) => {
         renderItem={({ item, index }) => (
           <Pressable
             style={[styles.item, index !== friends.length - 1 && styles.itemGap]}
-            onPress={() => navigation.navigate("FriendScreens", { friendId: item.id })}
+            onPress={() => {
+              setSelectedFriend(item); // Guardamos el amigo seleccionado en el contexto
+              navigation.navigate("FriendScreens", { friendId: item.id }); // Navegamos a la pantalla del perfil
+            }}
           >
-            <Image
-              source={require("../../../../assets/images/Konoha.png")}
-              style={styles.avatar}
-            />
-            <Text style={styles.name} numberOfLines={1}>
+            {/* Mostrar la foto del amigo */}
+            {item.photo ? (
+              <Image
+                source={{ uri: item.photo }} // Usamos la foto del amigo desde la API
+                style={styles.avatar}
+              />
+            ) : (
+              <View style={styles.avatar} /> // Si no hay foto, mostramos un placeholder
+            )}
+            <Text style={styles.name} numberOfLines={2}>
               {item.name}
             </Text>
           </Pressable>
@@ -54,12 +59,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     color: "#000",
-  },
-  arrow: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#000",
-    marginLeft: 6,
   },
   row: {
     paddingTop: 2,
@@ -85,4 +84,5 @@ const styles = StyleSheet.create({
     maxWidth: 74,
   },
 });
+
 export default Friends;
