@@ -40,8 +40,6 @@ const Register = ({ navigation }) => {
     try {
       const response = await postData('http://44.213.235.160:8080/resenalo/register', registrationData);
 
-      // Verifica si la respuesta es exitosa
-      if (response) {
         const responseBody = await response.text(); // Leer la respuesta como texto
         console.log('Respuesta del servidor:', responseBody);
 
@@ -53,10 +51,7 @@ const Register = ({ navigation }) => {
           console.error('Error en el registro:', responseBody);
           alert('Hubo un problema al registrar la cuenta');
         }
-      } else {
-        console.error('Error en la respuesta', response);
-        alert('No se recibió respuesta del servidor');
-      }
+      
     } catch (error) {
       console.error('Error en la conexión', error);
       alert('Hubo un problema con la conexión');
@@ -97,7 +92,7 @@ const Register = ({ navigation }) => {
       alert('Hubo un problema con la conexión');
     }
   };
-
+//serranotarazonadavid@gmail.com
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t("registerScreen.createAccount")}</Text>
