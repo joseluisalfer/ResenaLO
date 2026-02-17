@@ -4,17 +4,13 @@ import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import ProfileImage from "../ProfileImage/ProfileImage";
 
-
-
-const OwnInfo = () => {
-    const [image, setImage] = useState(null);
-
+const OwnInfo = ({ image, user, description}) => {  // Recibe 'image' directamente
     const navigation = useNavigation();
 
     return (
         <View>
             {/* Imagen de perfil */}
-            <ProfileImage image={image} setImage={setImage} />
+            <ProfileImage image={image}  />
 
             <View style={{ alignItems: "center" }}>
                 <Text variant="bodyMedium" style={styles.username}>
@@ -24,11 +20,11 @@ const OwnInfo = () => {
 
             <View style={{ alignItems: "center" }}>
                 <Text variant="headlineSmall" style={styles.name}>
-                    Samuel Rodriguez
+                    {user}
                 </Text>
                 
                 <Text variant="bodyMedium" style={styles.bio}>
-                    Desarrollador móvil | Amante de las mujeres | LOL player
+                    {description}
                 </Text>
             </View>
 
@@ -62,7 +58,8 @@ const styles = StyleSheet.create({
         marginTop: 3,
     },
     name: {
-        marginTop: 12,
+        marginTop: 5,
+        fontSize: 25,
         fontWeight: "bold",
     },
     ubication: {

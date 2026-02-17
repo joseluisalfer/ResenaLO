@@ -47,7 +47,6 @@ const PedirDatos = ({ navigation }) => {
       
       console.log(dataEmail.results);
       setEmailLogged(dataEmail);
-
       // Verificar si la respuesta es exitosa (status 200 OK)oscarmartorellg@gmail.com
       if (response === null) {
         // Si la respuesta es null (vacía), consideramos que el login es exitoso
