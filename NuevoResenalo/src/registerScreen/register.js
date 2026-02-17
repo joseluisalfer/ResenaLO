@@ -1,46 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
   Pressable,
-  Modal
-} from 'react-native';
-import { Button } from 'react-native-paper';
-import { useTranslation } from 'react-i18next';
-import '../../assets/i18n/index';
-import { postData } from '../services/services';
+  Modal,
+} from "react-native";
+import { Button } from "react-native-paper";
+import { useTranslation } from "react-i18next";
+import "../../assets/i18n/index";
+import { postData, getData } from "../services/services";
+import Context from "../Context/Context";
 
 const Register = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const { t } = useTranslation();
-  
+  const { setIsLoged, setEmailLogged } = useContext(Context);
+
   // Verificación del código
-  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationCode, setVerificationCode] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
   // Validación de campos vacíos
   const validateForm = () => {
     if (!email || !password || !confirmPassword || !username || !name) {
-      alert('Todos los campos son obligatorios');
+      alert("Todos los campos son obligatorios");
       return false;
     }
     if (password !== confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      alert("Las contraseñas no coinciden");
       return false;
     }
     if (!validateEmail(email)) {
-      alert('Por favor, ingresa un correo electrónico válido');
+      alert("Por favor, ingresa un correo electrónico válido");
       return false;
     }
     return true;
   };
 
+  //serranotarazonadavid@gmail.com
   // Validación del correo electrónico con expresión regular
   const validateEmail = (email) => {
     const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -58,52 +61,51 @@ const Register = ({ navigation }) => {
     };
 
     try {
-      const response = await postData('http://44.213.235.160:8080/resenalo/register', registrationData);
+      const response = await postData(
+        "http://44.213.235.160:8080/resenalo/register",
+        registrationData,
+      );
 
       // Verifica si la respuesta es válida y tiene un estado adecuado
-      if (response && response.status === 200) {
-        const responseBody = await response.text(); // Leer la respuesta como texto
-        console.log('Respuesta del servidor:', responseBody);
 
-        if (responseBody === "Cuenta creada con ÉXITO") {
-          alert('Registro exitoso');
-          setModalVisible(true); // Muestra el modal de verificación después de registrar
-        } else {
-          console.error('Error en el registro:', responseBody);
-          alert('Hubo un problema al registrar la cuenta');
-        }
+      if (response === null) {
+        setModalVisible(true); // Muestra el modal de verificación después de registrar
       } else {
-        console.error('No se recibió respuesta válida del servidor');
-        alert('No se recibió respuesta válida del servidor');
+        console.error("Respuesta no exitosa:", response);
+        alert("Hubo un problema con el registro");
       }
     } catch (error) {
-      console.error('Error en la conexión', error);
-      alert('Hubo un problema con la conexión');
+      console.error("Error en la conexión", error);
+      alert("Hubo un problema con la conexión");
     }
   };
 
   const handleModalConfirm = async () => {
     if (!verificationCode.trim()) {
-      alert('Por favor, ingresa el código de verificación.');
+      alert("Por favor, ingresa el código de verificación.");
       return;
     }
 
     try {
       const data = {
         token: verificationCode,
-        email: email
+        email: email,
       };
-      const response = await postData('http://44.213.235.160:8080/resenalo/verifyEmail', data);
+      const response = await postData(
+        "http://44.213.235.160:8080/resenalo/verifyEmail",
+        data,
+      );
 
-      if (response && response.status === 200) {
-        alert('Verificación exitosa');
-        setModalVisible(false); // Cerrar el modal al confirmar la verificación
+      if (response === null) {
+        setModalVisible(false);
+        navigation.goBack();
       } else {
-        alert('Código de verificación incorrecto');
+        setModalVisible(false);
+        alert("Código de verificación incorrecto");
       }
     } catch (error) {
-      console.error('Error en la conexión', error);
-      alert('Hubo un problema con la conexión');
+      console.error("Error en la conexión", error);
+      alert("Hubo un problema con la conexión");
     }
   };
 
@@ -121,7 +123,10 @@ const Register = ({ navigation }) => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Introduce el código de verificación enviado a su correo electrónico</Text>
+            <Text style={styles.modalText}>
+              Introduce el código de verificación enviado a su correo
+              electrónico
+            </Text>
             <TextInput
               style={styles.input}
               placeholder="Código de verificacion"
@@ -134,7 +139,10 @@ const Register = ({ navigation }) => {
                 Confirmar
               </Button>
             )}
-            <Text onPress={() => setModalVisible(false)} style={styles.cancelButton}>
+            <Text
+              onPress={() => setModalVisible(false)}
+              style={styles.cancelButton}
+            >
               Cancelar
             </Text>
           </View>
@@ -187,10 +195,10 @@ const Register = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    alignItems: "center",
+    justifyContent: "flex-start",
     paddingHorizontal: 20,
-    backgroundColor: '#f7f7f7',
+    backgroundColor: "#f7f7f7",
     marginTop: 20,
   },
   banner: {
@@ -198,19 +206,19 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   subtitle: {
     fontSize: 14,
-    color: '#555',
-    textAlign: 'center',
+    color: "#555",
+    textAlign: "center",
     marginBottom: 10,
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 45,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
@@ -218,16 +226,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: 'black',
-    justifyContent: 'center',
+    backgroundColor: "black",
+    justifyContent: "center",
     padding: 12,
     height: 50,
     width: 300,
     borderRadius: 10,
   },
   buttonText: {
-    color: 'white',
-    textAlign: 'center',
+    color: "white",
+    textAlign: "center",
     fontSize: 15,
   },
   modalOverlay: {
@@ -248,12 +256,11 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   modalText: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
     marginBottom: 20,
   },
 });
 
 export default Register;
-//serranotarazonadavid@gmail.com
