@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import Home from "./placeScreens/PlaceStacks";
 import Publish from "./mainScreens/Publish";
-import Notification from "./mainScreens/stackNotification/StackNotification";
+import Find from "./mainScreens/stackNotification/StackNotification";
 import Profile from "./editScreen/ProfileScreens";
 
 const Tab = createBottomTabNavigator();
@@ -20,8 +20,8 @@ const Main = () => (
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Publish") {
             iconName = focused ? "add-circle" : "add-circle-outline";
-          } else if (route.name === "Notification") {
-            iconName = focused ? "notifications" : "notifications-outline";
+          } else if (route.name === "Find") {
+            iconName = focused ? "search" : "search-outline";
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
           }
@@ -35,7 +35,7 @@ const Main = () => (
     >
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Publish" component={Publish} />
-      <Tab.Screen name="Notification" component={Notification} />
+      <Tab.Screen name="Find" component={Find} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
 );
