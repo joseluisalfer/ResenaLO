@@ -9,42 +9,88 @@ import {
 } from 'react-native';
 import { Button } from 'react-native-paper';
 import Banner from '../Componentes/Banner/Banner';
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
 import '../../assets/i18n/index';
+import { postData } from '../services/services';
+
 const Register = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [birth, setBirth] = useState('');
-
+  const [name, setName] = useState('');
   const { t } = useTranslation();
-
+//@
   const [verificationCode, setVerificationCode] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
-
-  const handleRegister = () => {
+   const handleRegister = async () => {
     if (password !== confirmPassword) {
       alert('Las contraseñas no coinciden');
       return;
     }
 
-    console.log({ email, password, username, birth });
-    setModalVisible(true);
+    const registrationData = {
+      email: email,
+      password: password,
+      user: username,
+      name: name,
+    };
+
+    try {
+      const response = await postData('http://44.213.235.160:8080/resenalo/register', registrationData);
+
+      // Verifica si la respuesta es exitosa
+      if (response.ok) {
+        console.log('Registro exitoso');
+        alert('Registro exitoso');
+        setModalVisible(true); // Muestra el modal de verificación después de registrar
+      } else {
+        const errorData = await response.json();
+        console.error('Error en el registro', errorData);
+        alert('Hubo un problema al registrar la cuenta');
+      }
+    } catch (error) {
+      console.error('Error en la conexión', error);
+      alert('Hubo un problema con la conexión');
+    }
   };
 
-    const handleModalConfirm = () => {
-    console.log("Código de verificación confirmado:", verificationCode);
-    setModalVisible(false);
-    
-  };
+  const handleModalConfirm = async () => {
+    if (!verificationCode.trim()) {
+      alert('Por favor, ingresa el código de verificación.');
+      return;
+    }
 
+    try {
+      const data ={
+        token : verificationCode,
+        email: email
+      }
+      const response = await postData('http://44.213.235.160:8080/resenalo/verifyEmail', data);
+
+      // Comprobar la respuesta
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Verificación exitosa', data);
+        alert('Verificación exitosa');
+        setModalVisible(false);
+      } else {
+        const errorData = await response.json();
+        console.error('Error en la verificación', errorData);
+        alert('Código de verificación incorrecto');
+      }
+    } catch (error) {
+      console.error('Error en la conexión', error);
+      alert('Hubo un problema con la conexión');
+    }
+  };
+//serranotarazonadavid@gmail.com
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t("registerScreen.createAccount")}</Text>
       <Text style={styles.subtitle}>
-       {t("registerScreen.footer")}
+        {t("registerScreen.footer")}
       </Text>
 
       <Modal
@@ -64,7 +110,6 @@ const Register = ({ navigation }) => {
               onChangeText={setVerificationCode}
             />
 
-            {/* Botón de confirmar que aparece solo si hay texto en el campo */}
             {verificationCode.trim().length > 0 && (
               <Button
                 onPress={handleModalConfirm}
@@ -79,9 +124,7 @@ const Register = ({ navigation }) => {
             </Text>
           </View>
         </View>
-
       </Modal>
-
 
       <TextInput
         style={styles.input}
@@ -117,17 +160,14 @@ const Register = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder={t("registerScreen.date")}
-        value={birth}
-        onChangeText={setBirth}
+        placeholder={t("registerScreen.name")}
+        value={name}
+        onChangeText={setName}
       />
-
 
       <Pressable style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>{t("registerScreen.register")}</Text>
-        {/*handleRegister()*/}
-</Pressable>
-      
+      </Pressable>
     </View>
   );
 };
@@ -139,7 +179,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingHorizontal: 20,
     backgroundColor: '#f7f7f7',
-    marginTop: 20,  
+    marginTop: 20,
   },
   banner: {
     marginBottom: -20,
@@ -157,18 +197,18 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    height: 45,  
+    height: 45,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 10,  
+    marginBottom: 10,
     fontSize: 16,
   },
   button: {
     backgroundColor: 'black',
     justifyContent: 'center',
-    padding: 12,  
+    padding: 12,
     height: 50,
     width: 300,
     borderRadius: 10,
@@ -182,13 +222,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",  // Fondo oscuro para el modal
+    backgroundColor: "rgba(0, 0, 0, 0.5)", 
   },
   modalContent: {
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    width: "80%",  // Ancho del modal
+    width: "80%",  
   },
   cancelButton: {
     color: "red",
