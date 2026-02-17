@@ -59,7 +59,7 @@ const WeekPlace = ({ navigation }) => {
                 <Pressable 
                   key={index} 
                   style={styles.podiumItem}
-                  onPress={() => handlePressPlace(item.url)}
+                  onPress={() => handlePressPlace(item.review)}
                 >
                   <Text style={styles.rank}>{item.rank}</Text>
                   <View style={styles.barContainer}>

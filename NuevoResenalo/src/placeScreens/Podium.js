@@ -46,7 +46,7 @@ const Podium = ({ navigation }) => {
     return (
       <Pressable
         style={podiumStyles}
-        onPress={() => handlePress(item.originalUrl)}
+        onPress={() => handlePress(item.review)}
       >
         <Image
           source={{ uri: `data:${item.mimeType};base64,${item.image}` }}
@@ -65,7 +65,7 @@ const Podium = ({ navigation }) => {
 
   const renderOtherPlaces = ({ item, index }) => (
     <Pressable
-      onPress={() => handlePress(item.originalUrl)}
+      onPress={() => handlePress(item.review)}
       style={styles.card}
     >
       <Card.Content style={styles.cardContent}>

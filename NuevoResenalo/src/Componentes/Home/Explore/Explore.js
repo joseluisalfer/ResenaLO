@@ -72,7 +72,7 @@ const Explore = ({ navigation }) => {
               styles.card,
               { opacity: pressed ? 0.8 : 1 }
             ]}
-            onPress={() => handleOnPress(reviewsUrls[index])}
+            onPress={() => handleOnPress(review.review)}
           >
             <Image
               source={{ uri: `data:${review.mimeType};base64,${review.image}` }}

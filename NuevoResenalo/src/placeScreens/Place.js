@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Images from "../Componentes/Place/Images/images";
@@ -21,7 +22,7 @@ const Place = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
   const { searchUrl } = useContext(Context);
-  console.log("URL recibida:", searchUrl);
+  const {emailLogged} = useContext(Context);
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
@@ -29,22 +30,17 @@ const Place = ({ navigation }) => {
     longitudeDelta: 0.01,
   });
 
-  console.log(searchUrl);
   useEffect(() => {
     let isMounted = true;
 
     const fetchUntilReady = async () => {
-      // Si no hay URL, no hay nada que hacer: se queda cargando (como pediste)
       if (!searchUrl) return;
 
       setLoading(true);
       setPlaceData(null);
-      console.log("3");
-      // Reintento infinito hasta que haya datos válidos
       while (isMounted) {
         try {
           const raw = await getData(searchUrl);
-          console.log(raw);
           if (raw) {
             if (!isMounted) return;
 
@@ -58,14 +54,11 @@ const Place = ({ navigation }) => {
                 longitudeDelta: 0.01,
               });
             }
-            console.log("4");
             setImagePos(0);
             setLoading(false);
-            return; 
+            return;
           }
-        } catch (e) {
-          
-        }
+        } catch (e) { }
 
         await sleep(1000);
       }
@@ -81,7 +74,7 @@ const Place = ({ navigation }) => {
   if (loading || !placeData) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#1748ce" />
+        <ActivityIndicator size="large" color="#2654d1" />
       </View>
     );
   }
@@ -139,8 +132,22 @@ const Place = ({ navigation }) => {
 
       <View style={styles.reviewSection}>
         <Text style={styles.sectionTitle}>Reseña de {user}</Text>
+        <Pressable
+          style={({ pressed }) => [
+            styles.btnPressable,
+            { transform: [{ scale: pressed ? 0.96 : 1 }], opacity: pressed ? 0.9 : 1 }
+          ]}
+          onPress={() =>
+            navigation.navigate("Review", {
+              reviewId: placeData.id,
+              user: emailLogged.user
+            })
+          }
+        >
+          <Text style={styles.btnText}>AÑADIR RESEÑA</Text>
+        </Pressable>
         <Review name={user} comment={description} stars={valoration} />
-        
+
       </View>
     </ScrollView>
   );
@@ -157,7 +164,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   reviewSection: { marginTop: 30, marginBottom: 50 },
-  sectionTitle: { fontSize: 18, fontWeight: "bold" },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 15 },
+  btnPressable: {
+    backgroundColor: "#2654d1",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  btnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   coords: { fontSize: 10, color: "#eee", textAlign: "center", marginTop: 10 },
 });
 
