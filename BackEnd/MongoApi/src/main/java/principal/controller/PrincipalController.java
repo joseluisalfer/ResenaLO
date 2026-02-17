@@ -332,6 +332,49 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
+	@PostMapping("deleteFollow")
+	public ResponseEntity<Object> deleteFollow(@RequestBody String body) throws IOException {
+		JSONObject json = new JSONObject(body);
+		String us = json.getString("user");
+		String usFollow = json.getString("userFollow");
+
+		// Buscar usuario
+		User user = userRepository.findByUser(us);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		// Buscar usuario a dejar de seguir
+		User userFollow = userRepository.findByUser(usFollow);
+		if (userFollow == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		// Quitar usuario a la lista de seguidos si está presente
+		List<String> listFollow = user.getFolloweds();
+		List<String> listFriends1 = user.getFriends();
+		if (listFollow.contains(userFollow.getUser())) {
+			listFollow.remove(userFollow.getUser());
+			listFriends1.remove(userFollow.getUser());
+			user.setFolloweds(listFollow);
+			user.setFriends(listFriends1);
+			userRepository.save(user);
+		}
+
+		List<String> listFollowers = userFollow.getFollowers();
+		List<String> listFriends2 = userFollow.getFriends();
+		if (listFollowers.contains(user.getUser())) {
+			listFollowers.remove(user.getUser());
+			listFriends2.remove(user.getUser());
+			userFollow.setFollowers(listFollowers);
+			userFollow.setFriends(listFriends2);
+			userRepository.save(userFollow);
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).build();
+
+	}
+
 	@PutMapping("updateTitle")
 	public ResponseEntity<Object> updateTitle(@RequestBody String body) throws IOException {
 		// Parsear el cuerpo del JSON usando JSONObject
@@ -565,7 +608,17 @@ public class PrincipalController {
 			// Agregar datos del usuario al JSON
 			jsonR.put("id", user.getId());
 			jsonR.put("user", user.getUser());
-
+			if(user.getName() == null) {
+				jsonR.put("name", "");
+			}else {
+				jsonR.put("name", user.getName());
+			}
+			
+			if(user.getDescription() == null) {
+				jsonR.put("description", "");
+			}else {
+				jsonR.put("description", user.getDescription());
+			}
 			// Añadir notificaciones al JSON
 			JSONArray notificationsArray = new JSONArray();
 
@@ -657,7 +710,17 @@ public class PrincipalController {
 			// Agregar datos del usuario al JSON
 			jsonR.put("id", user.getId());
 			jsonR.put("user", user.getUser());
-
+			if(user.getName() == null) {
+				jsonR.put("name", "");
+			}else {
+				jsonR.put("name", user.getName());
+			}
+			
+			if(user.getDescription() == null) {
+				jsonR.put("description", "");
+			}else {
+				jsonR.put("description", user.getDescription());
+			}
 			// Verificar si el usuario tiene imagen y agregarla a Base64
 			if (user.getImage() != null) {
 				String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
@@ -731,8 +794,18 @@ public class PrincipalController {
 			// Agregar datos del usuario al JSON
 			jsonR.put("id", user.getId());
 			jsonR.put("user", user.getUser());
-			jsonR.put("name", user.getName());
-			jsonR.put("description", user.getDescription());
+			if(user.getName() == null) {
+				jsonR.put("name", "");
+			}else {
+				jsonR.put("name", user.getName());
+			}
+			
+			if(user.getDescription() == null) {
+				jsonR.put("description", "");
+			}else {
+				jsonR.put("description", user.getDescription());
+			}
+			
 
 			// Verificar si el usuario tiene imagen y agregarla a Base64
 			if (user.getImage() != null) {
@@ -880,7 +953,7 @@ public class PrincipalController {
 			jsonP.put("image", JSONObject.NULL);
 		}
 
-		return ResponseEntity.ok(jsonP.toString());
+		return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
 	}
 
 	@GetMapping("/reviewPlace")
@@ -1130,7 +1203,19 @@ public class PrincipalController {
 			top10Links.add("http://44.213.235.160:8080/resenalo/reviewP?id=" + r.getId());
 		}
 
-		return ResponseEntity.ok(top10Links);
+		return ResponseEntity.status(HttpStatus.OK).body(top10Links);
+	}
+
+	// Devuelve el top 3 de reviews
+	@GetMapping("/top3Reviews")
+	public ResponseEntity<List<String>> top3Reviews() {
+	    List<Review> top3Reviews = reviewRepository.findTop3ByOrderByValorationDesc();
+	    
+	    List<String> top3Links = top3Reviews.stream()
+	        .map(r -> "http://44.213.235.160:8080/resenalo/reviewP?id=" + r.getId())
+	        .collect(Collectors.toList());
+
+	    return ResponseEntity.status(HttpStatus.OK).body(top3Links);
 	}
 
 }

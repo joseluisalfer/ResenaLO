@@ -12,6 +12,6 @@ public interface ReviewRepository extends MongoRepository<Review, String> {
 	List<Review> findByUser(String user);
 	List<Review> findByValoration(int valoration);
 	List<Review> findByTitle(String title);
-	
+	List<Review> findTop3ByOrderByValorationDesc();
 	Optional<Review> findById(String id);
 }
