@@ -6,20 +6,43 @@ import {
   Image,
   Pressable,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput
 } from "react-native";
 import { getData } from "../services/services";
 
 const FindUser = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
+  const [searchText, setSearchText] = useState(""); // Estado para la barra de búsqueda
 
-  // const imageUri = photo
-  //   ? photo.startsWith("data:image")
-  //     ? photo
-  //     : photo.startsWith("http")
-  //       ? photo : `data:image/jpeg;base64,${photo}`
-  //   : null;
+  // Función para manejar la imagen y detectar si es URL o Base64
+  const getImageUri = (rawPhoto) => {
+    if (rawPhoto) {
+      if (rawPhoto.startsWith("data:image")) {
+        return rawPhoto; // Si es Base64
+      } else if (rawPhoto.startsWith("http")) {
+        return rawPhoto; // Si es una URL
+      } else {
+        return `data:image/jpeg;base64,${rawPhoto}`; // Si es Base64 sin prefijo
+      }
+    }
+    return null;
+  };
+
+  // Función para convertir una imagen en URI a Base64
+  const toBase64 = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      reader.onloadend = () => {
+        resolve(reader.result); // Devolvemos la imagen en formato Base64
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob); // Convierte la imagen a Base64
+    });
+  };
 
   const obtainUsers = async () => {
     try {
@@ -34,10 +57,12 @@ const FindUser = ({ navigation }) => {
           console.log("Detalles completos del usuario:", res);
 
           if (res.results) {
-            const photoUrl = res.results.photo;
+            let photoUrl = res.results.photo;
+            photoUrl = await getImageUri(photoUrl); // Aplicamos getImageUri para manejar la imagen
+
             return {
               name: res.results.name,
-              photo: photoUrl,
+              photo: photoUrl, // Asignamos la imagen procesada
               user: res.results.user,
             };
           } else {
@@ -57,6 +82,11 @@ const FindUser = ({ navigation }) => {
     }
   };
 
+  // Filtrar usuarios según el texto de búsqueda
+  const filteredUsers = users.filter((user) =>
+    user.user.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   useEffect(() => {
     obtainUsers();
   }, []);
@@ -64,15 +94,26 @@ const FindUser = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Usuarios</Text>
+        <Text style={styles.title}>Buscar Usuarios</Text>
       </View>
+
+      {/* Barra de búsqueda */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Buscar usuario..."
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+      </View>
+
       <View style={{ width: "100%" }}>
         {loading ? (
           <ActivityIndicator size="large" color="#2654d1" style={styles.loader} />
         ) : (
           <ScrollView contentContainerStyle={styles.scrollView}>
-            {users.length > 0 ? (
-              users.map((item, index) => {
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((item, index) => {
                 console.log("Rendering user:", item);
                 return (
                   <Pressable
@@ -114,6 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
+    marginTop: 30,
   },
   title: {
     fontSize: 28,
@@ -121,6 +163,20 @@ const styles = StyleSheet.create({
     color: "#000",
     textAlign: "center",
     marginBottom: 10,
+  },
+  searchContainer: {
+    width: "90%",
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    marginTop: 20
+  },
+  searchBar: {
+    height: 40,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 10,
+    fontSize: 16,
   },
   card: {
     flexDirection: "row",
