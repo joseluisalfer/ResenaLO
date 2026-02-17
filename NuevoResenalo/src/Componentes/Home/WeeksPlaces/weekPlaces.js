@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../../services/services";
-import { useTranslation } from 'react-i18next';
 import Context from "../../../Context/Context";
-import '../../../../assets/i18n/index';
 
 const WeekPlace = ({ navigation }) => {
-  const { t } = useTranslation();
   const [podiumData, setPodiumData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { setSearchUrl } = useContext(Context);
 
   const obtainData = async () => {
     try {
+      setLoading(true);
       const urls = await getData("http://44.213.235.160:8080/resenalo/top3Reviews");
       if (urls && urls.length >= 3) {
         const details = await Promise.all(urls.map(url => getData(url)));
@@ -28,6 +27,8 @@ const WeekPlace = ({ navigation }) => {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -43,31 +44,39 @@ const WeekPlace = ({ navigation }) => {
   return (
     <View style={styles.wrapper}>
       <View style={styles.card}>
-        <View style={styles.podiumRow}>
-          {podiumData.map((item, index) => {
-            let barStyle = styles.bronze;
-            if (item.rank === 1) barStyle = styles.gold;
-            else if (item.rank === 2) barStyle = styles.silver;
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        ) : (
+          <View style={styles.podiumRow}>
+            {podiumData.map((item, index) => {
+              let barStyle = styles.bronze;
+              if (item.rank === 1) barStyle = styles.gold;
+              else if (item.rank === 2) barStyle = styles.silver;
 
-            return (
-              <Pressable 
-                key={index} 
-                style={styles.podiumItem}
-                onPress={() => handlePressPlace(item.url)}
-              >
-                <Text style={styles.rank}>{item.rank}</Text>
-                <View style={[styles.bar, barStyle]} />
-                <Text style={styles.place}>{item.data.title}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+              return (
+                <Pressable 
+                  key={index} 
+                  style={styles.podiumItem}
+                  onPress={() => handlePressPlace(item.url)}
+                >
+                  <Text style={styles.rank}>{item.rank}</Text>
+                  <View style={styles.barContainer}>
+                    <View style={[styles.bar, barStyle]} />
+                  </View>
+                  <Text style={styles.place} numberOfLines={1}>{item.data.title}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
 
         <Pressable
           style={styles.titleWrapper}
           onPress={() => navigation.navigate("Podium")}
         >
-          <Text style={styles.title}>{t("home.places_week")}</Text>
+          <Text style={styles.title}>Top 10 lugares</Text>
           <Ionicons name="chevron-forward-outline" size={25} color="#fff" />
         </Pressable>
       </View>
@@ -86,6 +95,12 @@ const styles = StyleSheet.create({
     padding: "4%",
     justifyContent: "space-between",
     marginTop: 15, 
+    minHeight: 180,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   podiumRow: {
     flexDirection: "row",
@@ -105,11 +120,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 6,
   },
+  barContainer: {
+    width: "100%",
+    height: 100,
+    justifyContent: "flex-end",
+  },
   bar: {
     width: "100%",
     borderRadius: 10,
   },
-
   gold: {
     height: 100, 
     backgroundColor: "#ffd549",

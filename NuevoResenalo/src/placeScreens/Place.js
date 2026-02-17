@@ -82,7 +82,6 @@ const Place = ({ navigation }) => {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#1748ce" />
-        <Text style={styles.loadingText}>Cargando reseña...</Text>
       </View>
     );
   }
