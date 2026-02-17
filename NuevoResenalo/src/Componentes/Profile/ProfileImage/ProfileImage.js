@@ -1,8 +1,26 @@
-import React, { useState } from "react";
-import { View, Pressable, Text, Image, Alert, StyleSheet } from "react-native";
+import React, { useState, useContext } from "react";
+import Context from "../../../Context/Context";
+import { View, Pressable, Image, Alert, StyleSheet } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
-const ProfileImage = ({ image, setImage }) => {
+const ProfileImage = () => {
+  const { emailLogged } = useContext(Context);
+  const [base64Image, setBase64Image] = useState(emailLogged.results.photo); // Estado para la imagen en base64
+
+  // Función para manejar la imagen y detectar si es URL o Base64
+  const getImageUri = (rawPhoto) => {
+    if (rawPhoto) {
+      if (rawPhoto.startsWith("data:image")) {
+        return rawPhoto; // Si es Base64
+      } else if (rawPhoto.startsWith("http")) {
+        return rawPhoto; // Si es una URL
+      } else {
+        return `data:image/jpeg;base64,${rawPhoto}`; // Si es Base64 sin prefijo
+      }
+    }
+    return null;
+  };
+
   const seleccionarImagen = async () => {
     Alert.alert("Cambiar imagen de perfil", "Elige una opción", [
       {
@@ -22,8 +40,8 @@ const ProfileImage = ({ image, setImage }) => {
 
           if (!result.canceled) {
             // Si se selecciona una imagen, la conviertes a base64
-            const base64Image = await toBase64(result.assets[0].uri);
-            setImage(base64Image); // Actualizamos el estado con la nueva imagen
+            const base64 = await toBase64(result.assets[0].uri);
+            setBase64Image(base64); // Almacena la imagen en base64 en el estado
           }
         },
       },
@@ -45,15 +63,9 @@ const ProfileImage = ({ image, setImage }) => {
 
           if (!result.canceled) {
             // Convertir la imagen a Base64 si se toma una foto
-            const base64Image = await toBase64(result.assets[0].uri);
-            setImage(base64Image); // Actualizamos el estado con la nueva imagen
+            const base64 = await toBase64(result.assets[0].uri);
+            setBase64Image(base64); // Almacena la imagen en base64 en el estado
           }
-        },
-      },
-      {
-        text: "Eliminar foto de perfil",
-        onPress: () => {
-          setImage(null); // Eliminar la imagen
         },
       },
       { text: "Cancelar", style: "cancel" },
@@ -70,19 +82,21 @@ const ProfileImage = ({ image, setImage }) => {
         resolve(reader.result); // Devolvemos la imagen en formato Base64
       };
       reader.onerror = reject;
-      reader.readAsDataURL(blob);  // Convierte la imagen a Base64
+      reader.readAsDataURL(blob); // Convierte la imagen a Base64
     });
   };
+
+  const imageUri = getImageUri(base64Image); // Obtiene la URI correcta (Base64 o URL)
 
   return (
     <View style={styles.container}>
       <Pressable onPress={seleccionarImagen} style={styles.photoSquare}>
-        {/* Si hay imagen (Base64), la mostramos dentro del círculo */}
-        {image ? (
-          <Image source={{ uri: image }} style={styles.photo} />
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.photo} />
         ) : (
           <View style={styles.placeholder}>
-            <Text style={styles.plus}>+</Text>
+            {/* Aquí podrías poner un texto o un fondo predeterminado si no se ha cargado ninguna imagen */}
+            <Text style={styles.photoText}>Imagen de perfil</Text>
           </View>
         )}
       </Pressable>
@@ -116,11 +130,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     height: "100%",
+    backgroundColor: "#ddd",
+    borderRadius: 60,
   },
-  plus: {
-    fontSize: 40,
-    color: "#aaa",
-    fontWeight: "bold",
+  photoText: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
   },
 });
 

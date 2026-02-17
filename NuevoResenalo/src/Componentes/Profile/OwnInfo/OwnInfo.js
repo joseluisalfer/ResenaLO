@@ -4,23 +4,23 @@ import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import ProfileImage from "../ProfileImage/ProfileImage";
 
-const OwnInfo = ({ image, user, description}) => {  // Recibe 'image' directamente
+const OwnInfo = ({ user, description, name}) => {  // Recibe 'image' directamente
     const navigation = useNavigation();
 
     return (
         <View>
             {/* Imagen de perfil */}
-            <ProfileImage image={image}  />
+            <ProfileImage/>
 
             <View style={{ alignItems: "center" }}>
                 <Text variant="bodyMedium" style={styles.username}>
-                    @samueltrava.official
+                    @{user}
                 </Text>
             </View>
 
             <View style={{ alignItems: "center" }}>
                 <Text variant="headlineSmall" style={styles.name}>
-                    {user}
+                    {name}
                 </Text>
                 
                 <Text variant="bodyMedium" style={styles.bio}>

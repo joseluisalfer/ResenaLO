@@ -23,6 +23,8 @@ const Profile = ({ navigation }) => {
     console.log("Idioma cambiado a: ", language);
   };
 //oscarmartorellg@gmail.com
+//unairp19@gmail.com
+//serranotarazonadavid@gmail.com
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* ModalProfile que maneja el modal y las opciones */}
@@ -35,7 +37,7 @@ const Profile = ({ navigation }) => {
 
       {/* Información personal */}
       <View style={styles.section}>
-        <OwnInfo image={emailLogged.results.photo} user={emailLogged.results.user} description={emailLogged.results.description}/>
+        <OwnInfo name={emailLogged.results.name} user={emailLogged.results.user} description={emailLogged.results.description}/>
       </View>
 
       {/* Estadísticas o información adicional */}
