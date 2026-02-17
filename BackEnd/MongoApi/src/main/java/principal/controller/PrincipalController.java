@@ -170,8 +170,8 @@ public class PrincipalController {
 		// Guardar el usuario en la base de datos
 		userRepository.save(newUser);
 
-		return ResponseEntity.status(HttpStatus.CREATED) // 201
-				.body("Cuenta creada con ÉXITO");
+		return ResponseEntity.status(HttpStatus.OK) // 201
+				.build();
 	}
 
 	@PostMapping("/login")
