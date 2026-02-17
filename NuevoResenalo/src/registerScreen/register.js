@@ -24,11 +24,31 @@ const Register = ({ navigation }) => {
   const [verificationCode, setVerificationCode] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleRegister = async () => {
+  // Validación de campos vacíos
+  const validateForm = () => {
+    if (!email || !password || !confirmPassword || !username || !name) {
+      alert('Todos los campos son obligatorios');
+      return false;
+    }
     if (password !== confirmPassword) {
       alert('Las contraseñas no coinciden');
-      return;
+      return false;
     }
+    if (!validateEmail(email)) {
+      alert('Por favor, ingresa un correo electrónico válido');
+      return false;
+    }
+    return true;
+  };
+
+  // Validación del correo electrónico con expresión regular
+  const validateEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return regex.test(email);
+  };
+
+  const handleRegister = async () => {
+    if (!validateForm()) return;
 
     const registrationData = {
       email: email,
@@ -40,18 +60,22 @@ const Register = ({ navigation }) => {
     try {
       const response = await postData('http://44.213.235.160:8080/resenalo/register', registrationData);
 
+      // Verifica si la respuesta es válida y tiene un estado adecuado
+      if (response && response.status === 200) {
         const responseBody = await response.text(); // Leer la respuesta como texto
         console.log('Respuesta del servidor:', responseBody);
 
-        if (response.ok) {
-          console.log('Registro exitoso');
+        if (responseBody === "Cuenta creada con ÉXITO") {
           alert('Registro exitoso');
           setModalVisible(true); // Muestra el modal de verificación después de registrar
         } else {
           console.error('Error en el registro:', responseBody);
           alert('Hubo un problema al registrar la cuenta');
         }
-      
+      } else {
+        console.error('No se recibió respuesta válida del servidor');
+        alert('No se recibió respuesta válida del servidor');
+      }
     } catch (error) {
       console.error('Error en la conexión', error);
       alert('Hubo un problema con la conexión');
@@ -71,28 +95,18 @@ const Register = ({ navigation }) => {
       };
       const response = await postData('http://44.213.235.160:8080/resenalo/verifyEmail', data);
 
-      if (response) {
-        const responseBody = await response.text(); // Leer la respuesta como texto
-        console.log('Respuesta de verificación:', responseBody);
-
-        if (response.ok) {
-          console.log('Verificación exitosa');
-          alert('Verificación exitosa');
-          setModalVisible(false); // Cerrar el modal al confirmar la verificación
-        } else {
-          console.error('Error en la verificación:', responseBody);
-          alert('Código de verificación incorrecto');
-        }
+      if (response && response.status === 200) {
+        alert('Verificación exitosa');
+        setModalVisible(false); // Cerrar el modal al confirmar la verificación
       } else {
-        console.error('Error en la respuesta', response);
-        alert('No se recibió respuesta del servidor');
+        alert('Código de verificación incorrecto');
       }
     } catch (error) {
       console.error('Error en la conexión', error);
       alert('Hubo un problema con la conexión');
     }
   };
-//serranotarazonadavid@gmail.com
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t("registerScreen.createAccount")}</Text>
@@ -242,3 +256,4 @@ const styles = StyleSheet.create({
 });
 
 export default Register;
+//serranotarazonadavid@gmail.com
