@@ -13,6 +13,7 @@
         "password": "contraseña",
         "confirm": "Confirmar contraseña",
         "user": "Nombre de usuario",
+        "name": "Nombre",
         "date": "Fecha de nacimiento (DD/MM/AAAA)",
         "register": "Registrarse"
     },
