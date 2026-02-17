@@ -142,7 +142,7 @@ public class PrincipalController {
 		newUser.setDate(new Date());
 		newUser.setName(name);
 		newUser.setToken(token);
-
+		newUser.setDescription("");
 		  // Manejo de la imagen por defecto
 	    byte[] imageBytes = null;
 	    try {
@@ -170,8 +170,7 @@ public class PrincipalController {
 		// Guardar el usuario en la base de datos
 		userRepository.save(newUser);
 
-		return ResponseEntity.status(HttpStatus.OK) // 201
-				.build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PostMapping("/login")
@@ -196,14 +195,13 @@ public class PrincipalController {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Credenciales incorrectas\"}");
 			}
 
-			// A espera de arreglar el email
 			// Comprobar si el usuario ya está verificado
-//			if (!dbUser.isVerified()) {
-//				return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"error\": \"El usuario ya está logueado\"}");
-//			}
+		if (!dbUser.isVerified()) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"error\": \"El usuario ya está logueado\"}");
+			}
 
 			// Marcar al usuario como verificado
-			// dbUser.setVerified(true);
+			 dbUser.setVerified(true);
 			userRepository.save(dbUser);
 
 			return ResponseEntity.status(HttpStatus.OK).build();
@@ -1209,22 +1207,13 @@ public class PrincipalController {
 	@GetMapping("/top10Reviews")
 	public ResponseEntity<List<String>> top10Reviews() {
 
-		List<Review> listReviews = reviewRepository.findAll();
+		 List<Review> top10Reviews = reviewRepository.findTop10ByOrderByValorationDesc();
+		    
+		    List<String> top10Links = top10Reviews.stream()
+		        .map(r -> "http://44.213.235.160:8080/resenalo/reviewP?id=" + r.getId())
+		        .collect(Collectors.toList());
 
-		// Ordenar de mayor a menor por valoración
-		listReviews.sort((r1, r2) -> Double.compare(r2.getValoration(), r1.getValoration()));
-
-		// Límite hasta 10
-		int limite = Math.min(10, listReviews.size());
-
-		// Crear lista de links
-		List<String> top10Links = new ArrayList<>();
-		for (int i = 0; i < limite; i++) {
-			Review r = listReviews.get(i);
-			top10Links.add("http://44.213.235.160:8080/resenalo/reviewP?id=" + r.getId());
-		}
-
-		return ResponseEntity.status(HttpStatus.OK).body(top10Links);
+		    return ResponseEntity.status(HttpStatus.OK).body(top10Links);
 	}
 
 	// Devuelve el top 3 de reviews
