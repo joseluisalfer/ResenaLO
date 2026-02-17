@@ -4,7 +4,7 @@ const Context = createContext();
 
 export const Provider = ({ children }) => {
   const [isLoged, setIsLoged] = useState(false); // Estado inicial de isLoged es false
-  const [emailLogged, setEmailLogged] = useState({}); // Estado inicial de isLoged es false
+  const [emailLogged, setEmailLogged] = useState({}); 
   const [publishInfo, setPublishInfo] = useState({
     title: "",
     user: "", 
