@@ -1,6 +1,7 @@
 package principal.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -142,9 +143,29 @@ public class PrincipalController {
 		newUser.setName(name);
 		newUser.setToken(token);
 
-		String imagePath = "src/main/resources/foto_default.png";
-		byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
-		newUser.setImage(imageBytes);
+		  // Manejo de la imagen por defecto
+	    byte[] imageBytes = null;
+	    try {
+	        // Usamos getClass().getResourceAsStream() para leer la imagen desde el classpath
+	        InputStream imageStream = getClass().getResourceAsStream("/foto_default.png");
+	        if (imageStream != null) {
+	            imageBytes = imageStream.readAllBytes();
+	        } else {
+	            // Si la imagen no se encuentra, lanzamos un error o usamos una imagen predeterminada
+	            System.err.println("No se pudo encontrar la imagen por defecto.");
+	            // Puedes usar una imagen por defecto en memoria si lo prefieres
+	        }
+	    } catch (IOException e) {
+	        // Manejar la excepción de lectura de archivo
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("Error al leer la imagen por defecto");
+	    }
+
+	    // Si la imagen se leyo correctamente, la asignamos al nuevo usuario
+	    if (imageBytes != null) {
+	        newUser.setImage(imageBytes);
+	    }
 
 		// Guardar el usuario en la base de datos
 		userRepository.save(newUser);
