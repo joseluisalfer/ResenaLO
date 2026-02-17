@@ -15,14 +15,13 @@ import Review from "../Componentes/Place/Review/review";
 import { getData } from "../services/services";
 import Context from "../Context/Context";
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
 const Place = ({ navigation }) => {
   const [placeData, setPlaceData] = useState(null);
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
-  const { searchUrl } = useContext(Context);
-  const {emailLogged} = useContext(Context);
+  const { searchUrl, emailLogged } = useContext(Context);
+  
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
@@ -33,42 +32,44 @@ const Place = ({ navigation }) => {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchUntilReady = async () => {
+    const fetchData = async () => {
       if (!searchUrl) return;
 
       setLoading(true);
-      setPlaceData(null);
-      while (isMounted) {
-        try {
-          const raw = await getData(searchUrl);
-          if (raw) {
-            if (!isMounted) return;
+      try {
+        const rawPlace = await getData(searchUrl);
+        
+        if (rawPlace && isMounted) {
+          setPlaceData(rawPlace);
 
-            setPlaceData(raw);
+          const currentId = rawPlace.id || rawPlace._id;
+          const commentsUrl = `http://44.213.235.160:8080/resenalo/comment?idReview=${currentId}`;
+          const responseComments = await getData(commentsUrl);
 
-            if (raw.latitud && raw.longitud) {
-              setRegion({
-                latitude: parseFloat(raw.latitud),
-                longitude: parseFloat(raw.longitud),
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              });
-            }
-            setImagePos(0);
-            setLoading(false);
-            return;
+          if (responseComments && Array.isArray(responseComments)) {
+            setComments(responseComments);
+          } else {
+            setComments([]);
           }
-        } catch (e) { }
 
-        await sleep(1000);
+          if (rawPlace.latitud && rawPlace.longitud) {
+            setRegion({
+              latitude: parseFloat(rawPlace.latitud),
+              longitude: parseFloat(rawPlace.longitud),
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchUntilReady();
-
-    return () => {
-      isMounted = false;
-    };
+    fetchData();
+    return () => { isMounted = false; };
   }, [searchUrl]);
 
   if (loading || !placeData) {
@@ -79,75 +80,60 @@ const Place = ({ navigation }) => {
     );
   }
 
-  const {
-    title: apiTitle,
-    type,
-    images = [],
-    user,
-    valoration,
-    description,
-    latitud,
-    longitud,
-  } = placeData;
-
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Ionicons
-          name="arrow-back"
-          size={28}
-          onPress={() => navigation.goBack()}
-        />
+        <Ionicons name="arrow-back" size={28} onPress={() => navigation.goBack()} />
         <Ionicons
           name="create-outline"
           size={28}
-          onPress={() =>
-            navigation.navigate("EditPlace", { place: placeData, searchUrl })
-          }
+          onPress={() => navigation.navigate("EditPlace")}
         />
       </View>
+
       <Images
-        images={images}
+        images={placeData.images || []}
         imagePos={imagePos}
-        nextImage={() =>
-          setImagePos((prev) =>
-            images.length ? (prev + 1) % images.length : 0,
-          )
-        }
-        prevImage={() =>
-          setImagePos((prev) =>
-            images.length ? (prev - 1 + images.length) % images.length : 0,
-          )
-        }
+        nextImage={() => setImagePos((prev) => (placeData.images.length ? (prev + 1) % placeData.images.length : 0))}
+        prevImage={() => setImagePos((prev) => (placeData.images.length ? (prev - 1 + placeData.images.length) % placeData.images.length : 0))}
       />
 
       <PlaceInfo
-        name={apiTitle || "Sin título"}
-        type={type}
-        description={description}
-        averageRating={valoration}
+        name={placeData.title || "Sin título"}
+        type={placeData.type}
+        description={placeData.description}
+        averageRating={placeData.valoration}
       />
 
-      <Map latitud={latitud} longitud={longitud} region={region} />
+      <Map latitud={placeData.latitud} longitud={placeData.longitud} region={region} />
 
       <View style={styles.reviewSection}>
-        <Text style={styles.sectionTitle}>Reseña de {user}</Text>
+        <Text style={styles.sectionTitle}>COMENTARIOS</Text>
+        
         <Pressable
-          style={({ pressed }) => [
-            styles.btnPressable,
-            { transform: [{ scale: pressed ? 0.96 : 1 }], opacity: pressed ? 0.9 : 1 }
-          ]}
+          style={styles.btnPressable}
           onPress={() =>
             navigation.navigate("Review", {
-              reviewId: placeData.id,
+              reviewId: placeData.id || placeData._id,
               user: emailLogged.user
             })
           }
         >
           <Text style={styles.btnText}>AÑADIR RESEÑA</Text>
         </Pressable>
-        <Review name={user} comment={description} stars={valoration} />
 
+        {comments.length > 0 ? (
+          comments.map((item) => (
+            <Review 
+              key={item._id} 
+              name={item.user} 
+              comment={item.text} 
+              stars={item.valoration} 
+            />
+          ))
+        ) : (
+          <Text style={styles.noCommentsText}>No hay reseñas.</Text>
+        )}
       </View>
     </ScrollView>
   );
@@ -156,13 +142,7 @@ const Place = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 20 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  loadingText: { marginTop: 10, color: "#333" },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 50,
-    marginBottom: 20,
-  },
+  header: { flexDirection: "row", justifyContent: "space-between", marginTop: 50, marginBottom: 20 },
   reviewSection: { marginTop: 30, marginBottom: 50 },
   sectionTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 15 },
   btnPressable: {
@@ -170,20 +150,10 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    marginBottom: 20,
   },
-  btnText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  coords: { fontSize: 10, color: "#eee", textAlign: "center", marginTop: 10 },
+  btnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  noCommentsText: { textAlign: 'center', color: '#999', fontStyle: 'italic' }
 });
 
 export default Place;

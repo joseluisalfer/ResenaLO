@@ -10,7 +10,7 @@ const Review = ({ name, comment, stars }) => {
 
         <View style={styles.starsContainer}>
           <Text style={styles.starText}>{stars}</Text>
-          <Ionicons name="star" size={20} color="#000000" />
+          <Ionicons name="star" size={18} color="#FFD700" /> 
         </View>
 
         <Text style={styles.comment}>{comment}</Text>
@@ -21,20 +21,20 @@ const Review = ({ name, comment, stars }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    marginVertical: 8,
   },
   commentBox: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f9f9f9",
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#ddd",
-    position: "relative",
+    borderColor: "#eee",
   },
   name: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "bold",
-    marginBottom: 5,
+    color: "#333",
+    marginBottom: 4,
   },
   starsContainer: {
     flexDirection: "row",
@@ -44,14 +44,15 @@ const styles = StyleSheet.create({
     right: 15,
   },
   starText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     marginRight: 4,
+    color: "#000",
   },
   comment: {
     fontSize: 14,
-    color: "#333",
-    marginTop: 5,
+    color: "#555",
+    lineHeight: 20,
   },
 });
 

@@ -75,11 +75,10 @@ const styles = StyleSheet.create({
   },
   top: {
     flex: 2,
-    marginBottom: 10,
+    marginBottom: 50,
   },
   mid: {
     flex: 1.2,
-    marginBottom: 5,
   },
   bottom: {
     flex: 3,
