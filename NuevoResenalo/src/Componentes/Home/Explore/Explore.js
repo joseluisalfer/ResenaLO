@@ -1,20 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Image, ActivityIndicator, Pressable } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, StyleSheet, Text, Image, ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
+import { getData } from "../../../services/services";
+import Context from "../../../Context/Context";
 
 const Explore = ({ navigation }) => {
   const [reviewsUrls, setReviewsUrls] = useState([]);
   const [reviewsData, setReviewsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { setSearchUrl } = useContext(Context);
 
   useEffect(() => {
-    fetch('http://44.213.235.160:8080/resenalo/randomReviews')
-      .then(response => response.json())
-      .then(data => setReviewsUrls(data))
-      .catch(error => {
-        console.error("Error:", error);
+    const fetchUrls = async () => {
+      try {
+        const data = await getData('http://44.213.235.160:8080/resenalo/randomReviews');
+        if (data) setReviewsUrls(data);
+      } catch (error) {
+        console.error(error);
         setLoading(false);
-      });
+      }
+    };
+    fetchUrls();
   }, []);
 
   useEffect(() => {
@@ -22,14 +28,11 @@ const Explore = ({ navigation }) => {
       const fetchReviewDetails = async () => {
         try {
           const reviews = await Promise.all(
-            reviewsUrls.map(async (url) => {
-              const response = await fetch(url);
-              return await response.json();
-            })
+            reviewsUrls.map(url => getData(url))
           );
-          setReviewsData(reviews);
+          setReviewsData(reviews.filter(r => r !== null));
         } catch (error) {
-          console.error("Error details:", error);
+          console.error(error);
         } finally {
           setLoading(false);
         }
@@ -37,6 +40,11 @@ const Explore = ({ navigation }) => {
       fetchReviewDetails();
     }
   }, [reviewsUrls]);
+
+  const handleOnPress = (url) => {
+    setSearchUrl(url); 
+    navigation.navigate("Place"); 
+  };
 
   if (loading) {
     return (
@@ -47,10 +55,10 @@ const Explore = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Pressable 
-        style={styles.header} 
-        onPress={() => navigation?.navigate("ListPlace")} 
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <Pressable
+        style={styles.header}
+        onPress={() => navigation?.navigate("ListPlace")}
       >
         <Text style={styles.title}>Explorar</Text>
         <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
@@ -58,28 +66,37 @@ const Explore = ({ navigation }) => {
 
       <View style={styles.grid}>
         {reviewsData.map((review, index) => (
-          <View key={index} style={styles.card}>
-            <Image 
-              source={{ uri: `data:${review.mimeType};base64,${review.image}` }} 
+          <Pressable
+            key={index}
+            style={({ pressed }) => [
+              styles.card,
+              { opacity: pressed ? 0.8 : 1 }
+            ]}
+            onPress={() => handleOnPress(reviewsUrls[index])}
+          >
+            <Image
+              source={{ uri: `data:${review.mimeType};base64,${review.image}` }}
               style={styles.image}
               resizeMode="cover"
             />
             <View style={styles.footer}>
               <Text style={styles.place} numberOfLines={1}>{review.title}</Text>
-              <Text style={styles.rating}>{review.valoration}/5</Text>
+              <View style={styles.ratingContainer}>
+                <Text style={styles.rating}>{review.valoration}</Text>
+                <Ionicons name="star" size={13} color="#FFD700" style={{ marginLeft: 3 }} />
+              </View>
             </View>
-          </View>
+          </Pressable>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 60,
+    paddingTop: 5,
   },
   header: {
     flexDirection: "row",
@@ -88,7 +105,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: '4%',
   },
   title: {
-    fontSize: 22, 
+    fontSize: 22,
     fontWeight: "700",
     color: "#000",
   },
@@ -97,19 +114,23 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     paddingHorizontal: '4%',
+    paddingBottom: 20,
   },
   card: {
     width: "48%",
     marginBottom: 15,
     borderRadius: 15,
     overflow: "hidden",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    elevation: 3,
+    backgroundColor: '#fff',
   },
   image: {
     width: '100%',
-    height: 120, 
+    height: 120,
   },
   footer: {
     flexDirection: 'row',
@@ -125,14 +146,18 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     flex: 1,
   },
-  rating: {
-    fontSize: 14,  
-    fontWeight: "bold", 
-    color: "#ffffff",
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginLeft: 5,
   },
+  rating: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#ffffff",
+  },
   loadingWrapper: {
-    flex: 1,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
   },

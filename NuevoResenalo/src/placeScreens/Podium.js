@@ -1,50 +1,63 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect, useContext } from "react";
+import { View, Text, StyleSheet, Pressable, FlatList, Image, ActivityIndicator } from "react-native";
 import { Card } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { useTranslation } from 'react-i18next'
-import '../../assets/i18n/index';
+import { getData } from "../services/services";
+import Context from "../Context/Context";
 
+const Podium = ({ navigation }) => {
+  const [top10, setTop10] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { setSearchUrl } = useContext(Context);
 
-const mockPodium = [
-  { id: "1", name: "Sevilla", rating: "4.8/5" },
-  { id: "2", name: "Murcia", rating: "4.7/5" },
-  { id: "3", name: "Madrid", rating: "4.6/5" },
-  { id: "4", name: "Valencia", rating: "4.5/5" },
-  { id: "5", name: "Barcelona", rating: "4.4/5" },
-  { id: "6", name: "Granada", rating: "4.3/5" },
-  { id: "7", name: "Bilbao", rating: "4.2/5" },
-  { id: "8", name: "Sevilla Este", rating: "4.1/5" },
-  { id: "9", name: "Alicante", rating: "4.0/5" },
-  { id: "10", name: "Zaragoza", rating: "3.9/5" },
-];
+  useEffect(() => {
+    const fetchTop10 = async () => {
+      try {
+        const urls = await getData("http://44.213.235.160:8080/resenalo/top10Reviews");
+        if (urls) {
+          const details = await Promise.all(
+            urls.map(async (url) => {
+              const res = await getData(url);
+              return { ...res, originalUrl: url };
+            })
+          );
+          setTop10(details.filter(item => item !== null));
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTop10();
+  }, []);
 
-const Podium = () => {
-  const navigation = useNavigation();
-  const { t } = useTranslation();
- 
+  const handlePress = (url) => {
+    setSearchUrl(url);
+    navigation.navigate("Place");
+  };
+
   const renderPodiumItem = ({ item, index }) => {
     const podiumStyles = [styles.podiumItem];
-    if (index === 0) {
-      podiumStyles.push(styles.gold);
-    } else if (index === 1) {
-      podiumStyles.push(styles.silver);
-    } else if (index === 2) {
-      podiumStyles.push(styles.bronze);
-    }
+    if (index === 0) podiumStyles.push(styles.gold);
+    else if (index === 1) podiumStyles.push(styles.silver);
+    else if (index === 2) podiumStyles.push(styles.bronze);
+
     return (
       <Pressable
         style={podiumStyles}
-        onPress={() => navigation.navigate("Place", { placeId: item.id })}
+        onPress={() => handlePress(item.originalUrl)}
       >
         <Image
-          source={require("../../assets/images/Konoha.png")}
+          source={{ uri: `data:${item.mimeType};base64,${item.image}` }}
           style={styles.podiumImage}
         />
         <View style={styles.podiumDetails}>
-          <Text style={styles.place}>{item.name}</Text>
-          <Text style={styles.rating}>{item.rating}</Text>
+          <Text style={styles.place} numberOfLines={1}>{item.title}</Text>
+          <View style={styles.ratingRow}>
+            <Text style={styles.rating}>{item.valoration}</Text>
+            <Ionicons name="star" size={14} color="#fdeb81" style={{ marginLeft: 2 }} />
+          </View>
         </View>
       </Pressable>
     );
@@ -52,7 +65,7 @@ const Podium = () => {
 
   const renderOtherPlaces = ({ item, index }) => (
     <Pressable
-      onPress={() => navigation.navigate("Place", { placeId: item.id })}
+      onPress={() => handlePress(item.originalUrl)}
       style={styles.card}
     >
       <Card.Content style={styles.cardContent}>
@@ -60,51 +73,64 @@ const Podium = () => {
           <Text style={styles.cardNumber}>{index + 4}#</Text>
         </View>
         <View style={styles.cardDetails}>
-          <Text style={styles.placeName}>{item.name}</Text>
-          <Text style={styles.placeRating}>{item.rating}</Text>
+          <Text style={styles.placeName} numberOfLines={1}>{item.title}</Text>
+          <View style={styles.ratingRow}>
+            <Text style={styles.placeRating}>{item.valoration}</Text>
+            <Ionicons name="star" size={14} color="#FFD700" style={{ marginLeft: 4 }} />
+          </View>
         </View>
         <Image
-          source={require("../../assets/images/Konoha.png")}
+          source={{ uri: `data:${item.mimeType};base64,${item.image}` }}
           style={styles.cardImage}
         />
       </Card.Content>
     </Pressable>
   );
 
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#2654d1" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Ionicons
         name="arrow-back"
-        marginTop="5%"
         size={30}
         color="black"
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       />
 
-      <Text style={styles.title}>{t("placeScreen.podium")}</Text>
+      <Text style={styles.title}>Podio de Reseñas</Text>
 
-      <View style={styles.podium}>
-        <View style={styles.podiumRow}>
-          <View style={styles.podiumItemContainerLeft}>
-            {renderPodiumItem({ item: mockPodium[1], index: 1 })}
-          </View>
-          <View style={styles.podiumItemContainerCenter}>
-            {renderPodiumItem({ item: mockPodium[0], index: 0 })}
-          </View>
-          <View style={styles.podiumItemContainerRight}>
-            {renderPodiumItem({ item: mockPodium[2], index: 2 })}
+      {top10.length >= 3 && (
+        <View style={styles.podium}>
+          <View style={styles.podiumRow}>
+            <View style={styles.podiumItemContainerLeft}>
+              {renderPodiumItem({ item: top10[1], index: 1 })}
+            </View>
+            <View style={styles.podiumItemContainerCenter}>
+              {renderPodiumItem({ item: top10[0], index: 0 })}
+            </View>
+            <View style={styles.podiumItemContainerRight}>
+              {renderPodiumItem({ item: top10[2], index: 2 })}
+            </View>
           </View>
         </View>
-      </View>
+      )}
 
-      <Text style={styles.subTitle}>{t("placeScreen.anotherText")}</Text>
+      <Text style={styles.subTitle}>Otros lugares destacados</Text>
 
       <FlatList
-        data={mockPodium.slice(3)}
+        data={top10.slice(3)}
         renderItem={renderOtherPlaces}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.otherPlacesList}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
@@ -114,8 +140,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 30,
+    paddingTop: 40,
     paddingHorizontal: 16,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   backButton: {
     marginBottom: 10,
@@ -124,131 +155,102 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 16,
+    marginVertical: 10,
   },
   podium: {
-    marginBottom: 30,
+    marginBottom: 20,
   },
   podiumRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
+    alignItems: "flex-end",
   },
-  podiumItemContainerLeft: {
-    flex: 1,
-    alignItems: "center",
-  },
-  podiumItemContainerCenter: {
-    flex: 1,
-    alignItems: "center",
-  },
-  podiumItemContainerRight: {
-    flex: 1,
-    alignItems: "center",
-  },
+  podiumItemContainerLeft: { flex: 1, alignItems: "center" },
+  podiumItemContainerCenter: { flex: 1, alignItems: "center" },
+  podiumItemContainerRight: { flex: 1, alignItems: "center" },
   podiumItem: {
-    width: 120,
+    width: '95%',
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    paddingVertical: 15,
     borderRadius: 12,
     backgroundColor: "#f4f4f4",
-    marginVertical: 10,
   },
-  gold: {
-    backgroundColor: "#ffd700",
-    padding: 20,
-  },
-  silver: {
-    backgroundColor: "#c0c0c0",
-    padding: 20,
-  },
-  bronze: {
-    backgroundColor: "#cd7f32",
-    padding: 20,
-  },
+  gold: { backgroundColor: "#ffd700", height: 180, justifyContent: 'center' },
+  silver: { backgroundColor: "#c0c0c0", height: 150, justifyContent: 'center' },
+  bronze: { backgroundColor: "#cd7f32", height: 130, justifyContent: 'center' },
   podiumImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#eee'
   },
   podiumDetails: {
     marginTop: 10,
     alignItems: "center",
+    paddingHorizontal: 5
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
   },
   place: {
-    fontSize: 16,
-    color: "#fff",
-    textShadowColor: "black",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 5,
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: "#000",
+    textAlign: 'center'
   },
   rating: {
-    fontSize: 14,
-    color: "#fff",
-    textShadowColor: "black",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 5,
-    marginTop: 5,
+    fontSize: 13,
+    fontWeight: '600',
+    color: "#000",
   },
   subTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginVertical: 15,
   },
   card: {
-    width: "95%",
-    marginBottom: 16,
-    borderRadius: 8,
+    width: "100%",
+    marginBottom: 12,
+    borderRadius: 12,
     elevation: 2,
-    borderWidth: 1,
-    borderColor: "#ddd",
     backgroundColor: "#fff",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    alignSelf: "center",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#eee'
   },
   cardContent: {
     flexDirection: "row",
     alignItems: "center",
   },
-  cardHeader: {
-    flex: 1,
-    alignItems: "flex-start",
-  },
+  cardHeader: { width: 50 },
   cardNumber: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#000",
+    color: "#000000",
   },
   cardDetails: {
-    flex: 3,
-    alignItems: "flex-start",
+    flex: 1,
     paddingLeft: 10,
   },
   placeName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#000",
-    marginVertical: 5,
   },
   placeRating: {
     fontSize: 14,
-    color: "gray",
+    fontWeight: '600',
+    color: "#444",
   },
   cardImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginLeft: 10,
-  },
-  podiumList: {
-    marginBottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
   },
   otherPlacesList: {
-    paddingBottom: 20,
+    paddingBottom: 30,
   },
 });
 

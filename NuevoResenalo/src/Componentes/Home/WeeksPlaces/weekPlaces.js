@@ -1,57 +1,64 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import Podium from "../../../placeScreens/Podium";
-import { Ionicons } from "@expo/vector-icons"; // Importando Ionicons
+import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../../services/services";
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
+import Context from "../../../Context/Context";
 import '../../../../assets/i18n/index';
+
 const WeekPlace = ({ navigation }) => {
-
   const { t } = useTranslation();
-
-  const [top3, setTop3] = useState([]);
+  const [podiumData, setPodiumData] = useState([]);
+  const { setSearchUrl } = useContext(Context);
 
   const obtainData = async () => {
-    const response = await fetch("http://44.213.235.160:8080/resenalo/top3Reviews");
-    const data = await response.json();
+    try {
+      const urls = await getData("http://44.213.235.160:8080/resenalo/top3Reviews");
+      if (urls && urls.length >= 3) {
+        const details = await Promise.all(urls.map(url => getData(url)));
+        
+        const rawItems = details.map((data, index) => ({
+          data,
+          url: urls[index],
+          rank: index + 1
+        })).filter(item => item.data !== null);
 
-    console.log("Enlaces recibidos:", data);
-
-    const details = await Promise.all(
-      data.map(async (data) => {
-        const res = await fetch(data);
-        const detailsData = await res.json();
-        console.log("Detalles recibidos para el enlace:", detailsData)
-        return detailsData;
-      })
-    );
-
-    setTop3(details);
+        const ordered = [rawItems[1], rawItems[0], rawItems[2]];
+        setPodiumData(ordered);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   useEffect(() => {
     obtainData();
   }, []);
 
+  const handlePressPlace = (url) => {
+    setSearchUrl(url);
+    navigation.navigate("Place");
+  };
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.card}>
         <View style={styles.podiumRow}>
-
-          {top3.map((place, index) => {
-            const rank = index + 1;  // Para determinar el rango (1, 2, 3)
+          {podiumData.map((item, index) => {
             let barStyle = styles.bronze;
-
-            // Cambiar el estilo según el rank
-            if (rank === 1) barStyle = styles.gold;
-            else if (rank === 2) barStyle = styles.silver;
+            if (item.rank === 1) barStyle = styles.gold;
+            else if (item.rank === 2) barStyle = styles.silver;
 
             return (
-              <View key={rank} style={styles.podiumItem}>
-                <Text style={styles.rank}>{rank}</Text>
+              <Pressable 
+                key={index} 
+                style={styles.podiumItem}
+                onPress={() => handlePressPlace(item.url)}
+              >
+                <Text style={styles.rank}>{item.rank}</Text>
                 <View style={[styles.bar, barStyle]} />
-                <Text style={styles.place}>{place.title}</Text> {/* Muestra el título del lugar */}
-              </View>
+                <Text style={styles.place}>{item.data.title}</Text>
+              </Pressable>
             );
           })}
         </View>
@@ -68,8 +75,6 @@ const WeekPlace = ({ navigation }) => {
   );
 };
 
-export default WeekPlace;
-
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
@@ -80,12 +85,15 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: "4%",
     justifyContent: "space-between",
+    marginTop: 15, 
   },
   podiumRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
     paddingHorizontal: "2%",
+    flex: 1,
+    marginBottom: 10, 
   },
   podiumItem: {
     width: "30%",
@@ -95,44 +103,43 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "800",
     fontSize: 14,
-    marginBottom: "4%",
+    marginBottom: 6,
   },
   bar: {
     width: "100%",
     borderRadius: 10,
   },
+
   gold: {
-    height: "50%",
+    height: 100, 
     backgroundColor: "#ffd549",
   },
   silver: {
-    height: "40%",
+    height: 70,
     backgroundColor: "#e7e7e7",
   },
   bronze: {
-    height: "30%",
+    height: 45,
     backgroundColor: "#d48332",
   },
   place: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
-    marginTop: "4%",
+    marginTop: 6,
+    textAlign: 'center',
+    width: '100%',
   },
   titleWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: "4%",
+    paddingTop: 5,
   },
   title: {
     fontSize: 18,
     fontWeight: "700",
     color: "#ffffff",
-  },
-  arrow: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#ffffff",
-    marginLeft: 6,
-  },
+  }
 });
+
+export default WeekPlace;
