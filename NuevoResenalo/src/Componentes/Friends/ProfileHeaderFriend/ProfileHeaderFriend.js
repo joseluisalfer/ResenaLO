@@ -1,166 +1,128 @@
-import React, { useContext, useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
+import React, { useContext } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Context from "../../../Context/Context"; // Importamos el contexto
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Context from "../../../Context/Context";
 
 const ProfileHeaderFriend = ({ navigation }) => {
-  const { selectedFriend } = useContext(Context); // Usamos el contexto para obtener el amigo seleccionado
-  const [loading, setLoading] = useState(false); // Estado para controlar si los datos están cargando
-  const [isFollowing, setIsFollowing] = useState(false); // Estado para controlar si el usuario sigue o no al amigo
+  const { selectedFriend } = useContext(Context);
 
-
-  // Función para obtener el estado de seguimiento desde AsyncStorage
-  const getFollowStatus = async () => {
-    try {
-      const storedStatus = await AsyncStorage.getItem(`followStatus_${selectedFriend.user}`);
-      if (storedStatus !== null) {
-        setIsFollowing(JSON.parse(storedStatus)); // Establecemos el estado si ya estaba guardado
-      }
-    } catch (error) {
-      console.error("Error getting follow status", error);
-    }
-  };
-
-  // Función para guardar el estado de seguimiento en AsyncStorage
-  const saveFollowStatus = async (status) => {
-    try {
-      await AsyncStorage.setItem(`followStatus_${selectedFriend.user}`, JSON.stringify(status)); // Guardamos el estado
-    } catch (error) {
-      console.error("Error saving follow status", error);
-    }
-  };
-
-  useEffect(() => {
-    // Cargar el estado de seguimiento cuando se monta el componente
-    getFollowStatus();
-  }, [selectedFriend]);
-
-  // Si no hay un amigo seleccionado, se muestra un indicador de carga
+  // 🔒 Si no hay amigo seleccionado, mostrar mensaje
   if (!selectedFriend) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={styles.emptyText}>No hay amigo seleccionado</Text>
       </View>
     );
   }
 
-  const { name, user, description, photo } = selectedFriend;
+  // 🔍 Comprobamos que selectedFriend.results y photo existen
+  const getImageUri = () => {
+    const photo = selectedFriend.photo;
 
-  // Aseguramos que la foto esté bien formateada (base64 o URL)
-  const imageUri = photo
-    ? photo.startsWith("data:image")
-      ? photo
-      : photo.startsWith("http")
-      ? photo
-      : `data:image/jpeg;base64,${photo}`
-    : null;
+    if (typeof photo !== "string") return null;
 
-  const handleFollow = () => {
-    const newFollowStatus = !isFollowing;
-    setIsFollowing(newFollowStatus); // Cambiar el estado de seguir a no seguir o viceversa
-    saveFollowStatus(newFollowStatus); // Guardar el nuevo estado en AsyncStorage
+    if (photo.startsWith("http")) return photo;
+    if (photo.startsWith("data:image")) return photo;
+    if (photo.startsWith("image/")) return `data:${photo}`;
+    
+    // Asumimos que es base64 puro
+    return `image/jpeg;base64,${photo}`;
   };
+
+  const imageUri = getImageUri();
 
   return (
     <View style={styles.container}>
-      {/* Flecha de regreso siempre visible */}
-      <Ionicons
-        name="arrow-back"
-        size={30}
-        color="black"
-        style={styles.backButton}
-        onPress={() => navigation.navigate("Home")} // Navega directamente a la pantalla Home
-      />
-
-      {/* Botón de Seguir ubicado arriba a la derecha */}
-      <TouchableOpacity style={styles.followButton} onPress={handleFollow}>
-        <Ionicons
-          name={isFollowing ? "close-circle" : "checkmark-circle"} // Cambia el ícono basado en el estado
-          size={30}
-          color={isFollowing ? "red" : "green"} // Cambia el color según si está siguiendo o no
-        />
-        <Text style={styles.followText}>{isFollowing ? "Siguiendo" : "Seguir"}</Text>
+      <TouchableOpacity 
+        style={styles.backButton} 
+        onPress={() => navigation.goBack()}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Ionicons name="arrow-back" size={30} color="#000" />
       </TouchableOpacity>
 
-      <View style={styles.profileImageContainer}>
+      <View style={styles.imageContainer}>
         {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.profileImage} />
+          <Image 
+            source={{ uri: imageUri }} 
+            style={styles.profileImage}
+            resizeMode="cover"
+            onError={(e) => console.log("❌ Error cargando imagen:", e.nativeEvent?.error)}
+          />
         ) : (
-          <View style={[styles.profileImage, styles.placeholder]} />
+          <View style={[styles.profileImage, styles.placeholder]}>
+            <Ionicons name="person" size={50} color="#999" />
+          </View>
         )}
       </View>
 
-      <Text style={styles.username}>@{name}</Text>
-      <Text style={styles.name}>{user}</Text>
+      <Text style={styles.username}>@{selectedFriend.user}</Text>
 
-      {/* Mostrar la descripción solo si existe */}
-      {description ? (
-        <Text style={styles.bio}>{description}</Text>
-      ) : (
-        <Text style={styles.bio}>No description available</Text> // Mensaje por defecto si no hay descripción
-      )}
+      <Text style={styles.fullName}>{selectedFriend.name}</Text>
+
+      <Text style={styles.description} numberOfLines={3}>
+        {selectedFriend.description}
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
-    marginTop: 40,
     alignItems: "center",
-    position: "relative",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
   },
   backButton: {
-    position: "absolute",
+    position: "absolute", // Fija la flecha en la parte superior
     top: 10,
-    right: 280,
+    left: 20, // Coloca la flecha más cerca del borde izquierdo
+    zIndex: 1, // Asegura que la flecha esté sobre otros elementos
+    padding: 5,
   },
-  followButton: {
-    position: "absolute",
-    top: 10,
-    left: 190,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#ddd",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  followText: {
-    marginLeft: 8,
-    fontSize: 18,
-    color: "#333",
-  },
-  profileImageContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+  imageContainer: {
     marginBottom: 16,
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#ddd",
+    backgroundColor: "#f0f0f0",
+    borderWidth: 2,
+    borderColor: "#eee",
   },
   placeholder: {
-    backgroundColor: "#ddd", // Esto será usado si no hay imagen
-  },
-  name: {
-    marginTop: 12,
-    fontWeight: "bold",
-    fontSize: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
   },
   username: {
-    color: "gray",
-    marginTop: 3,
-    fontSize: 20,
-  },
-  bio: {
-    textAlign: "center",
+    fontSize: 18,
+    color: "#666",
     marginTop: 8,
-    paddingHorizontal: 20,
-    fontSize: 20,
+    fontWeight: "500",
+  },
+  fullName: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#000",
+    marginTop: 4,
+    textAlign: "center",
+  },
+  description: {
+    fontSize: 15,
+    color: "#333",
+    textAlign: "center",
+    marginTop: 12,
+    paddingHorizontal: 10,
+    lineHeight: 22,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 40,
   },
 });
 
