@@ -9,22 +9,22 @@ import { getData } from "../services/services";
 import Context from "../Context/Context";
 
 const Profile = ({ navigation }) => {
-  const {emailLogged} = useContext(Context);
+  const { emailLogged, isLoged, setIsLoged } = useContext(Context);
 
   useEffect(() => {
     console.log(emailLogged)
   }, []);
 
   const handleLogOut = () => {
-    console.log("Log Out clicked");
+    setIsLoged(false);
   };
 
   const handleChangeLanguage = (language) => {
     console.log("Idioma cambiado a: ", language);
   };
-//oscarmartorellg@gmail.com
-//unairp19@gmail.com
-//serranotarazonadavid@gmail.com
+  //oscarmartorellg@gmail.com
+  //unairp19@gmail.com
+  //serranotarazonadavid@gmail.com
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* ModalProfile que maneja el modal y las opciones */}
@@ -37,7 +37,7 @@ const Profile = ({ navigation }) => {
 
       {/* Información personal */}
       <View style={styles.section}>
-        <OwnInfo name={emailLogged.results.name} user={emailLogged.results.user} description={emailLogged.results.description}/>
+        <OwnInfo name={emailLogged.results.name} user={emailLogged.results.user} description={emailLogged.results.description} />
       </View>
 
       {/* Estadísticas o información adicional */}
