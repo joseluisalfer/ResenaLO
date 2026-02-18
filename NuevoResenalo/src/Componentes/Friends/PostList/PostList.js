@@ -1,162 +1,169 @@
-import React from "react";
-import { View, FlatList, StyleSheet, Text, Pressable, Image } from "react-native";
-import { Card } from "react-native-paper";
+import React, { useState, useEffect, useContext } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTranslation } from 'react-i18next'
-import '../../../../assets/i18n/index';
-import { useState } from "react";
-{/*const mockPosts = [
-  {
-    id: "1",
-    title: "En Catarroja hay moros",
-    content: "No lo digo yo, lo dice la gente, ¡vaya locura! 😂",
-  },
-  {
-    id: "2",
-    title: "Que no lo vea mi madre!",
-    content: "Que no vea mi madre ese mueble de la basura que se lo lleva para casa!!! 😲"
-  },
-  {
-    id: "3",
-    title: "Un secretillo",
-    content: "Y un secretillo... he comido jamón. 🤫"
-  },
-  {
-    id: "4",
-    title: "Sabeis que??",
-    content: "He robado en el dia"
-  }
-];*/}
+import { Card } from "react-native-paper";
+import { getData } from "../../../services/services";
+import Context from "../../../Context/Context"; 
 
 const PostList = () => {
   const { t } = useTranslation();
-  const [places, setPlaces] = useState([
-     {
-       id: "1",
-       name: "Catarroja Plaza",
-       image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
-       rating: "4.5/5",
-     },
-     {
-       id: "2",
-       name: "Catarroja Parque",
-       image: require("../../../../assets/images/CatarrojaParque.jpg"),
-       rating: "4.0/5",
-     },
-     {
-       id: "3",
-       name: "Catarroja Fuente",
-       image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
-       rating: "3.8/5",
-     },
-     {
-       id: "4",
-       name: "Catarroja Playa",
-       image: require("../../../../assets/images/CatarrojaParque.jpg"),
-       rating: "4.7/5",
-     },
-     {
-       id: "5",
-       name: "Catarroja Estadio",
-       image: require("../../../../assets/images/CatarrojaPlaza.jpg"),
-       rating: "4.2/5",
-     }, {
-       id: "6",
-       name: "Catarroja Estadio",
-       image: require("../../../../assets/images/CatarrojaParque.jpg"),
-       rating: "4.2/5",
-     }
-   ]);
- 
-   return (
-     <View style={styles.wrapper}>
-       {/* Título y botón de navegación */}
-       <Pressable
-         style={styles.header}
-         onPress={() => navigation.navigate("Place")}
-       >
-         <Text style={styles.title}>Publicaciones</Text>
-         <Ionicons name="chevron-forward-outline" size={25} color="#000" style={{marginTop: 20}} />
-       </Pressable>
- 
-       {/* Grid de publicaciones con 2 columnas */}
-       <FlatList
-         data={places}
-         keyExtractor={(item) => item.id}
-         numColumns={2} // Mostrar en 2 columnas
-         renderItem={({ item, index }) => {
- 
-           const backgroundColor = index % 3 === 0 ? "#1748ce" : index % 3 === 1 ? "#DC3545" : 'white';
-           const textColor = backgroundColor === 'white' ? 'black' : 'white';
- 
-           
-           return (
-             <Pressable
-               key={item.id}
-               style={styles.card}
-               onPress={() => navigation.navigate("Place", { placeId: item.id })}
-             >
-               <Card style={[styles.cardContainer, { backgroundColor }]}>
-                 {/* Imagen dentro del Card */}
-                 <Card.Cover source={item.image} style={styles.image} resizeMode="cover" />
- 
-                 {/* Contenido del Card */}
-                 <Card.Content style={styles.cardContent}>
-                   <Text style={[styles.placeName, { color: textColor }]}>{item.name}</Text>
-                   <Text style={[styles.rating, { color: textColor }]}>Calificación: {item.rating}</Text>
-                 </Card.Content>
-               </Card>
-             </Pressable>
-           );
-         }}
-       />
-     </View>
-   );
- };
- 
- const styles = StyleSheet.create({
-   wrapper: {
-     flex: 1,
-     paddingHorizontal: 8,
-   },
-   header: {
-     flexDirection: "row",
-     alignItems: "center",
-     marginBottom: 10,
-   },
-   title: {
-     fontSize: 18,
-     fontWeight: "700",
-     color: "#000",
-     marginTop: 20
-   },
-   cardContainer: {
-     flex: 1, // Asegura que cada tarjeta ocupe el mismo espacio en su columna
-     margin: 8,
-     borderRadius: 12,
-     overflow: "hidden",
-     backgroundColor: "#1748ce", // Fondo de la tarjeta
-     height: "100%"
-   },
-   image: {
-     height: 100, // Imagen con una altura consistente
-     width: "100%",
-     borderRadius: 10,
-     aspectRatio: 1.5,
-   },
-   cardContent: {
-     padding: 8,
-     justifyContent: "space-between",
- 
-   },
-   placeName: {
-     fontSize: 14, // Tamaño de fuente más pequeño
-     fontWeight: "bold",
-     color: "#fff", // Texto blanco para mayor contraste
-   },
-   rating: {
-     fontSize: 12, // Tamaño de fuente más pequeño
-     color: "#fff", // Texto blanco para mayor contraste
-   },
- });
+  const [places, setPlaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { emailLogged } = useContext(Context); 
+  const { setSearchUrl } = useContext(Context);
+
+  const changePageAndSendUriProfile = (uri) => {
+    navigation.navigate("Place");
+    setSearchUrl(uri)
+  };
+  // Función para obtener las reseñas de las URLs
+  const fetchReviews = async () => {
+    try {
+      setLoading(true);
+
+      const reviewUrls = emailLogged?.results?.reviews ?? [];
+      if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {
+        setPlaces([]);
+        return;
+      }
+
+      const reviewDetails = await Promise.all(
+        reviewUrls.map(async (url) => {
+          try {
+            const reviewData = await getData(url); // Obtener los datos de cada reseña desde su enlace
+
+            const imgRaw = reviewData?.images;
+            const currentImage = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
+
+            if (!currentImage) return null;
+
+            const imageUri =
+              typeof currentImage === "string" &&
+                currentImage.startsWith("data:image")
+                ? currentImage
+                : `data:image/jpeg;base64,${currentImage}`;
+            console.log(reviewData);
+            return {
+              id: reviewData?.id ?? url,
+              name: reviewData?.title ?? "Sin título",
+              image: { uri: imageUri },
+              rating: reviewData?.valoration ?? 0,
+              uri: url,
+            };
+          } catch {
+            return null;
+          }
+        }),
+      );
+
+      setPlaces(reviewDetails.filter(Boolean)); // Filtrar las reseñas válidas
+    } catch (error) {
+      console.error("Error al obtener las reseñas:", error);
+      setPlaces([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews(); // Llamar a la función para obtener las reseñas
+  }, [emailLogged]); // Se vuelve a ejecutar cuando cambia el `emailLogged`
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#1748ce" />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.wrapper}>
+      <FlatList
+        data={places}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2} // Mostrar en 2 columnas
+        renderItem={({ item, index }) => {
+          const backgroundColor =
+            index % 3 === 0 ? "#1748ce" : index % 3 === 1 ? "#DC3545" : "white";
+          const textColor = backgroundColor === "white" ? "black" : "white";
+
+          return (
+            <Pressable
+              key={item.id}
+              style={styles.card}
+              onPress={() => changePageAndSendUriProfile(item.uri)}
+            >
+              <Card style={[styles.cardContainer, { backgroundColor }]}>
+                {/* Imagen dentro del Card */}
+                <Card.Cover
+                  source={item.image}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+
+                {/* Contenido del Card */}
+                <Card.Content style={styles.cardContent}>
+                  <Text style={[styles.placeName, { color: textColor }]}>
+                    {item.name}
+                  </Text>
+                  <Text style={[styles.rating, { color: textColor }]}>
+                    ⭐ {item.rating}
+                  </Text>
+                </Card.Content>
+              </Card>
+            </Pressable>
+          );
+        }}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    paddingHorizontal: 8,
+  },
+  card: {
+    flex: 1,
+    margin: 8,
+    justifyContent: "center", // Asegura que el contenido esté centrado en la tarjeta
+  },
+  cardContainer: {
+    flex: 1, // Hace que cada tarjeta ocupe el mismo espacio
+    borderRadius: 12,
+    overflow: "hidden",
+    height: 200, // Definir una altura para mantener consistencia
+  },
+  image: {
+    height: 120, // Imagen con una altura consistente
+    width: "100%",
+    borderRadius: 10,
+    aspectRatio: 1.5,
+  },
+  cardContent: {
+    padding: 8,
+    justifyContent: "space-between",
+  },
+  placeName: {
+    fontSize: 14, // Tamaño de fuente más pequeño
+    fontWeight: "bold",
+    color: "#fff", // Texto blanco para mayor contraste
+  },
+  rating: {
+    fontSize: 12, // Tamaño de fuente más pequeño
+    color: "#fff", // Texto blanco para mayor contraste
+  },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+});
+
 export default PostList;

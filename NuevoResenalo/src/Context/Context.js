@@ -3,7 +3,7 @@ import { createContext, useState } from "react";
 const Context = createContext();
 
 export const Provider = ({ children }) => {
-  const [isLoged, setIsLoged] = useState(true); // Estado inicial de isLoged es false
+  const [isLoged, setIsLoged] = useState(false); // Estado inicial de isLoged es false
   const [emailLogged, setEmailLogged] = useState({}); 
   const [publishInfo, setPublishInfo] = useState({
     title: "",
