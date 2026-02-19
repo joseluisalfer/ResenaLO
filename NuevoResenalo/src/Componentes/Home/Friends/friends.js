@@ -28,7 +28,6 @@ const Friends = ({ navigation }) => {
 
   useEffect(() => {
     obtainUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const obtainUsers = async () => {
