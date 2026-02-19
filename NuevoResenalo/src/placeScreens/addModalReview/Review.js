@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from "react";
 import { 
     Pressable, 
     StyleSheet, 
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { postData } from "../../services/services";
+import Context from "../../Context/Context";
 
 function Review({ route, navigation }) {
     const { reviewId } = route.params || {};
@@ -19,6 +20,7 @@ function Review({ route, navigation }) {
     const [reviewText, setReviewText] = useState('');
     const [rating, setRating] = useState(0);
     const [loading, setLoading] = useState(false);
+    const { emailLogged } = useContext(Context);
 
     const handleSubmitReview = async () => {
         if (rating === 0) {
@@ -38,7 +40,7 @@ function Review({ route, navigation }) {
 
         const data = {
             reviewId: reviewId,      
-            user: "Unai", 
+            user: emailLogged.results.user,
             text: reviewText.trim(),
             valoration: rating.toString()
         };

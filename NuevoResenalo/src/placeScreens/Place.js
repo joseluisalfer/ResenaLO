@@ -21,7 +21,7 @@ const Place = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
   const { searchUrl, emailLogged } = useContext(Context);
-  
+
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
@@ -42,7 +42,7 @@ const Place = ({ navigation }) => {
         if (rawPlace && isMounted) {
           setPlaceData(rawPlace);
 
-          const currentId = rawPlace.id || rawPlace._id;
+          const currentId = rawPlace.id
           const commentsUrl = `http://44.213.235.160:8080/resenalo/comment?idReview=${currentId}`;
           const responseComments = await getData(commentsUrl);
 
@@ -99,7 +99,7 @@ const Place = ({ navigation }) => {
       />
 
       <PlaceInfo
-        name={placeData.title || "Sin título"}
+        name={placeData.title}
         type={placeData.type}
         description={placeData.description}
         averageRating={placeData.valoration}
@@ -114,8 +114,8 @@ const Place = ({ navigation }) => {
           style={styles.btnPressable}
           onPress={() =>
             navigation.navigate("Review", {
-              reviewId: placeData.id || placeData._id,
-              user: emailLogged.user
+              reviewId: placeData.id,
+              user: emailLogged.results.user
             })
           }
         >

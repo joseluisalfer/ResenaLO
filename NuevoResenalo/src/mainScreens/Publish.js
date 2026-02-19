@@ -89,7 +89,7 @@ const Publish = () => {
 
     try {
       const response = await postData(
-        "http://44.213.235.160:8080/first/uploadReview",
+        "http://44.213.235.160:8080/resenalo/uploadReview",
         data,
       );
       if (response === null) {
