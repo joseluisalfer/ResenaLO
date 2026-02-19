@@ -28,44 +28,41 @@ const Friends = ({ navigation }) => {
 
   useEffect(() => {
     obtainUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const obtainUsers = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
+      const rawFriends = emailLogged?.results?.friends ?? [];
+      const friendUrls = pickRandomUpToN(rawFriends, 5);
 
-      const friendUrls = pickRandomUpToN(emailLogged.results.friends, 5);
-
-      const userDetails = await Promise.all(
+      const settled = await Promise.allSettled(
         friendUrls.map(async (url) => {
           const userData = await getData(url);
-
-          const userName = userData.results.name;
-          const userPhoto = userData.results.photo;
-          const userDescription = userData.results.description;
-          const userUser = userData.results.user;
-          const userReviews = userData.results.reviews;
-
-          let imageUri = null;
-          if (userPhoto.startsWith("http")) imageUri = userPhoto;
-          else if (userPhoto.startsWith("data:image")) imageUri = userPhoto;
-          else if (userPhoto.startsWith("image/")) imageUri = `data:${userPhoto}`;
-          else imageUri = `data:image/jpeg;base64,${userPhoto}`;
-
+          const r = userData?.results;
           return {
-            id: userData.results.id, // ✅ id estable (no parsear URL)
-            name: userName,
-            photo: imageUri,
-            description: userDescription,
-            user: userUser,
-            reviews: userReviews,
+            id: r.id,
+            name: r.name,
+            photo: r.photo,        // 👈 URL tal cual
+            description: r.description,
+            user: r.user,
+            reviews: r.reviews,
           };
         })
       );
 
-      setFriends(userDetails);
+      const ok = settled
+        .filter((x) => x.status === "fulfilled")
+        .map((x) => x.value)
+        .filter(Boolean);
+
+      console.log("PHOTO 0 =>", ok[0]?.photo);
+
+      setFriends(ok);
     } catch (err) {
       console.error("Error crítico en obtainUsers:", err);
+      setFriends([]);
     } finally {
       setLoading(false);
     }
@@ -75,7 +72,6 @@ const Friends = ({ navigation }) => {
     return (
       <View style={styles.wrapper}>
         <ActivityIndicator size="large" color="#2654d1" />
-        <Text style={styles.loadingText}></Text>
       </View>
     );
   }
@@ -101,12 +97,15 @@ const Friends = ({ navigation }) => {
       <FlatList
         horizontal
         data={friends}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.row}
         renderItem={({ item, index }) => (
           <Pressable
-            style={[styles.item, index !== friends.length - 1 && styles.itemGap]}
+            style={[
+              styles.item,
+              index !== friends.length - 1 && styles.itemGap,
+            ]}
             onPress={() => {
               setSelectedFriend(item);
               navigation.navigate("FriendScreens", {
@@ -119,17 +118,17 @@ const Friends = ({ navigation }) => {
               });
             }}
           >
-            {item.photo ? (
-              <Image
-                source={{ uri: item.photo }}
-                style={styles.avatar}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                <Ionicons name="person" size={28} color="#888" />
-              </View>
-            )}
+            <Image
+              source={{ uri: item.photo.trim(), cache: "reload" }}
+              style={styles.avatar}
+              resizeMode="cover"
+              onError={(e) => {
+                console.log("❌ IMAGE ERROR:", item.photo, e.nativeEvent);
+              }}
+              onLoad={() => {
+                console.log("✅ IMAGE LOADED:", item.photo);
+              }}
+            />
 
             <Text style={styles.name} numberOfLines={1}>
               {item.name}
@@ -146,18 +145,11 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: 8,
     paddingVertical: 4,
     paddingHorizontal: 4,
   },
   title: { fontSize: 18, fontWeight: "700", color: "#000" },
-  loadingText: {
-    marginTop: 10,
-    color: "#666",
-    textAlign: "center",
-    fontSize: 14,
-  },
   row: { paddingVertical: 4 },
   item: { width: 74, alignItems: "center" },
   itemGap: { marginRight: 12 },
@@ -167,12 +159,6 @@ const styles = StyleSheet.create({
     borderRadius: 27,
     marginBottom: 4,
     backgroundColor: "#f0f0f0",
-  },
-  avatarPlaceholder: {
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
   },
   name: {
     fontSize: 11,

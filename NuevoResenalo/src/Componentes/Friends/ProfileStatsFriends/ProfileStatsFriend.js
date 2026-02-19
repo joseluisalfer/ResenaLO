@@ -1,13 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "react-native-paper";
-import Context from "../../../Context/Context"; // Asegúrate de que el contexto esté importado correctamente
+import Context from "../../../Context/Context";
 
 const ProfileStatsFriend = () => {
-  const { selectedFriend } = useContext(Context); // Obtener los datos del amigo seleccionado desde el contexto
-  const [loading, setLoading] = useState(false);
+  const { selectedFriend } = useContext(Context);
 
-  // Si no hay un amigo seleccionado, muestra un mensaje de carga
   if (!selectedFriend) {
     return (
       <View style={styles.container}>
@@ -16,53 +14,51 @@ const ProfileStatsFriend = () => {
     );
   }
 
-  // Obtenemos las reviews y amigos del contexto
   const reviews = selectedFriend.reviews || [];
-  const friends = selectedFriend.friends || [];
+  const followers = selectedFriend.followers || [];
 
-  // Obtener la cantidad de reviews y amigos
   const reviewCount = reviews.length;
-  const friendCount = friends.length;
+  const followersCount = followers.length;
 
   return (
-    <Card style={styles.statsCard}>
-      <Card.Content style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text variant="titleMedium" style={styles.statText}>{reviewCount}</Text>
-          <Text variant="bodySmall" style={styles.statText}>Posts</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text variant="titleMedium" style={styles.statText}>{friendCount}</Text>
-          <Text variant="bodySmall" style={styles.statText}>Friends</Text>
-        </View>
-      </Card.Content>
-    </Card>
+    <View>
+      <Card style={styles.statsCard}>
+        <Card.Content style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text variant="titleMedium">{reviewCount}</Text>
+            <Text variant="bodySmall">Posts</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text variant="titleMedium">{followersCount}</Text>
+            <Text variant="bodySmall">Followers</Text>
+          </View>
+        </Card.Content>
+      </Card>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   statsCard: {
-    marginTop: 10,
+    marginTop: 20,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#ddd",
     marginHorizontal: 16,
-    width: "90%",
-    backgroundColor: "#2654d1",
   },
   statsContainer: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-around",
     paddingVertical: 12,
   },
   statItem: {
     alignItems: "center",
-    flex: 1,
   },
-  statText: {
-    color: "white",
-    fontSize: 18,
-  }
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
+  },
 });
 
 export default ProfileStatsFriend;
