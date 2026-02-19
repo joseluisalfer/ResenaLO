@@ -143,29 +143,30 @@ public class PrincipalController {
 		newUser.setName(name);
 		newUser.setToken(token);
 		newUser.setDescription("");
-		  // Manejo de la imagen por defecto
-	    byte[] imageBytes = null;
-	    try {
-	        // Usamos getClass().getResourceAsStream() para leer la imagen desde el classpath
-	        InputStream imageStream = getClass().getResourceAsStream("/foto_default.png");
-	        if (imageStream != null) {
-	            imageBytes = imageStream.readAllBytes();
-	        } else {
-	            // Si la imagen no se encuentra, lanzamos un error o usamos una imagen predeterminada
-	            System.err.println("No se pudo encontrar la imagen por defecto.");
-	            // Puedes usar una imagen por defecto en memoria si lo prefieres
-	        }
-	    } catch (IOException e) {
-	        // Manejar la excepción de lectura de archivo
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body("Error al leer la imagen por defecto");
-	    }
+		// Manejo de la imagen por defecto
+		byte[] imageBytes = null;
+		try {
+			// Usamos getClass().getResourceAsStream() para leer la imagen desde el
+			// classpath
+			InputStream imageStream = getClass().getResourceAsStream("/foto_default.png");
+			if (imageStream != null) {
+				imageBytes = imageStream.readAllBytes();
+			} else {
+				// Si la imagen no se encuentra, lanzamos un error o usamos una imagen
+				// predeterminada
+				System.err.println("No se pudo encontrar la imagen por defecto.");
+				// Puedes usar una imagen por defecto en memoria si lo prefieres
+			}
+		} catch (IOException e) {
+			// Manejar la excepción de lectura de archivo
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al leer la imagen por defecto");
+		}
 
-	    // Si la imagen se leyo correctamente, la asignamos al nuevo usuario
-	    if (imageBytes != null) {
-	        newUser.setImage(imageBytes);
-	    }
+		// Si la imagen se leyo correctamente, la asignamos al nuevo usuario
+		if (imageBytes != null) {
+			newUser.setImage(imageBytes);
+		}
 
 		// Guardar el usuario en la base de datos
 		userRepository.save(newUser);
@@ -196,12 +197,12 @@ public class PrincipalController {
 			}
 
 			// Comprobar si el usuario ya está verificado
-		if (!dbUser.isVerified()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"error\": \"El usuario ya está logueado\"}");
+			if (!dbUser.isVerified()) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"error\": \"El usuario ya está logueado\"}");
 			}
 
 			// Marcar al usuario como verificado
-			 dbUser.setVerified(true);
+			dbUser.setVerified(true);
 			userRepository.save(dbUser);
 
 			return ResponseEntity.status(HttpStatus.OK).build();
@@ -627,15 +628,15 @@ public class PrincipalController {
 			// Agregar datos del usuario al JSON
 			jsonR.put("id", user.getId());
 			jsonR.put("user", user.getUser());
-			if(user.getName() == null) {
+			if (user.getName() == null) {
 				jsonR.put("name", "");
-			}else {
+			} else {
 				jsonR.put("name", user.getName());
 			}
-			
-			if(user.getDescription() == null) {
+
+			if (user.getDescription() == null) {
 				jsonR.put("description", "");
-			}else {
+			} else {
 				jsonR.put("description", user.getDescription());
 			}
 			// Añadir notificaciones al JSON
@@ -729,15 +730,15 @@ public class PrincipalController {
 			// Agregar datos del usuario al JSON
 			jsonR.put("id", user.getId());
 			jsonR.put("user", user.getUser());
-			if(user.getName() == null) {
+			if (user.getName() == null) {
 				jsonR.put("name", "");
-			}else {
+			} else {
 				jsonR.put("name", user.getName());
 			}
-			
-			if(user.getDescription() == null) {
+
+			if (user.getDescription() == null) {
 				jsonR.put("description", "");
-			}else {
+			} else {
 				jsonR.put("description", user.getDescription());
 			}
 			// Verificar si el usuario tiene imagen y agregarla a Base64
@@ -813,18 +814,17 @@ public class PrincipalController {
 			// Agregar datos del usuario al JSON
 			jsonR.put("id", user.getId());
 			jsonR.put("user", user.getUser());
-			if(user.getName() == null) {
+			if (user.getName() == null) {
 				jsonR.put("name", "");
-			}else {
+			} else {
 				jsonR.put("name", user.getName());
 			}
-			
-			if(user.getDescription() == null) {
+
+			if (user.getDescription() == null) {
 				jsonR.put("description", "");
-			}else {
+			} else {
 				jsonR.put("description", user.getDescription());
 			}
-			
 
 			// Verificar si el usuario tiene imagen y agregarla a Base64
 			if (user.getImage() != null) {
@@ -1096,62 +1096,53 @@ public class PrincipalController {
 	}
 
 	@GetMapping("comments")
-	public ResponseEntity<String> comments(
-	        @RequestParam(defaultValue = "0") int page, 
-	        @RequestParam(defaultValue = "10") int size) {
+	public ResponseEntity<String> comments(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
 
-	    // Crear el objeto Pageable para la paginación
-	    Pageable pageable = PageRequest.of(page, size);
+		// Crear el objeto Pageable para la paginación
+		Pageable pageable = PageRequest.of(page, size);
 
-	    // Obtener todos los comentarios con paginación
-	    Page<Comments> pageComments = commentsRepository.findAll(pageable);
+		// Obtener todos los comentarios con paginación
+		Page<Comments> pageComments = commentsRepository.findAll(pageable);
 
-	    // Crear el array JSON que contendrá todas las reseñas
-	    JSONArray jsonComments = new JSONArray();
+		// Crear el array JSON que contendrá todas las reseñas
+		JSONArray jsonComments = new JSONArray();
 
-	    for (Comments comment : pageComments.getContent()) {
-	        // Crear un objeto JSON para cada comentario
-	        JSONObject commentJson = new JSONObject();
-	        commentJson.put("id", comment.getId());
-	        commentJson.put("text", comment.getText());
-	        commentJson.put("date_publication", comment.getDate());
+		for (Comments comment : pageComments.getContent()) {
+			// Crear un objeto JSON para cada comentario
+			JSONObject commentJson = new JSONObject();
+			commentJson.put("id", comment.getId());
+			commentJson.put("text", comment.getText());
+			commentJson.put("date_publication", comment.getDate());
+			commentJson.put("user", comment.getUser());
+			commentJson.put("valoration", Math.round(comment.getValoration() * 100.0) / 100.0);
 
-	        // Obtener el usuario asociado a la reseña usando el userId de la reseña
-	        String userId = comment.getUser();
-	        User user = userRepository.findByUser(userId);
+			String reviewId = comment.getId();
+			Optional<Review> Oreview = reviewRepository.findById(reviewId);
 
-	        // Generar el enlace al usuario
-	        String userLink = (user != null) ? "http://44.213.235.160:8080/resenalo/user?id=" + user.getId() : null;
+			// Verificar si la reseña existe
+			if (Oreview.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
+			}
 
-	        // Agregar el enlace del usuario a la reseña
-	        commentJson.put("user", userLink);
+			Review review = Oreview.get();
+			String linkReview = "http://44.213.235.160:8080/resenalo/review?id=" + review.getId();
+			commentJson.put("review", linkReview);
+			jsonComments.put(commentJson);
+		}
 
-	        String reviewId = comment.getId();
-	        Optional<Review> Oreview = reviewRepository.findById(reviewId);
+		// Crear un objeto JSON para los metadatos de la paginación
+		JSONObject paginationMeta = new JSONObject();
+		paginationMeta.put("current_page", pageComments.getNumber());
+		paginationMeta.put("total_pages", pageComments.getTotalPages());
+		paginationMeta.put("total_comments", pageComments.getTotalElements());
 
-	        // Verificar si la reseña existe
-	        if (Oreview.isEmpty()) {
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
-	        }
+		// Crear el JSON final con los comentarios y los metadatos de paginación
+		JSONObject responseJson = new JSONObject();
+		responseJson.put("comments", jsonComments);
+		responseJson.put("pagination", paginationMeta);
 
-	        Review review = Oreview.get();
-	        String linkReview = "http://44.213.235.160:8080/resenalo/review?id=" + review.getId();
-	        commentJson.put("review", linkReview);
-	        jsonComments.put(commentJson);
-	    }
-
-	    // Crear un objeto JSON para los metadatos de la paginación
-	    JSONObject paginationMeta = new JSONObject();
-	    paginationMeta.put("current_page", pageComments.getNumber());
-	    paginationMeta.put("total_pages", pageComments.getTotalPages());
-	    paginationMeta.put("total_comments", pageComments.getTotalElements());
-
-	    // Crear el JSON final con los comentarios y los metadatos de paginación
-	    JSONObject responseJson = new JSONObject();
-	    responseJson.put("comments", jsonComments);
-	    responseJson.put("pagination", paginationMeta);
-
-	    return ResponseEntity.status(HttpStatus.OK).body(responseJson.toString());
+		return ResponseEntity.status(HttpStatus.OK).body(responseJson.toString());
 	}
 
 	@GetMapping("/comment")
@@ -1163,16 +1154,8 @@ public class PrincipalController {
 			commentJson.put("id", comment.getId());
 			commentJson.put("text", comment.getText());
 			commentJson.put("date_publication", comment.getDate());
-
-			// Obtener el usuario asociado a la reseña usando el userId de la reseña
-			String userId = comment.getUser();
-			User user = userRepository.findByUser(userId);
-
-			// Generar el enlace al usuario
-			String userLink = (user != null) ? "http://44.213.235.160:8080/resenalo/user?id=" + user.getId() : null;
-
-			// Agregar el enlace del usuario a la reseña
-			commentJson.put("user", userLink);
+			commentJson.put("user", comment.getUser());
+			commentJson.put("valoration", Math.round(comment.getValoration() * 100.0) / 100.0);
 			String reviewId = comment.getId();
 			Optional<Review> Oreview = reviewRepository.findById(idReview);
 
@@ -1224,25 +1207,23 @@ public class PrincipalController {
 	@GetMapping("/top10Reviews")
 	public ResponseEntity<List<String>> top10Reviews() {
 
-		 List<Review> top10Reviews = reviewRepository.findTop10ByOrderByValorationDesc();
-		    
-		    List<String> top10Links = top10Reviews.stream()
-		        .map(r -> "http://44.213.235.160:8080/resenalo/reviewP?id=" + r.getId())
-		        .collect(Collectors.toList());
+		List<Review> top10Reviews = reviewRepository.findTop10ByOrderByValorationDesc();
 
-		    return ResponseEntity.status(HttpStatus.OK).body(top10Links);
+		List<String> top10Links = top10Reviews.stream()
+				.map(r -> "http://44.213.235.160:8080/resenalo/reviewP?id=" + r.getId()).collect(Collectors.toList());
+
+		return ResponseEntity.status(HttpStatus.OK).body(top10Links);
 	}
 
 	// Devuelve el top 3 de reviews
 	@GetMapping("/top3Reviews")
 	public ResponseEntity<List<String>> top3Reviews() {
-	    List<Review> top3Reviews = reviewRepository.findTop3ByOrderByValorationDesc();
-	    
-	    List<String> top3Links = top3Reviews.stream()
-	        .map(r -> "http://44.213.235.160:8080/resenalo/reviewP?id=" + r.getId())
-	        .collect(Collectors.toList());
+		List<Review> top3Reviews = reviewRepository.findTop3ByOrderByValorationDesc();
 
-	    return ResponseEntity.status(HttpStatus.OK).body(top3Links);
+		List<String> top3Links = top3Reviews.stream()
+				.map(r -> "http://44.213.235.160:8080/resenalo/reviewP?id=" + r.getId()).collect(Collectors.toList());
+
+		return ResponseEntity.status(HttpStatus.OK).body(top3Links);
 	}
 
 }
