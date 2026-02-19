@@ -65,7 +65,6 @@ public class PrincipalController {
 	@Autowired
 	private S3PublicImageService s3PublicImageService;
 
-	
 	// Genera la contraseña encriptada
 	public static String hashPassword(String plainPassword) {
 		// 10-12 suele ser un buen coste; 12 es común si el servidor lo aguanta
@@ -151,31 +150,7 @@ public class PrincipalController {
 		newUser.setName(name);
 		newUser.setToken(token);
 		newUser.setDescription("");
-		// Manejo de la imagen por defecto
-		byte[] imageBytes = null;
-		try {
-			// Usamos getClass().getResourceAsStream() para leer la imagen desde el
-			// classpath
-			InputStream imageStream = getClass().getResourceAsStream("/foto_default.png");
-			if (imageStream != null) {
-				imageBytes = imageStream.readAllBytes();
-			} else {
-				// Si la imagen no se encuentra, lanzamos un error o usamos una imagen
-				// predeterminada
-				System.err.println("No se pudo encontrar la imagen por defecto.");
-				// Puedes usar una imagen por defecto en memoria si lo prefieres
-			}
-		} catch (IOException e) {
-			// Manejar la excepción de lectura de archivo
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al leer la imagen por defecto");
-		}
-
-		// Si la imagen se leyo correctamente, la asignamos al nuevo usuario
-		if (imageBytes != null) {
-			newUser.setImage(imageBytes);
-		}
-
+		newUser.setImage("https://resenalo.s3.us-east-1.amazonaws.com/public/reviews/foto_default.png");
 		// Guardar el usuario en la base de datos
 		userRepository.save(newUser);
 
@@ -268,55 +243,55 @@ public class PrincipalController {
 	}
 
 	@PostMapping("/uploadReview")
-    public ResponseEntity<Object> uploadReview(@RequestBody String body) throws IOException {
+	public ResponseEntity<Object> uploadReview(@RequestBody String body) throws IOException {
 
-        JSONObject json = new JSONObject(body);
+		JSONObject json = new JSONObject(body);
 
-        String title = json.getString("title");
-        String user = json.getString("user");
-        double valoration = json.getDouble("valoration");
-        String description = json.getString("description");
-        String type = json.getString("type");
+		String title = json.getString("title");
+		String user = json.getString("user");
+		double valoration = json.getDouble("valoration");
+		String description = json.getString("description");
+		String type = json.getString("type");
 
-        String coords = json.getString("coords");
-        String[] coords2 = coords.split(",");
-        double latitud = Double.parseDouble(coords2[0].trim());
-        double longitud = Double.parseDouble(coords2[1].trim());
+		String coords = json.getString("coords");
+		String[] coords2 = coords.split(",");
+		double latitud = Double.parseDouble(coords2[0].trim());
+		double longitud = Double.parseDouble(coords2[1].trim());
 
-        Review resena = new Review();
-        resena.setTitle(title);
-        resena.setUser(user);
-        resena.setValoration(valoration);
-        resena.setDescription(description);
-        resena.setType(type);
-        resena.setLatitud(latitud);
-        resena.setLongitud(longitud);
-        resena.setImageUrls(new ArrayList<>());
+		Review resena = new Review();
+		resena.setTitle(title);
+		resena.setUser(user);
+		resena.setValoration(valoration);
+		resena.setDescription(description);
+		resena.setType(type);
+		resena.setLatitud(latitud);
+		resena.setLongitud(longitud);
+		resena.setImageUrls(new ArrayList<>());
 
-        resena = reviewRepository.save(resena);
+		resena = reviewRepository.save(resena);
 
-        if (json.has("files") && !json.isNull("files")) {
-            JSONArray files = json.getJSONArray("files");
+		if (json.has("files") && !json.isNull("files")) {
+			JSONArray files = json.getJSONArray("files");
 
-            for (int i = 0; i < files.length(); i++) {
-                String base64Image = files.getString(i);
-                if (base64Image == null || base64Image.isBlank()) continue;
+			for (int i = 0; i < files.length(); i++) {
+				String base64Image = files.getString(i);
+				if (base64Image == null || base64Image.isBlank())
+					continue;
 
-                byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+				byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
-                String relative = "reviews/" + resena.getId() + "/" + UUID.randomUUID() + ".jpg";
-                String key = s3PublicImageService.buildKey(relative); // -> public/....
+				String relative = "reviews/" + resena.getId() + "/" + UUID.randomUUID() + ".jpg";
+				String key = s3PublicImageService.buildKey(relative); // -> public/....
 
-                String publicUrl = s3PublicImageService.uploadAndGetPublicUrl(key, imageBytes, "image/jpeg");
-                resena.getImageUrls().add(publicUrl);
-            }
+				String publicUrl = s3PublicImageService.uploadAndGetPublicUrl(key, imageBytes, "image/jpeg");
+				resena.getImageUrls().add(publicUrl);
+			}
 
-            reviewRepository.save(resena);
-        }
+			reviewRepository.save(resena);
+		}
 
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
 
 	@PostMapping("addFollow")
 	public ResponseEntity<Object> addFollow(@RequestBody String body) throws IOException {
@@ -569,27 +544,47 @@ public class PrincipalController {
 
 	@PutMapping("updatePhoto")
 	public ResponseEntity<Object> updatePhoto(@RequestBody String body) throws IOException {
-		// Parsear el cuerpo del JSON usando JSONObject
+
 		JSONObject json = new JSONObject(body);
 
 		String email = json.getString("email");
-		String newImagePath = json.getString("newImage"); // Aquí recibimos la ruta del archivo
+		String base64Image = json.getString("file"); // base64
+		if (base64Image == null || base64Image.isBlank()) {
+			return ResponseEntity.badRequest().body("file vacío");
+		}
 
 		User user = userRepository.findByEmail(email);
-
-		if (user != null) {
-			// Convertir la ruta del archivo en un arreglo de bytes
-			Path path = Paths.get(newImagePath);
-			byte[] imageBytes = Files.readAllBytes(path); // Leer el archivo y convertirlo a bytes
-
-			// Guardar la imagen en el usuario
-			user.setImage(imageBytes);
-			userRepository.save(user);
-
-			return ResponseEntity.status(HttpStatus.OK).build();
-		} else {
+		if (user == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
+
+		// Si te llega con prefijo: "data:image/jpeg;base64,...."
+		if (base64Image.contains(",")) {
+			base64Image = base64Image.split(",")[1];
+		}
+
+		byte[] imageBytes;
+		try {
+			imageBytes = Base64.getDecoder().decode(base64Image);
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.badRequest().body("base64 inválido");
+		}
+
+		// Subir a S3
+		String relative = "users/" + user.getId() + "/" + UUID.randomUUID() + ".jpg";
+		String key = s3PublicImageService.buildKey(relative);
+
+		String publicUrl = s3PublicImageService.uploadAndGetPublicUrl(key, imageBytes, "image/jpeg");
+
+		// Guardar URL en la BD (IMPORTANTE: tu campo user.image debe ser String)
+		user.setImage(publicUrl);
+		userRepository.save(user);
+
+		// Devuelves la URL para que el front actualice al momento
+		JSONObject response = new JSONObject();
+		response.put("imageUrl", publicUrl);
+
+		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
 	}
 
 	@DeleteMapping("deleteReview")
@@ -669,13 +664,8 @@ public class PrincipalController {
 					notificationsArray.put(notif); // cada notificación como string
 				}
 			}
-			// Verificar si el usuario tiene imagen y agregarla a Base64
-			if (user.getImage() != null) {
-				String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
-				jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
-			} else {
-				jsonR.put("photo", "null"); // Si no hay imagen, poner null o una imagen predeterminada
-			}
+
+			jsonR.put("photo", user.getImage());
 
 			// Convertir reseñas en links (solo enlaces como strings)
 			if (listReviews != null && !listReviews.isEmpty()) {
@@ -763,13 +753,7 @@ public class PrincipalController {
 			} else {
 				jsonR.put("description", user.getDescription());
 			}
-			// Verificar si el usuario tiene imagen y agregarla a Base64
-			if (user.getImage() != null) {
-				String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
-				jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
-			} else {
-				jsonR.put("photo", "null"); // Si no hay imagen, poner null o una imagen predeterminada
-			}
+			jsonR.put("photo", user.getImage());
 
 			// Convertir reseñas en links (solo enlaces como strings)
 			if (listReviews != null && !listReviews.isEmpty()) {
@@ -848,13 +832,7 @@ public class PrincipalController {
 				jsonR.put("description", user.getDescription());
 			}
 
-			// Verificar si el usuario tiene imagen y agregarla a Base64
-			if (user.getImage() != null) {
-				String encodedImage = Base64.getEncoder().encodeToString(user.getImage());
-				jsonR.put("photo", encodedImage); // Agregar la imagen convertida a Base64
-			} else {
-				jsonR.put("photo", "null"); // Si no hay imagen, poner null o una imagen predeterminada
-			}
+			jsonR.put("photo", user.getImage());
 
 			// Añadir notificaciones al JSON
 			JSONArray notificationsArray = new JSONArray();

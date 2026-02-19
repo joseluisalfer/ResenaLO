@@ -16,7 +16,7 @@ public class User {
 	private String name;
 	private String password;
 	private String email;
-	private byte[] image;
+	private String image;
 	private Date date;
 	private List<String> followeds = new ArrayList<>();
 	private List<String> followers = new ArrayList<>();
@@ -61,11 +61,11 @@ public class User {
 		this.email = email;
 	}
 
-	public byte[] getImage() {
+	public String getImage() {
 		return image;
 	}
 
-	public void setImage(byte[] image) {
+	public void setImage(String image) {
 		this.image = image;
 	}
 
