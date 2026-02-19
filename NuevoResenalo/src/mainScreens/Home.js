@@ -13,7 +13,7 @@ const HomeScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.mid}>
-        {/* ✅ Friends se encarga de todo: fetch, estado, UI */}
+        
         <Friends navigation={navigation} />
       </View>
 

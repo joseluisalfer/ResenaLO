@@ -4,67 +4,84 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  Image,
   Pressable,
   ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { Card } from "react-native-paper";
 import { getData } from "../../../services/services";
-import Context from "../../../Context/Context"; 
+import Context from "../../../Context/Context";
 
-const PostList = () => {
-  const { t } = useTranslation();
+const PLACEHOLDER_IMG = "https://via.placeholder.com/600x400.png?text=No+image";
+
+const Posts = ({ navigation }) => {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { emailLogged } = useContext(Context); 
-  const { setSearchUrl } = useContext(Context);
+  const { selectedFriend } = useContext(Context);
 
-  const changePageAndSendUriProfile = (uri) => {
-    navigation.navigate("Place");
-    setSearchUrl(uri)
+  const normalizeImageToUri = (imgRaw) => {
+    const first = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
+
+    const value =
+      typeof first === "string" ? first :
+      first?.url ? first.url :
+      null;
+
+    if (!value || typeof value !== "string") return PLACEHOLDER_IMG;
+    if (value.startsWith("http")) return value;
+    if (value.startsWith("data:image")) return value;
+
+    const cleanBase64 = value.replace(/[^A-Za-z0-9+/=]/g, "");
+    return `data:image/jpeg;base64,${cleanBase64}`;
   };
-  // Función para obtener las reseñas de las URLs
+
+  const changePageAndSendUriProfile = (reviewUrl) => {
+    navigation.navigate("Place", { reviewUrl });
+  };
+
   const fetchReviews = async () => {
     try {
       setLoading(true);
 
-      const reviewUrls = emailLogged?.results?.reviews ?? [];
+      const reviewUrls =
+        selectedFriend?.reviews ??
+        selectedFriend?.results?.reviews ??
+        [];
+
+      // ✅ Debug rápido
+      console.log("selectedFriend:", selectedFriend);
+      console.log("reviewUrls:", reviewUrls);
+
       if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {
         setPlaces([]);
         return;
       }
 
       const reviewDetails = await Promise.all(
-        reviewUrls.map(async (url) => {
+        reviewUrls.map(async (url, index) => {
           try {
-            const reviewData = await getData(url); // Obtener los datos de cada reseña desde su enlace
+            const reviewData = await getData(url);
 
-            const imgRaw = reviewData?.images;
-            const currentImage = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
-
-            if (!currentImage) return null;
-
-            const imageUri =
-              typeof currentImage === "string" &&
-                currentImage.startsWith("data:image")
-                ? currentImage
-                : `data:image/jpeg;base64,${currentImage}`;
-            console.log(reviewData);
             return {
-              id: reviewData?.id ?? url,
-              name: reviewData?.title ?? "Sin título",
-              image: { uri: imageUri },
+              id: reviewData?.id ?? `review_${index}_${url}`,
+              name: reviewData?.title ?? reviewData?.type ?? "Sin título",
+              image: { uri: normalizeImageToUri(reviewData?.images) },
               rating: reviewData?.valoration ?? 0,
               uri: url,
             };
-          } catch {
-            return null;
+          } catch (e) {
+            console.log("Error cargando review:", url, e);
+            return {
+              id: `error_${index}_${url}`,
+              name: "Error al cargar",
+              image: { uri: PLACEHOLDER_IMG },
+              rating: 0,
+              uri: url,
+            };
           }
-        }),
+        })
       );
 
-      setPlaces(reviewDetails.filter(Boolean)); // Filtrar las reseñas válidas
+      setPlaces(reviewDetails.filter(Boolean));
     } catch (error) {
       console.error("Error al obtener las reseñas:", error);
       setPlaces([]);
@@ -74,8 +91,8 @@ const PostList = () => {
   };
 
   useEffect(() => {
-    fetchReviews(); // Llamar a la función para obtener las reseñas
-  }, [emailLogged]); // Se vuelve a ejecutar cuando cambia el `emailLogged`
+    fetchReviews();
+  }, [selectedFriend]);
 
   if (loading) {
     return (
@@ -88,9 +105,12 @@ const PostList = () => {
   return (
     <View style={styles.wrapper}>
       <FlatList
+        key={selectedFriend?.id ?? selectedFriend?.results?.id ?? "no_friend"}
         data={places}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={2} // Mostrar en 2 columnas
+        extraData={places}
+        keyExtractor={(item) => String(item.id)}
+        numColumns={2}
+        contentContainerStyle={{ flexGrow: 1 }}
         renderItem={({ item, index }) => {
           const backgroundColor =
             index % 3 === 0 ? "#1748ce" : index % 3 === 1 ? "#DC3545" : "white";
@@ -98,21 +118,23 @@ const PostList = () => {
 
           return (
             <Pressable
-              key={item.id}
               style={styles.card}
               onPress={() => changePageAndSendUriProfile(item.uri)}
             >
               <Card style={[styles.cardContainer, { backgroundColor }]}>
-                {/* Imagen dentro del Card */}
                 <Card.Cover
                   source={item.image}
                   style={styles.image}
                   resizeMode="cover"
+                  onError={(e) =>
+                    console.log("❌ Error imagen:", item.image, e?.nativeEvent)
+                  }
                 />
-
-                {/* Contenido del Card */}
                 <Card.Content style={styles.cardContent}>
-                  <Text style={[styles.placeName, { color: textColor }]}>
+                  <Text
+                    style={[styles.placeName, { color: textColor }]}
+                    numberOfLines={2}
+                  >
                     {item.name}
                   </Text>
                   <Text style={[styles.rating, { color: textColor }]}>
@@ -123,6 +145,11 @@ const PostList = () => {
             </Pressable>
           );
         }}
+        ListEmptyComponent={
+          <View style={styles.emptyWrap}>
+            <Text style={styles.emptyText}>No hay reseñas disponibles</Text>
+          </View>
+        }
       />
     </View>
   );
@@ -132,38 +159,58 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     paddingHorizontal: 8,
+    backgroundColor: "#fff",
+    width: "100%"
   },
+
+  debugText: {
+    paddingTop: 8,
+    paddingHorizontal: 8,
+    fontSize: 12,
+    opacity: 0.7,
+  },
+
   card: {
     flex: 1,
     margin: 8,
-    justifyContent: "center", // Asegura que el contenido esté centrado en la tarjeta
+    justifyContent: "center",
   },
   cardContainer: {
-    flex: 1, // Hace que cada tarjeta ocupe el mismo espacio
+    flex: 1,
     borderRadius: 12,
     overflow: "hidden",
-    height: 200, // Definir una altura para mantener consistencia
+    height: 200,
   },
   image: {
-    height: 120, // Imagen con una altura consistente
+    height: 120,
     width: "100%",
-    borderRadius: 10,
-    aspectRatio: 1.5,
   },
   cardContent: {
     padding: 8,
     justifyContent: "space-between",
   },
   placeName: {
-    fontSize: 14, // Tamaño de fuente más pequeño
+    fontSize: 14,
     fontWeight: "bold",
-    color: "#fff", // Texto blanco para mayor contraste
   },
   rating: {
-    fontSize: 12, // Tamaño de fuente más pequeño
-    color: "#fff", // Texto blanco para mayor contraste
+    fontSize: 12,
+    marginTop: 4,
   },
+
+  emptyWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+  },
+  emptyText: {
+    textAlign: "center",
+    opacity: 0.7,
+    fontSize: 14,
+  },
+
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
 
-export default PostList;
+export default Posts;

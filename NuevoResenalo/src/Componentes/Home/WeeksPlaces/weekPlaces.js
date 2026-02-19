@@ -46,7 +46,7 @@ const WeekPlace = ({ navigation }) => {
       <View style={styles.card}>
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#fff" />
+            <ActivityIndicator size="large" color="#2654d1" />
           </View>
         ) : (
           <View style={styles.podiumRow}>
