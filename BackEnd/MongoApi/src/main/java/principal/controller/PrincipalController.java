@@ -1096,45 +1096,62 @@ public class PrincipalController {
 	}
 
 	@GetMapping("comments")
-	public ResponseEntity<String> comments() {
+	public ResponseEntity<String> comments(
+	        @RequestParam(defaultValue = "0") int page, 
+	        @RequestParam(defaultValue = "10") int size) {
 
-		// Obtener todos los comentarios
-		List<Comments> listComments = commentsRepository.findAll();
-		// Crear el array JSON que contendrá todas las reseñas
-		JSONArray jsonComments = new JSONArray();
+	    // Crear el objeto Pageable para la paginación
+	    Pageable pageable = PageRequest.of(page, size);
 
-		for (Comments comment : listComments) {
-			// Crear un objeto JSON para cada comentario
-			JSONObject commentJson = new JSONObject();
-			commentJson.put("id", comment.getId());
-			commentJson.put("text", comment.getText());
-			commentJson.put("date_publication", comment.getDate());
+	    // Obtener todos los comentarios con paginación
+	    Page<Comments> pageComments = commentsRepository.findAll(pageable);
 
-			// Obtener el usuario asociado a la reseña usando el userId de la reseña
-			String userId = comment.getUser();
-			User user = userRepository.findByUser(userId);
+	    // Crear el array JSON que contendrá todas las reseñas
+	    JSONArray jsonComments = new JSONArray();
 
-			// Generar el enlace al usuario
-			String userLink = (user != null) ? "http://44.213.235.160:8080/resenalo/user?id=" + user.getId() : null;
+	    for (Comments comment : pageComments.getContent()) {
+	        // Crear un objeto JSON para cada comentario
+	        JSONObject commentJson = new JSONObject();
+	        commentJson.put("id", comment.getId());
+	        commentJson.put("text", comment.getText());
+	        commentJson.put("date_publication", comment.getDate());
 
-			// Agregar el enlace del usuario a la reseña
-			commentJson.put("user", userLink);
+	        // Obtener el usuario asociado a la reseña usando el userId de la reseña
+	        String userId = comment.getUser();
+	        User user = userRepository.findByUser(userId);
 
-			String reviewId = comment.getId();
-			Optional<Review> Oreview = reviewRepository.findById(reviewId);
+	        // Generar el enlace al usuario
+	        String userLink = (user != null) ? "http://44.213.235.160:8080/resenalo/user?id=" + user.getId() : null;
 
-			// Verificar si la reseña existe
-			if (!Oreview.isPresent()) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
-			}
+	        // Agregar el enlace del usuario a la reseña
+	        commentJson.put("user", userLink);
 
-			Review review = Oreview.get();
-			String linkReview = "http://44.213.235.160:8080/resenalo/review?id=" + review.getId();
-			commentJson.put("review", linkReview);
-			jsonComments.put(commentJson);
-		}
+	        String reviewId = comment.getId();
+	        Optional<Review> Oreview = reviewRepository.findById(reviewId);
 
-		return ResponseEntity.status(HttpStatus.OK).body(jsonComments.toString());
+	        // Verificar si la reseña existe
+	        if (Oreview.isEmpty()) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
+	        }
+
+	        Review review = Oreview.get();
+	        String linkReview = "http://44.213.235.160:8080/resenalo/review?id=" + review.getId();
+	        commentJson.put("review", linkReview);
+	        jsonComments.put(commentJson);
+	    }
+
+	    // Crear un objeto JSON para los metadatos de la paginación
+	    JSONObject paginationMeta = new JSONObject();
+	    paginationMeta.put("current_page", pageComments.getNumber());
+	    paginationMeta.put("total_pages", pageComments.getTotalPages());
+	    paginationMeta.put("total_comments", pageComments.getTotalElements());
+
+	    // Crear el JSON final con los comentarios y los metadatos de paginación
+	    JSONObject responseJson = new JSONObject();
+	    responseJson.put("comments", jsonComments);
+	    responseJson.put("pagination", paginationMeta);
+
+	    return ResponseEntity.status(HttpStatus.OK).body(responseJson.toString());
 	}
 
 	@GetMapping("/comment")
@@ -1157,10 +1174,10 @@ public class PrincipalController {
 			// Agregar el enlace del usuario a la reseña
 			commentJson.put("user", userLink);
 			String reviewId = comment.getId();
-			Optional<Review> Oreview = reviewRepository.findById(reviewId);
+			Optional<Review> Oreview = reviewRepository.findById(idReview);
 
 			// Verificar si la reseña existe
-			if (!Oreview.isPresent()) {
+			if (Oreview.isEmpty()) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Review not found\"}");
 			}
 
