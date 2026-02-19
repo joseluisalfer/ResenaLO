@@ -75,7 +75,7 @@ const Explore = ({ navigation }) => {
             onPress={() => handleOnPress(review.review)}
           >
             <Image
-              source={{ uri: `data:${review.mimeType};base64,${review.image}` }}
+              source={{ uri: review.image }}
               style={styles.image}
               resizeMode="cover"
             />

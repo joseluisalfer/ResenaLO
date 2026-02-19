@@ -4,26 +4,23 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  Image,
   Pressable,
   ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { Card } from "react-native-paper";
-import { getData } from "../../../services/services"; // Asegúrate de tener esta función configurada para obtener los datos
-import Context from "../../../Context/Context"; // El contexto que contiene el emailLogged
+import { getData } from "../../../services/services";
+import Context from "../../../Context/Context";
 
 const Posts = ({ navigation }) => {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { emailLogged } = useContext(Context); // Obtener el emailLogged desde el contexto
-  const { setSearchUrl} = useContext(Context);
+  const { emailLogged, setSearchUrl } = useContext(Context);
 
   const changePageAndSendUriProfile = (uri) => {
+    setSearchUrl(uri);
     navigation.navigate("Place");
-    setSearchUrl(uri)
   };
-  // Función para obtener las reseñas de las URLs
+
   const fetchReviews = async () => {
     try {
       setLoading(true);
@@ -37,23 +34,15 @@ const Posts = ({ navigation }) => {
       const reviewDetails = await Promise.all(
         reviewUrls.map(async (url) => {
           try {
-            const reviewData = await getData(url); // Obtener los datos de cada reseña desde su enlace
+            const reviewData = await getData(url);
 
-            const imgRaw = reviewData?.images;
-            const currentImage = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
+            // Intentamos sacar la URL de 'image' o de la primera posición de 'images'
+            const finalImageUrl = reviewData?.image || (Array.isArray(reviewData?.images) ? reviewData.images[0] : null);
 
-            if (!currentImage) return null;
-
-            const imageUri =
-              typeof currentImage === "string" &&
-              currentImage.startsWith("data:image")
-                ? currentImage
-                : `data:image/jpeg;base64,${currentImage}`;
-            console.log(reviewData);
             return {
               id: reviewData?.id ?? url,
               name: reviewData?.title ?? "Sin título",
-              image: { uri: imageUri },
+              image: finalImageUrl ? { uri: finalImageUrl } : null,
               rating: reviewData?.valoration ?? 0,
               uri: url,
             };
@@ -63,7 +52,7 @@ const Posts = ({ navigation }) => {
         }),
       );
 
-      setPlaces(reviewDetails.filter(Boolean)); // Filtrar las reseñas válidas
+      setPlaces(reviewDetails.filter(Boolean));
     } catch (error) {
       console.error("Error al obtener las reseñas:", error);
       setPlaces([]);
@@ -73,8 +62,8 @@ const Posts = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetchReviews(); // Llamar a la función para obtener las reseñas
-  }, [emailLogged]); // Se vuelve a ejecutar cuando cambia el `emailLogged`
+    fetchReviews();
+  }, [emailLogged]);
 
   if (loading) {
     return (
@@ -86,11 +75,10 @@ const Posts = ({ navigation }) => {
 
   return (
     <View style={styles.wrapper}>
-      {/* Grid de publicaciones con 2 columnas */}
       <FlatList
         data={places}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={2} // Mostrar en 2 columnas
+        numColumns={2}
         renderItem={({ item, index }) => {
           const backgroundColor =
             index % 3 === 0 ? "#1748ce" : index % 3 === 1 ? "#DC3545" : "white";
@@ -98,21 +86,24 @@ const Posts = ({ navigation }) => {
 
           return (
             <Pressable
-              key={item.id}
               style={styles.card}
               onPress={() => changePageAndSendUriProfile(item.uri)}
             >
               <Card style={[styles.cardContainer, { backgroundColor }]}>
-                {/* Imagen dentro del Card */}
-                <Card.Cover
-                  source={item.image}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
+                {item.image ? (
+                  <Card.Cover
+                    source={item.image}
+                    style={styles.image}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={[styles.image, styles.center]}>
+                    <Text style={{ color: textColor }}>Sin imagen</Text>
+                  </View>
+                )}
 
-                {/* Contenido del Card */}
                 <Card.Content style={styles.cardContent}>
-                  <Text style={[styles.placeName, { color: textColor }]}>
+                  <Text style={[styles.placeName, { color: textColor }]} numberOfLines={1}>
                     {item.name}
                   </Text>
                   <Text style={[styles.rating, { color: textColor }]}>
@@ -136,32 +127,28 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     margin: 8,
-    justifyContent: "center", // Asegura que el contenido esté centrado en la tarjeta
   },
   cardContainer: {
-    flex: 1, // Hace que cada tarjeta ocupe el mismo espacio
+    flex: 1,
     borderRadius: 12,
     overflow: "hidden",
-    height: 200, // Definir una altura para mantener consistencia
+    height: 200,
   },
   image: {
-    height: 120, // Imagen con una altura consistente
+    height: 120,
     width: "100%",
-    borderRadius: 10,
-    aspectRatio: 1.5,
+    borderRadius: 0,
   },
   cardContent: {
     padding: 8,
     justifyContent: "space-between",
   },
   placeName: {
-    fontSize: 14, // Tamaño de fuente más pequeño
+    fontSize: 14,
     fontWeight: "bold",
-    color: "#fff", // Texto blanco para mayor contraste
   },
   rating: {
-    fontSize: 12, // Tamaño de fuente más pequeño
-    color: "#fff", // Texto blanco para mayor contraste
+    fontSize: 12,
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
