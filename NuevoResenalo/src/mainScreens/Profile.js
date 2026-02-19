@@ -1,18 +1,17 @@
-import React, { useContext, useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import React, { useContext, useEffect } from "react";
+import { View, StyleSheet, FlatList } from "react-native";
 import { Divider } from "react-native-paper";
 import Posts from "../Componentes/Profile/Posts/Posts";
 import OwnInfo from "../Componentes/Profile/OwnInfo/OwnInfo";
 import CardInfo from "../Componentes/Profile/CardInfo/CardInfo";
 import ModalProfile from "../Componentes/Profile/ModalProfile/ModalProfile";
-import { getData } from "../services/services";
 import Context from "../Context/Context";
 
 const Profile = ({ navigation }) => {
   const { emailLogged, isLoged, setIsLoged } = useContext(Context);
 
   useEffect(() => {
-    console.log(emailLogged)
+    console.log(emailLogged);
   }, []);
 
   const handleLogOut = () => {
@@ -22,12 +21,9 @@ const Profile = ({ navigation }) => {
   const handleChangeLanguage = (language) => {
     console.log("Idioma cambiado a: ", language);
   };
-  //oscarmartorellg@gmail.com
-  //unairp19@gmail.com
-  //serranotarazonadavid@gmail.com
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* ModalProfile que maneja el modal y las opciones */}
+
+  const Header = () => (
+    <View>
       <View style={styles.section}>
         <ModalProfile
           handleLogOut={handleLogOut}
@@ -35,26 +31,35 @@ const Profile = ({ navigation }) => {
         />
       </View>
 
-      {/* Información personal */}
       <View style={styles.section}>
-        <OwnInfo name={emailLogged.results.name} user={emailLogged.results.user} description={emailLogged.results.description} />
+        <OwnInfo
+          name={emailLogged.results.name}
+          user={emailLogged.results.user}
+          description={emailLogged.results.description}
+        />
       </View>
 
-      {/* Estadísticas o información adicional */}
       <View style={styles.section}>
         <CardInfo />
       </View>
 
-      {/* Divisor entre la información del perfil y las publicaciones */}
       <View style={styles.divider}>
         <Divider style={styles.dividerLine} />
       </View>
 
-      {/* Publicaciones */}
       <View style={styles.postsSection}>
         <Posts navigation={navigation} />
       </View>
-    </ScrollView>
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={[{ key: "content" }]}
+      renderItem={() => <Header />}
+      keyExtractor={(item) => item.key}
+      contentContainerStyle={styles.container}
+    />
   );
 };
 
