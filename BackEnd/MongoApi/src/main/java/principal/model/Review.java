@@ -16,25 +16,13 @@ public class Review {
 	private String type;
 	private double latitud;
 	private double longitud;
-	private List<byte[]> images = new ArrayList<>();
+	private List<String> imageUrls;
 	private String user;
 	private double valoration;
 	private String description;
 	private Date date;
 
 	public Review() {
-	}
-
-	public Review(String title, List<byte[]> images, String user, double valoration, String description,String type, double latitud, double longitud) {
-		super();
-		this.title = title;
-		this.images = images;
-		this.user = user;
-		this.valoration = valoration;
-		this.description = description;
-		this.type = type;
-		this.latitud = latitud;
-		this.longitud = longitud;
 	}
 
 	public String getId() {
@@ -53,12 +41,12 @@ public class Review {
 		this.title = title;
 	}
 
-	public List<byte[]> getImages() {
-		return images;
+	public List<String> getImageUrls() {
+		return imageUrls;
 	}
 
-	public void setImages(List<byte[]> images) {
-		this.images = images;
+	public void setImageUrls(List<String> imageUrls) {
+		this.imageUrls = imageUrls;
 	}
 
 	public String getUser() {
