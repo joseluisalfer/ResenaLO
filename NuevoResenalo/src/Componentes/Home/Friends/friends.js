@@ -12,90 +12,57 @@ import { Ionicons } from "@expo/vector-icons";
 import Context from "../../../Context/Context";
 import { getData } from "../../../services/services";
 
+const pickRandomUpToN = (arr, n = 5) => {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.min(n, copy.length));
+};
+
 const Friends = ({ navigation }) => {
+  const { setSelectedFriend, emailLogged } = useContext(Context);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const { setSelectedFriend, emailLogged } = useContext(Context); // ✅ usamos emailLogged para saber si hay sesión
 
   useEffect(() => {
     obtainUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const obtainUsers = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      setError(null);
+      const rawFriends = emailLogged?.results?.friends ?? [];
+      const friendUrls = pickRandomUpToN(rawFriends, 5);
 
-      const data = await getData("http://44.213.235.160:8080/resenalo/users");
-      const userUrls = data?.users || [];
-
-      if (!Array.isArray(userUrls) || userUrls.length === 0) {
-        setFriends([]);
-        return;
-      }
-
-      const userDetails = await Promise.all(
-        userUrls.map(async (url) => {
-          try {
-            const userData = await getData(url);
-
-            const userName =
-              userData?.results?.name || userData?.user?.name || "Usuario";
-            const userPhoto =
-              userData?.results?.photo || userData?.user?.photo || null;
-            const userDescription =
-              userData?.results?.description ||
-              userData?.user?.description ||
-              "Sin descripción";
-            const userUser =
-              userData?.results?.user || userData?.user?.user || "nombre";
-            const userReviews =
-              userData?.results?.reviews || userData?.user?.reviews || [];
-
-            let imageUri = null;
-            if (userPhoto && typeof userPhoto === "string") {
-              if (userPhoto.startsWith("http")) imageUri = userPhoto;
-              else if (userPhoto.startsWith("data:image")) imageUri = userPhoto;
-              else if (userPhoto.startsWith("image/")) imageUri = `data:${userPhoto}`;
-              else imageUri = `data:image/jpeg;base64,${userPhoto}`;
-            }
-
-            return {
-              name: userName,
-              photo: imageUri,
-              description: userDescription,
-              user: userUser,
-              reviews: Array.isArray(userReviews) ? userReviews : [],
-            };
-          } catch (err) {
-            return {
-              name: "Error",
-              photo: null,
-              description: "Sin descripción",
-              user: null,
-              reviews: [],
-            };
-          }
+      const settled = await Promise.allSettled(
+        friendUrls.map(async (url) => {
+          const userData = await getData(url);
+          const r = userData?.results;
+          return {
+            id: r.id,
+            name: r.name,
+            photo: r.photo,        // 👈 URL tal cual
+            description: r.description,
+            user: r.user,
+            reviews: r.reviews,
+          };
         })
       );
 
-      const friendsList = userDetails.map((user, index) => ({
-        id: `friend_${index}_${Date.now()}_${Math.random()
-          .toString(36)
-          .substr(2, 9)}`,
-        name: user.name,
-        photo: user.photo,
-        description: user.description,
-        user: user.user,
-        reviews: user.reviews ?? [],
-      }));
+      const ok = settled
+        .filter((x) => x.status === "fulfilled")
+        .map((x) => x.value)
+        .filter(Boolean);
 
-      setFriends(friendsList);
+      console.log("PHOTO 0 =>", ok[0]?.photo);
+
+      setFriends(ok);
     } catch (err) {
       console.error("Error crítico en obtainUsers:", err);
-      setError("No se pudieron cargar los amigos. Verifica tu conexión.");
+      setFriends([]);
     } finally {
       setLoading(false);
     }
@@ -105,19 +72,14 @@ const Friends = ({ navigation }) => {
     return (
       <View style={styles.wrapper}>
         <ActivityIndicator size="large" color="#2654d1" />
-        <Text style={styles.loadingText}></Text>
       </View>
     );
   }
 
- 
-
-  
-  const isLoggedIn = !!emailLogged; 
   if (friends.length === 0) {
     return (
       <View style={styles.wrapper}>
-        <Text style={styles.noFriendsText}>No tienes amigos</Text>
+        <Text style={styles.noFriendsText}>Todavia no tienes amigos</Text>
       </View>
     );
   }
@@ -135,12 +97,15 @@ const Friends = ({ navigation }) => {
       <FlatList
         horizontal
         data={friends}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.row}
         renderItem={({ item, index }) => (
           <Pressable
-            style={[styles.item, index !== friends.length - 1 && styles.itemGap]}
+            style={[
+              styles.item,
+              index !== friends.length - 1 && styles.itemGap,
+            ]}
             onPress={() => {
               setSelectedFriend(item);
               navigation.navigate("FriendScreens", {
@@ -149,17 +114,21 @@ const Friends = ({ navigation }) => {
                 friendPhoto: item.photo,
                 friendDescription: item.description,
                 friendUser: item.user,
-                friendReviews: item.reviews, // ✅ antes estaba mal (duplicabas friendUser)
+                friendReviews: item.reviews,
               });
             }}
           >
-            {item.photo ? (
-              <Image source={{ uri: item.photo }} style={styles.avatar} resizeMode="cover" />
-            ) : (
-              <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                <Ionicons name="person" size={28} color="#888" />
-              </View>
-            )}
+            <Image
+              source={{ uri: item.photo.trim(), cache: "reload" }}
+              style={styles.avatar}
+              resizeMode="cover"
+              onError={(e) => {
+                console.log("❌ IMAGE ERROR:", item.photo, e.nativeEvent);
+              }}
+              onLoad={() => {
+                console.log("✅ IMAGE LOADED:", item.photo);
+              }}
+            />
 
             <Text style={styles.name} numberOfLines={1}>
               {item.name}
@@ -176,22 +145,11 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: 8,
     paddingVertical: 4,
     paddingHorizontal: 4,
   },
   title: { fontSize: 18, fontWeight: "700", color: "#000" },
-  loadingText: { marginTop: 10, color: "#666", textAlign: "center", fontSize: 14 },
-  errorText: { color: "#DC3545", textAlign: "center", marginBottom: 10, fontSize: 14 },
-  retryButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: "center",
-  },
-  retryText: { color: "#fff", fontWeight: "600", fontSize: 14 },
   row: { paddingVertical: 4 },
   item: { width: 74, alignItems: "center" },
   itemGap: { marginRight: 12 },
@@ -202,12 +160,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     backgroundColor: "#f0f0f0",
   },
-  avatarPlaceholder: {
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
   name: {
     fontSize: 11,
     color: "#000",
@@ -215,8 +167,6 @@ const styles = StyleSheet.create({
     maxWidth: 74,
     fontWeight: "500",
   },
-
-  // ✅ nuevo estilo
   noFriendsText: {
     marginTop: 20,
     textAlign: "center",

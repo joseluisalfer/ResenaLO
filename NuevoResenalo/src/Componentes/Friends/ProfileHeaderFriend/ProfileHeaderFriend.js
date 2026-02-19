@@ -1,12 +1,11 @@
 import React, { useContext } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../../Context/Context";
 
 const ProfileHeaderFriend = ({ navigation }) => {
   const { selectedFriend } = useContext(Context);
 
-  // 🔒 Si no hay amigo seleccionado, mostrar mensaje
   if (!selectedFriend) {
     return (
       <View style={styles.container}>
@@ -15,109 +14,93 @@ const ProfileHeaderFriend = ({ navigation }) => {
     );
   }
 
-  // 🔍 Comprobamos que selectedFriend.results y photo existen
-  const getImageUri = () => {
-    const photo = selectedFriend.photo;
-
-    if (typeof photo !== "string") return null;
-
-    if (photo.startsWith("http")) return photo;
-    if (photo.startsWith("data:image")) return photo;
-    if (photo.startsWith("image/")) return `data:${photo}`;
-    
-    // Asumimos que es base64 puro
-    return `image/jpeg;base64,${photo}`;
-  };
-
-  const imageUri = getImageUri();
+  const { user, description, name, photo } = selectedFriend;
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.backButton} 
+      {/* ✅ Flecha atrás */}
+      <Pressable
+        style={styles.backButton}
         onPress={() => navigation.goBack()}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        hitSlop={12}
       >
         <Ionicons name="arrow-back" size={30} color="#000" />
-      </TouchableOpacity>
+      </Pressable>
 
-      <View style={styles.imageContainer}>
-        {imageUri ? (
-          <Image 
-            source={{ uri: imageUri }} 
-            style={styles.profileImage}
-            resizeMode="cover"
-            onError={(e) => console.log("❌ Error cargando imagen:", e.nativeEvent?.error)}
-          />
-        ) : (
-          <View style={[styles.profileImage, styles.placeholder]}>
-            <Ionicons name="person" size={50} color="#999" />
-          </View>
-        )}
+      {/* ✅ Imagen estilo ProfileImage */}
+      <View style={styles.photoWrap}>
+        <View style={styles.photoSquare}>
+          <Image source={{ uri: photo }} style={styles.photo} resizeMode="cover" />
+        </View>
       </View>
 
-      <Text style={styles.username}>@{selectedFriend.user}</Text>
+      {/* ✅ Texto estilo OwnInfo */}
+      <View style={{ alignItems: "center" }}>
+        <Text style={styles.username}>@{user}</Text>
+      </View>
 
-      <Text style={styles.fullName}>{selectedFriend.name}</Text>
-
-      <Text style={styles.description} numberOfLines={3}>
-        {selectedFriend.description}
-      </Text>
+      <View style={{ alignItems: "center" }}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.bio}>{description}</Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  // Igual que OwnInfo container
   container: {
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  backButton: {
-    position: "absolute", // Fija la flecha en la parte superior
-    top: 10,
-    left: 20, // Coloca la flecha más cerca del borde izquierdo
-    zIndex: 1, // Asegura que la flecha esté sobre otros elementos
-    padding: 5,
-  },
-  imageContainer: {
     marginBottom: 16,
+    marginTop: 40,
   },
-  profileImage: {
+
+  // Flecha fija arriba izq
+  backButton: {
+    position: "absolute",
+    top: -10,
+    left: 16,
+    zIndex: 999,
+    padding: 6,
+  },
+
+  // Igual que ProfileImage styles
+  photoWrap: {
+    marginTop: 35,
+    alignItems: "center",
+  },
+  photoSquare: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#f0f0f0",
-    borderWidth: 2,
-    borderColor: "#eee",
-  },
-  placeholder: {
+    borderWidth: 1,
+    borderColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f5f5f5",
+    position: "relative",
   },
+  photo: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 60,
+  },
+
+  // Igual que OwnInfo
   username: {
-    fontSize: 18,
-    color: "#666",
-    marginTop: 8,
-    fontWeight: "500",
+    color: "gray",
+    marginTop: 3,
   },
-  fullName: {
-    fontSize: 22,
+  name: {
+    marginTop: 5,
+    fontSize: 25,
     fontWeight: "bold",
-    color: "#000",
-    marginTop: 4,
-    textAlign: "center",
   },
-  description: {
-    fontSize: 15,
-    color: "#333",
+  bio: {
     textAlign: "center",
-    marginTop: 12,
-    paddingHorizontal: 10,
-    lineHeight: 22,
+    marginTop: 8,
+    paddingHorizontal: 20,
   },
+
   emptyText: {
     fontSize: 16,
     color: "#666",
