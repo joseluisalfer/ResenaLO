@@ -7,88 +7,106 @@ import {
   Pressable,
   ScrollView,
   ActivityIndicator,
-  TextInput
+  TouchableOpacity, // Añadido para el botón
 } from "react-native";
 import { getData } from "../services/services";
+import { Searchbar } from "react-native-paper";
+import Context from "../Context/Context";
 
 const FindUser = ({ navigation }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false); // Loader específico para paginación
   const [users, setUsers] = useState([]);
-  const [searchText, setSearchText] = useState(""); // Estado para la barra de búsqueda
+  const [shownUsers, setShownUsers] = useState([]);
+  const [searchText, setSearchText] = useState("");
 
-  // Función para manejar la imagen y detectar si es URL o Base64
+  // --- ESTADOS DE PAGINACIÓN ---
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
   const getImageUri = (rawPhoto) => {
     if (rawPhoto) {
-      if (rawPhoto.startsWith("data:image")) {
-        return rawPhoto; // Si es Base64
-      } else if (rawPhoto.startsWith("http")) {
-        return rawPhoto; // Si es una URL
+      if (rawPhoto.startsWith("data:image") || rawPhoto.startsWith("http")) {
+        return rawPhoto;
       } else {
-        return `data:image/jpeg;base64,${rawPhoto}`; // Si es Base64 sin prefijo
+        return `data:image/jpeg;base64,${rawPhoto}`;
       }
     }
     return null;
   };
 
-  // Función para convertir una imagen en URI a Base64
-  const toBase64 = async (uri) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    const reader = new FileReader();
-    return new Promise((resolve, reject) => {
-      reader.onloadend = () => {
-        resolve(reader.result); // Devolvemos la imagen en formato Base64
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob); // Convierte la imagen a Base64
-    });
-  };
-
-  const obtainUsers = async () => {
+  const obtainUsers = async (pageToLoad) => {
     try {
-      setLoading(true);
-      const urlUsers = await getData("http://44.213.235.160:8080/resenalo/users");
+      // Si es la página 0, es la carga inicial
+      if (pageToLoad === 0) setLoading(true);
+      else setLoadingMore(true);
 
-      console.log("Respuesta de la API de usuarios:", urlUsers);
+      // Agregamos el parámetro de página a la URL (ajusta el nombre del parámetro según tu API, ej: ?page=)
+      const url = `http://44.213.235.160:8080/resenalo/users?page=${pageToLoad}`;
+      const response = await getData(url);
 
-      if (urlUsers && urlUsers.users && urlUsers.users.length > 0) {
-        const userDetailsPromises = urlUsers.users.map(async (link) => {
+      console.log("Respuesta de la API:", response);
+
+      // Actualizamos el total de páginas desde la respuesta
+      if (response.totalPages !== undefined) {
+        setTotalPages(response.totalPages);
+      }
+
+      if (response && response.users && response.users.length > 0) {
+        const userDetailsPromises = response.users.map(async (link) => {
           const res = await getData(link);
-          console.log("Detalles completos del usuario:", res);
-
           if (res.results) {
             let photoUrl = res.results.photo;
-            photoUrl = await getImageUri(photoUrl); // Aplicamos getImageUri para manejar la imagen
+            photoUrl = await getImageUri(photoUrl);
 
             return {
               name: res.results.name,
-              photo: photoUrl, // Asignamos la imagen procesada
+              photo: photoUrl,
               user: res.results.user,
             };
-          } else {
-            console.log("No se encontraron resultados en el enlace:", link);
-            return null;
           }
+          return null;
         });
 
         const userDetails = await Promise.all(userDetailsPromises);
+        const cleanUsers = userDetails.filter((u) => u !== null);
 
-        setUsers(userDetails.filter((user) => user !== null));
+        // IMPORTANTE: Concatenamos los usuarios nuevos a los anteriores
+        const updatedUsers = pageToLoad === 0 ? cleanUsers : [...users, ...cleanUsers];
+
+        setUsers(updatedUsers);
+        setShownUsers(updatedUsers);
+        setPage(pageToLoad);
       }
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  // Filtrar usuarios según el texto de búsqueda
-  const filteredUsers = users.filter((user) =>
-    user.user.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const handleLoadMore = () => {
+    // Si la página actual + 1 es menor que el total, cargamos la siguiente
+    if (page + 1 < totalPages) {
+      obtainUsers(page + 1);
+    }
+  };
+
+  const handleSearch = () => {
+    const q = searchText.trim().toLowerCase();
+    if (!q) {
+      setShownUsers(users);
+      return;
+    }
+    const result = users.filter((u) =>
+      (u.user || "").toLowerCase().includes(q)
+    );
+    setShownUsers(result);
+  };
 
   useEffect(() => {
-    obtainUsers();
+    obtainUsers(0); // Carga inicial
   }, []);
 
   return (
@@ -97,41 +115,52 @@ const FindUser = ({ navigation }) => {
         <Text style={styles.title}>Buscar Usuarios</Text>
       </View>
 
-      {/* Barra de búsqueda */}
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchBar}
+        <Searchbar
           placeholder="Buscar usuario..."
           value={searchText}
           onChangeText={setSearchText}
+          onIconPress={handleSearch}
+          onSubmitEditing={handleSearch}
+          autoCapitalize="none"
+          style={styles.searchBarPaper}
+          inputStyle={styles.searchInput}
         />
       </View>
 
-      <View style={{ width: "100%" }}>
+      <View style={{ flex: 1, width: "100%" }}>
         {loading ? (
           <ActivityIndicator size="large" color="#2654d1" style={styles.loader} />
         ) : (
           <ScrollView contentContainerStyle={styles.scrollView}>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((item, index) => {
-                console.log("Rendering user:", item);
-                return (
-                  <Pressable
-                    key={index}
-                    onPress={() => navigation.navigate("Friend", { friendId: item.user })}
-                  >
-                    <View style={styles.card}>
-                      <Image source={{ uri: item.photo }} style={styles.image} />
-                      <View style={styles.textContainer}>
-                        <Text style={styles.placeName}>{item.name}</Text>
-                        <Text style={styles.followingText}>@{item.user}</Text>
-                      </View>
+            {shownUsers.length > 0 ? (
+              shownUsers.map((item, index) => (
+                <Pressable
+                  key={`${item.user}-${index}`} // Mejor usar una key única
+                  onPress={() => navigation.navigate("Friend", { friendId: item.user })}
+                >
+                  <View style={styles.card}>
+                    <Image source={{ uri: item.photo }} style={styles.image} />
+                    <View style={styles.textContainer}>
+                      <Text style={styles.placeName}>{item.name}</Text>
+                      <Text style={styles.followingText}>@{item.user}</Text>
                     </View>
-                  </Pressable>
-                );
-              })
+                  </View>
+                </Pressable>
+              ))
             ) : (
-              <Text>No se encontraron usuarios.</Text>
+              <Text style={{ textAlign: 'center' }}>No se encontraron usuarios.</Text>
+            )}
+            {!searchText && page + 1 < totalPages && (
+              <View style={styles.footerContainer}>
+                {loadingMore ? (
+                  <ActivityIndicator size="small" color="#2654d1" />
+                ) : (
+                  <TouchableOpacity style={styles.loadMoreBtn} onPress={handleLoadMore}>
+                    <Text style={styles.loadMoreText}>Cargar más</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             )}
           </ScrollView>
         )}
@@ -143,85 +172,74 @@ const FindUser = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    width: "100%",
+    backgroundColor: "white"
   },
   header: {
-    width: "100%",
     padding: 15,
     alignItems: "center",
-    backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
-    marginTop: 30,
+    marginTop: 30
   },
   title: {
     fontSize: 28,
-    fontWeight: "bold",
-    color: "#000",
-    textAlign: "center",
-    marginBottom: 10,
+    fontWeight: "bold"
   },
   searchContainer: {
     width: "90%",
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    marginTop: 20
+    alignSelf: 'center',
+    marginVertical: 20
   },
-  searchBar: {
-    height: 40,
-    borderColor: "#ddd",
-    borderWidth: 1,
+  searchBarPaper: {
     borderRadius: 8,
-    paddingLeft: 10,
+    height: 40
+  },
+  searchInput: {
     fontSize: 16,
+    minHeight: 40
   },
   card: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: "#f0f0f0",
+    padding: 10, backgroundColor: "#f0f0f0",
     borderRadius: 8,
     width: "90%",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    elevation: 5,
-    marginBottom: 15,
     alignSelf: "center",
+    marginBottom: 15
   },
   image: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 15,
+    marginRight: 15
   },
-  textContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "flex-start",
-  },
+  textContainer: { flex: 1 },
   placeName: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-    textAlign: "left",
+    fontWeight: "bold"
   },
   followingText: {
     fontSize: 16,
-    color: "#777",
-    marginTop: 5,
-    textAlign: "left",
+    color: "#777"
   },
-  loader: {
-    marginTop: 20,
+  loader: { marginTop: 20 },
+  scrollView: { paddingBottom: 20 },
+
+  footerContainer: {
+    paddingVertical: 20,
+    alignItems: 'center'
   },
-  scrollView: {
-    width: "100%",
-    paddingBottom: 20,
+  loadMoreBtn: {
+    padding: 12,
+    backgroundColor: '#1748ce',
+    borderRadius: 8,
+    width: '50%',
+    alignItems: 'center'
   },
+  loadMoreText: {
+    color: '#fff',
+    fontWeight: 'bold'
+  }
 });
 
 export default FindUser;
