@@ -321,11 +321,11 @@ public class PrincipalController {
 
 		// Agregar usuario a la lista de seguidores si no está ya presente
 		List<String> listFollowers = userFollow.getFollowers();
-		List<String> listNotifications = user.getNotifications();
+		
 		if (!listFollowers.contains(user.getUser())) {
 			listFollowers.add(user.getUser());
 			userFollow.setFollowers(listFollowers);
-			listNotifications.add(user.getUser() + " te ha empezado a seguir");
+
 			userRepository.save(userFollow);
 		}
 
@@ -436,63 +436,59 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
-	@PutMapping("updateUsername")
-	public ResponseEntity<Object> updateUsername(@RequestBody String body) throws IOException {
-		// Parsear el cuerpo del JSON usando JSONObject
-		JSONObject json = new JSONObject(body);
+	@PutMapping("updateUser")
+	public ResponseEntity<Object> updateUser(@RequestBody String body) throws IOException {
+	    JSONObject json = new JSONObject(body);
 
-		String email = json.getString("email");
-		String newUsername = json.getString("newUsername");
+	    // Requerido para localizar al usuario
+	    String email = json.getString("email");
 
-		User user = userRepository.findByEmail(email);
-		if (user != null) {
-			User user2 = userRepository.findByUser(newUsername);
-			if (user2 == null) {
-				user.setUser(newUsername);
-				userRepository.save(user);
-				return ResponseEntity.status(HttpStatus.OK).build();
-			} else {
-				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-			}
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
-	}
+	    User user = userRepository.findByEmail(email);
+	    if (user == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
 
-	@PutMapping("updateName")
-	public ResponseEntity<Object> updateName(@RequestBody String body) throws IOException {
-		// Parsear el cuerpo del JSON usando JSONObject
-		JSONObject json = new JSONObject(body);
+	    // Opcionales
+	    boolean changed = false;
 
-		String email = json.getString("email");
-		String newName = json.getString("newName");
+	    if (json.has("newUsername") && !json.isNull("newUsername")) {
+	        String newUsername = json.getString("newUsername").trim();
 
-		User user = userRepository.findByEmail(email);
-		if (user != null) {
-			user.setName(newName);
-			userRepository.save(user);
-			return ResponseEntity.status(HttpStatus.OK).build();
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
-	}
+	        // Evitar username vacío
+	        if (newUsername.isEmpty()) {
+	            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+	        }
 
-	@PutMapping("updateDescription")
-	public ResponseEntity<Object> updateDescription(@RequestBody String body) throws IOException {
-		// Parsear el cuerpo del JSON usando JSONObject
-		JSONObject json = new JSONObject(body);
+	        // Si es distinto al actual, comprobar que no exista
+	        if (!newUsername.equals(user.getUser())) {
+	            User existing = userRepository.findByUser(newUsername);
+	            if (existing != null) {
+	                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+	            }
+	            user.setUser(newUsername);
+	            changed = true;
+	        }
+	    }
 
-		String email = json.getString("email");
-		String newDescription = json.getString("newDescription");
+	    if (json.has("newName") && !json.isNull("newName")) {
+	        String newName = json.getString("newName");
+	        user.setName(newName);
+	        changed = true;
+	    }
 
-		User user = userRepository.findByEmail(email);
-		if (user != null) {
-			user.setDescription(newDescription);
-			userRepository.save(user);
-			return ResponseEntity.status(HttpStatus.OK).build();
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+	    if (json.has("newDescription") && !json.isNull("newDescription")) {
+	        String newDescription = json.getString("newDescription");
+	        user.setDescription(newDescription);
+	        changed = true;
+	    }
+
+	    // Si no vino ningún campo a actualizar
+	    if (!changed) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	    }
+
+	    userRepository.save(user);
+	    return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PostMapping("/commentReview")
@@ -588,22 +584,30 @@ public class PrincipalController {
 	}
 
 	@DeleteMapping("deleteReview")
-	public ResponseEntity<Object> deleteReview(@RequestBody String body) throws IOException {
-		// Parsear el cuerpo del JSON usando JSONObject
-		JSONObject json = new JSONObject(body);
-		String idReview = json.getString("idReview");
+	public ResponseEntity<Object> deleteReview(@RequestBody(required = false) String body) {
+	    if (body == null || body.isBlank()) {
+	        return ResponseEntity.badRequest().body("Body vacío");
+	    }
 
-		// Verificar si la reseña existe
-		Optional<Review> Oreview = reviewRepository.findById(idReview);
-		if (!Oreview.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Devuelve 404 si no existe la reseña
-		}
+	    JSONObject json = new JSONObject(body);
+	    if (!json.has("idReview")) {
+	        return ResponseEntity.badRequest().body("Falta idReview");
+	    }
 
-		// Eliminar la reseña
-		Review review = Oreview.get();
-		reviewRepository.delete(review);
+	    String idReview = json.getString("idReview");
 
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Devuelve 204 si se elimina correctamente
+	    Optional<Review> Oreview = reviewRepository.findById(idReview);
+	    if (Oreview.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
+
+	    // 1) borrar comentarios asociados
+	    commentsRepository.deleteByReviewId(idReview);
+
+	    // 2) borrar la review
+	    reviewRepository.deleteById(idReview);
+
+	    return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("deleteComment")
@@ -614,7 +618,7 @@ public class PrincipalController {
 
 		// Verificar si el comentario existe
 		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
-		if (!Ocomment.isPresent()) {
+		if (Ocomment.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Devuelve 404 si no existe el comentario
 		}
 
@@ -656,15 +660,8 @@ public class PrincipalController {
 			} else {
 				jsonR.put("description", user.getDescription());
 			}
-			// Añadir notificaciones al JSON
-			JSONArray notificationsArray = new JSONArray();
 
-			if (user.getNotifications() != null && !user.getNotifications().isEmpty()) {
-				for (String notif : user.getNotifications()) {
-					notificationsArray.put(notif); // cada notificación como string
-				}
-			}
-
+			jsonR.put("email", user.getEmail());
 			jsonR.put("photo", user.getImage());
 
 			// Convertir reseñas en links (solo enlaces como strings)
@@ -753,6 +750,7 @@ public class PrincipalController {
 			} else {
 				jsonR.put("description", user.getDescription());
 			}
+			jsonR.put("email", user.getEmail());
 			jsonR.put("photo", user.getImage());
 
 			// Convertir reseñas en links (solo enlaces como strings)
@@ -831,17 +829,8 @@ public class PrincipalController {
 			} else {
 				jsonR.put("description", user.getDescription());
 			}
-
+			jsonR.put("email", user.getEmail());
 			jsonR.put("photo", user.getImage());
-
-			// Añadir notificaciones al JSON
-			JSONArray notificationsArray = new JSONArray();
-
-			if (user.getNotifications() != null && !user.getNotifications().isEmpty()) {
-				for (String notif : user.getNotifications()) {
-					notificationsArray.put(notif); // cada notificación como string
-				}
-			}
 
 			// Convertir reseñas en links (solo enlaces como strings)
 			if (listReviews != null && !listReviews.isEmpty()) {
@@ -912,7 +901,7 @@ public class PrincipalController {
 		jsonP.put("id", review.getId());
 		jsonP.put("title", review.getTitle());
 		jsonP.put("user", review.getUser());
-		jsonP.put("valoration", review.getValoration());
+		jsonP.put("valoration", Math.round(review.getValoration() * 10.0) / 10.0);
 		jsonP.put("description", review.getDescription());
 		jsonP.put("latitud", review.getLatitud());
 		jsonP.put("longitud", review.getLongitud());
@@ -946,7 +935,7 @@ public class PrincipalController {
 
 		jsonP.put("title", review.getTitle());
 		jsonP.put("user", review.getUser());
-		jsonP.put("valoration", review.getValoration());
+		jsonP.put("valoration", Math.round(review.getValoration() * 10.0) / 10.0);
 		jsonP.put("review", "http://44.213.235.160:8080/resenalo/review?id=" + review.getId());
 
 		List<String> urls = review.getImageUrls();
@@ -975,7 +964,7 @@ public class PrincipalController {
 			jsonReview.put("id", review.getId());
 			jsonReview.put("title", review.getTitle());
 			jsonReview.put("user", review.getUser());
-			jsonReview.put("valoration", review.getValoration());
+			jsonReview.put("valoration", Math.round(review.getValoration() * 10.0) / 10.0);
 			jsonReview.put("description", review.getDescription());
 			jsonReview.put("latitud", review.getLatitud());
 			jsonReview.put("longitud", review.getLongitud());
@@ -1052,9 +1041,10 @@ public class PrincipalController {
 
 		// Recorrer todas las reseñas de la página actual y agregar el enlace
 		for (Review review : pageReviews.getContent()) {
-			String reviewLink = "http://44.213.235.160:8080/resenalo/review?id=" + review.getId();
+			String reviewLink = "http://44.213.235.160:8080/resenalo/reviewP?id=" + review.getId();
 			jsonReviews.put(reviewLink);
 		}
+		
 
 		// Crear el objeto JSON con la paginación: número total de páginas, página
 		// actual, etc.
