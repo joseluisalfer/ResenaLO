@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Place from '../Place';
 import Review from './Review';
-import EditPlace from './EditPlace';
+import DeletePlace from './DeletePlace';
 
 const Stack = createStackNavigator();
 
@@ -18,8 +18,8 @@ const ModalReview = () => (
         options={{ headerShown: true, headerMode: 'none' }}
       />
       <Stack.Screen
-        name="EditPlace"
-        component={EditPlace}
+        name="DeletePlace"
+        component={DeletePlace}
         options={{ headerShown: true, headerMode: 'none' }}
       />
     </Stack.Group>

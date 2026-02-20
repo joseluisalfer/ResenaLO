@@ -81,17 +81,29 @@ export const updateData = async (url, data) => {
 };
 
 // Función para hacer una petición DELETE
-export const deleteData = async (url) => {
+export const deleteData = async (url, data) => {
   try {
     const response = await fetch(url, {
       method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
     });
 
+    if (response.status === 204) {
+      return { success: true }; 
+    }
+
     if (response.ok) {
-      const result = await response.json();
-      return result;
+      try {
+        return await response.json();
+      } catch {
+        return { success: true };
+      }
     } else {
-      throw new Error('Error al eliminar los datos');
+      const errorText = await response.text();
+      throw new Error(`Error ${response.status}: ${errorText}`);
     }
   } catch (error) {
     console.log('Error en DELETE:', error);
