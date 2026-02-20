@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text} from 'react-native';
 import Banner from '../Componentes/Banner/Banner';
 import SetData from '../Componentes/Buttons/SetData/setData';
 import Registrarse from '../Componentes/Buttons/RegisterButton/registerButton';

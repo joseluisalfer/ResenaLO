@@ -16,7 +16,7 @@ const PLACEHOLDER_IMG = "https://via.placeholder.com/600x400.png?text=No+image";
 const Posts = ({ navigation }) => {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { selectedFriend } = useContext(Context);
+  const { selectedFriend, setSearchUrl } = useContext(Context);
 
   const normalizeImageToUri = (imgRaw) => {
     const first = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
@@ -34,8 +34,9 @@ const Posts = ({ navigation }) => {
     return `data:image/jpeg;base64,${cleanBase64}`;
   };
 
-  const changePageAndSendUriProfile = (reviewUrl) => {
-    navigation.navigate("Place", { reviewUrl });
+  const changePageAndSendUri = (uri) => {
+    setSearchUrl(uri);
+    navigation.navigate("Place");
   };
 
   const fetchReviews = async () => {
@@ -119,7 +120,7 @@ const Posts = ({ navigation }) => {
           return (
             <Pressable
               style={styles.card}
-              onPress={() => changePageAndSendUriProfile(item.uri)}
+              onPress={() => changePageAndSendUri(item.uri)}
             >
               <Card style={[styles.cardContainer, { backgroundColor }]}>
                 <Card.Cover
