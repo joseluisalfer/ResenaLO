@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     paddingBottom: 16,
-    paddingTop: 20,
+    paddingTop: 40,
   },
   section: {
     marginBottom: 16,
