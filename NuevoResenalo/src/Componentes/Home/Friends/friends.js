@@ -89,7 +89,7 @@ const Friends = ({ navigation }) => {
         style={styles.header}
         onPress={() => navigation.navigate("AllFriends")}
       >
-        <Text style={styles.title}>Friends</Text>
+        <Text style={styles.title}>Amigos</Text>
         <Ionicons name="chevron-forward-outline" size={25} color="#000" />
       </Pressable>
 
@@ -122,10 +122,10 @@ const Friends = ({ navigation }) => {
               style={styles.avatar}
               resizeMode="cover"
               onError={(e) => {
-                console.log("❌ IMAGE ERROR:", item.photo, e.nativeEvent);
+                console.log("IMAGE ERROR:", item.photo, e.nativeEvent);
               }}
               onLoad={() => {
-                console.log("✅ IMAGE LOADED:", item.photo);
+                console.log("IMAGE LOADED:", item.photo);
               }}
             />
 

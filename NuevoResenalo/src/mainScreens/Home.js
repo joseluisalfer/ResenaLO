@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import WeekPlace from "../../src/Componentes/Home/WeeksPlaces/weekPlaces";
-import Friends from "../Componentes/Home/Friends/Friends";
+import Friends from "../../src/Componentes/Home/Friends/Friends";
 import Explore from "../../src/Componentes/Home/Explore/Explore";
 import Context from "../Context/Context";
 
