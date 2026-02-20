@@ -1,8 +1,9 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { Card } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import Context from "../../../Context/Context";
+import { useFocusEffect } from '@react-navigation/native';
 
 const CardInfo = () => {
   const { emailLogged } = useContext(Context);
@@ -10,7 +11,7 @@ const CardInfo = () => {
   const [followers, setFollowers] = useState(emailLogged.results.followers || []); // Asegúrate de que reviews es un array
 
   useEffect(() => {
-    console.log(reviews); // Esto imprimirá el array de reviews
+    console.log(reviews);
   }, [reviews]);
 
   // Contar la cantidad de reviews

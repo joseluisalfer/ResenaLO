@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { Card } from "react-native-paper";
 import { getData } from "../../../services/services";
 import Context from "../../../Context/Context";
+import { useFocusEffect } from '@react-navigation/native';
 
 const Posts = ({ navigation }) => {
   const [places, setPlaces] = useState([]);
@@ -64,6 +65,12 @@ const Posts = ({ navigation }) => {
   useEffect(() => {
     fetchReviews();
   }, [emailLogged]);
+
+    useFocusEffect(
+      useCallback(() => {
+        fetchReviews();
+      }, [])
+    )
 
   if (loading) {
     return (
