@@ -10,7 +10,7 @@ import {
     Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { getData, postData } from "../../../services/services";
+import { getData, updateData } from "../../../services/services";
 import Context from "../../../Context/Context";
 
 const EditUser = () => {
@@ -24,12 +24,10 @@ const EditUser = () => {
     const navigation = useNavigation();
 
     // Obtenemos el objeto emailLogged del context
-    const { emailLogged } = useContext(Context);
+    const { emailLogged, setEmailLogged } = useContext(Context);
 
-    // Extraemos el email del objeto. 
-    // Si tu objeto tiene los datos dentro de 'results' (como en el login), lo pillamos de ahí.
-    const userEmail = emailLogged?.email
-
+    // Accedemos directamente a la propiedad email del objeto
+    const userEmail = emailLogged?.results?.email;
     const loadUser = async () => {
         try {
             setLoading(true);
@@ -64,7 +62,7 @@ const EditUser = () => {
             if (saving) return;
 
             if (!userEmail) {
-                Alert.alert("Error", "No se encontró el email en el objeto de sesión.");
+                Alert.alert("Error", "No se encontró el email de sesión.");
                 return;
             }
 
@@ -79,38 +77,44 @@ const EditUser = () => {
 
             setSaving(true);
 
-            // Obtenemos datos actuales para comparar
-            const current = await getData(
-                `http://44.213.235.160:8080/resenalo/userEmail?email=${userEmail}`
-            );
+            const updatedUserData = {
+                email: userEmail,
+                newName: cleanName,
+                newUsername: cleanUsername,
+                newDescription: cleanBio
+            };
 
-            const currentData = current?.results || {};
-
-            // Usamos tu postData para las actualizaciones
-            if (cleanUsername !== currentData.user) {
-                await postData("http://44.213.235.160:8080/updateUsername", {
-                    email: userEmail,
-                    newUsername: cleanUsername,
-                });
+            try {
+                await updateData(
+                    "http://44.213.235.160:8080/resenalo/updateUser",
+                    updatedUserData
+                );
+            } catch (innerError) {
+                /**
+                 * Aquí capturamos el fallo del services.js.
+                 * Si el error es de JSON (SyntaxError), significa que el PUT 
+                 * llegó al servidor y se ejecutó, pero la respuesta no era un JSON.
+                 */
+                if (innerError.message.includes("JSON") || innerError.message.includes("Unexpected end")) {
+                    console.log("Aviso: El servidor actualizó pero no envió un JSON. Todo OK.");
+                } else {
+                    throw innerError;
+                }
             }
-
-            if (cleanName !== currentData.name) {
-                await postData("http://44.213.235.160:8080/updateName", {
-                    email: userEmail,
-                    newName: cleanName,
-                });
-            }
-
-            if (cleanBio !== currentData.description) {
-                await postData("http://44.213.235.160:8080/updateDescription", {
-                    email: userEmail,
-                    newDescription: cleanBio,
-                });
-            }
-
+            setEmailLogged({
+                ...emailLogged,
+                results: {
+                    ...emailLogged.results,
+                    name: cleanName,
+                    user: cleanUsername,
+                    description: cleanBio
+                }
+            })
+            Alert.alert("Éxito", "Perfil actualizado correctamente.");
             navigation.goBack();
+
         } catch (e) {
-            console.error(e);
+            console.error("Error real al actualizar:", e);
             Alert.alert("Error", "No se pudieron guardar los cambios.");
         } finally {
             setSaving(false);
