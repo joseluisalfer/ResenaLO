@@ -6,6 +6,7 @@ import PlaceInfo from "../Componentes/Place/PlaceInfo/placeInfo";
 import Map from "../Componentes/Place/Map/map";
 import Review from "../Componentes/Place/Review/review";
 import DeleteModal from "../placeScreens/addModalReview/DeletePlace";
+import DeleteModalComment from "../placeScreens/addModalReview/DeleteComment"; 
 import { getData, deleteData } from "../services/services";
 import Context from "../Context/Context";
 
@@ -14,12 +15,21 @@ const Place = ({ navigation }) => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
+  
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { searchUrl, emailLogged } = useContext(Context);
+  const [isModalCommentVisible, setIsModalCommentVisible] = useState(false);
+  const [idToDelete, setIdToDelete] = useState(null);
 
+  const { searchUrl, emailLogged } = useContext(Context);
   const [region, setRegion] = useState({
     latitude: 0, longitude: 0, latitudeDelta: 0.01, longitudeDelta: 0.01,
   });
+
+  const fetchComments = async (id) => {
+    const commentsUrl = `http://44.213.235.160:8080/resenalo/comment?idReview=${id}`;
+    const responseComments = await getData(commentsUrl);
+    setComments(Array.isArray(responseComments) ? responseComments : []);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -30,10 +40,7 @@ const Place = ({ navigation }) => {
         const rawPlace = await getData(searchUrl);
         if (rawPlace && isMounted) {
           setPlaceData(rawPlace);
-          const commentsUrl = `http://44.213.235.160:8080/resenalo/comment?idReview=${rawPlace.id}`;
-          const responseComments = await getData(commentsUrl);
-          setComments(Array.isArray(responseComments) ? responseComments : []);
-
+          await fetchComments(rawPlace.id);
           if (rawPlace.latitud && rawPlace.longitud) {
             setRegion(prev => ({
               ...prev,
@@ -49,21 +56,27 @@ const Place = ({ navigation }) => {
     return () => { isMounted = false; };
   }, [searchUrl]);
 
-const handleConfirmDelete = async () => {
-  try {
-    setIsModalVisible(false);
-    
-    const deleteUrl = `http://44.213.235.160:8080/resenalo/deleteReview`;
-    
-    // Enviamos el objeto con la clave "idReview" según tus instrucciones
-    await deleteData(deleteUrl, { idReview: placeData.id });
-    
-    navigation.goBack();
-  } catch (error) {
-    console.error(error);
-    Alert.alert("Error", "No se pudo eliminar la reseña.");
-  }
-};
+  const handleConfirmDeletePlace = async () => {
+    try {
+      setIsModalVisible(false);
+      const deleteUrl = `http://44.213.235.160:8080/resenalo/deleteReview`;
+      await deleteData(deleteUrl, { idReview: placeData.id });
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Error", "No se pudo eliminar el lugar.");
+    }
+  };
+
+  const handleConfirmDeleteComment = async () => {
+    try {
+      setIsModalCommentVisible(false);
+      const deleteUrl = `http://44.213.235.160:8080/resenalo/deleteComment`;
+      await deleteData(deleteUrl, { idComment: idToDelete });
+      await fetchComments(placeData.id); 
+    } catch (error) {
+      Alert.alert("Error", "No se pudo eliminar el comentario.");
+    }
+  };
 
   if (loading || !placeData) {
     return (
@@ -73,15 +86,14 @@ const handleConfirmDelete = async () => {
     );
   }
 
-  const isOwner = emailLogged?.results?.user === placeData?.user;
+  const isPlaceOwner = emailLogged?.results?.user === placeData?.user;
 
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Ionicons name="arrow-back" size={28} onPress={() => navigation.goBack()} />
-          
-          {isOwner && (
+          {isPlaceOwner && (
             <Ionicons 
               name="trash-outline" 
               size={28} 
@@ -97,13 +109,7 @@ const handleConfirmDelete = async () => {
           prevImage={() => setImagePos((prev) => (placeData.images.length ? (prev - 1 + placeData.images.length) % placeData.images.length : 0))}
         />
 
-        <PlaceInfo
-          name={placeData.title}
-          type={placeData.type}
-          description={placeData.description}
-          averageRating={placeData.valoration}
-        />
-
+        <PlaceInfo name={placeData.title} type={placeData.type} description={placeData.description} averageRating={placeData.valoration} />
         <Map latitud={placeData.latitud} longitud={placeData.longitud} region={region} />
 
         <View style={styles.reviewSection}>
@@ -115,20 +121,39 @@ const handleConfirmDelete = async () => {
             <Text style={styles.btnText}>AÑADIR RESEÑA</Text>
           </Pressable>
 
-          {comments.length > 0 ? (
-            comments.map((item) => (
-              <Review key={item._id} name={item.user} comment={item.text} stars={item.valoration} />
-            ))
-          ) : (
-            <Text style={styles.noCommentsText}>No hay reseñas.</Text>
-          )}
+          {comments.map((item) => (
+            <View key={item._id} style={styles.commentRow}>
+              <View style={{ flex: 1 }}>
+                <Review name={item.user} comment={item.text} stars={item.valoration} />
+              </View>
+              {emailLogged?.results?.user === item.user && (
+                <Ionicons 
+                  name="trash-outline" 
+                  size={22} 
+                  color="#DC3545" 
+                  onPress={() => {
+                    setIdToDelete(item._id);
+                    setIsModalCommentVisible(true);
+                  }}
+                />
+              )}
+            </View>
+          ))}
         </View>
       </ScrollView>
 
       <DeleteModal
         isVisible={isModalVisible}
+        title="¿Quieres borrar este lugar?"
         onClose={() => setIsModalVisible(false)}
-        onConfirm={handleConfirmDelete}
+        onConfirm={handleConfirmDeletePlace}
+      />
+
+      <DeleteModalComment
+        isVisible={isModalCommentVisible}
+        title="¿Quieres borrar este comentario?"
+        onClose={() => setIsModalCommentVisible(false)}
+        onConfirm={handleConfirmDeleteComment}
       />
     </View>
   );
@@ -142,7 +167,13 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 15 },
   btnPressable: { backgroundColor: "#2654d1", paddingVertical: 14, borderRadius: 12, alignItems: "center", marginBottom: 20 },
   btnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  noCommentsText: { textAlign: 'center', color: '#999', fontStyle: 'italic' }
+  commentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    paddingVertical: 10
+  }
 });
 
 export default Place;

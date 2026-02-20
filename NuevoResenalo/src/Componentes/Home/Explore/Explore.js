@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, StyleSheet, Text, Image, ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../../services/services";
 import Context from "../../../Context/Context";
@@ -10,8 +11,7 @@ const Explore = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const { setSearchUrl } = useContext(Context);
 
-  useEffect(() => {
-    const fetchUrls = async () => {
+      const fetchUrls = async () => {
       try {
         const data = await getData('http://44.213.235.160:8080/resenalo/randomReviews');
         if (data) setReviewsUrls(data);
@@ -20,6 +20,8 @@ const Explore = ({ navigation }) => {
         setLoading(false);
       }
     };
+
+  useEffect(() => {
     fetchUrls();
   }, []);
 
@@ -40,6 +42,12 @@ const Explore = ({ navigation }) => {
       fetchReviewDetails();
     }
   }, [reviewsUrls]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUrls();
+    }, [])
+  )
 
   const handleOnPress = (url) => {
     setSearchUrl(url); 

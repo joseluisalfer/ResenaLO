@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback  } from "react";
 import { View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../../services/services";
 import Context from "../../../Context/Context";
+import { useFocusEffect } from '@react-navigation/native';
 
 const WeekPlace = ({ navigation }) => {
   const [podiumData, setPodiumData] = useState([]);
@@ -36,6 +37,12 @@ const WeekPlace = ({ navigation }) => {
   useEffect(() => {
     obtainData();
   }, []);
+
+    useFocusEffect(
+      useCallback(() => {
+        obtainData();
+      }, [])
+    )
 
   const handlePressPlace = (reviewUrl) => {
     setSearchUrl(reviewUrl);

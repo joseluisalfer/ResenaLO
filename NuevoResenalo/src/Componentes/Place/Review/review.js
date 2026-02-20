@@ -18,7 +18,7 @@ const Review = ({ name, comment, stars }) => {
     </View>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     marginVertical: 8,
