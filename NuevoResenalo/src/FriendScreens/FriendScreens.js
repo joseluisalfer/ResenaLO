@@ -1,19 +1,18 @@
 import React from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
 import ProfileHeaderFriend from "../Componentes/Friends/ProfileHeaderFriend/ProfileHeaderFriend";
 import ProfileStatsFriend from "../Componentes/Friends/ProfileStatsFriends/ProfileStatsFriend";
-
-// ⬇️ Usa el que realmente tengas: Posts o PostList
-import Posts from "../Componentes/Friends/PostList/PostList"; // si tu archivo exporta Posts, ajusta nombre/import
+import Posts from "../Componentes/Friends/PostList/PostList";
 
 const FriendScreens = () => {
   const navigation = useNavigation();
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
+  // ✅ Todo el contenido “de arriba” va en el header del FlatList
+  const ListHeader = () => (
+    <View>
       {/* Header/info amigo */}
       <View style={styles.section}>
         <ProfileHeaderFriend navigation={navigation} />
@@ -28,12 +27,22 @@ const FriendScreens = () => {
       <View style={styles.divider}>
         <Divider style={styles.dividerLine} />
       </View>
+    </View>
+  );
 
-      {/* Posts */}
-      <View style={styles.postsSection}>
-        <Posts navigation={navigation} />
-      </View>
-    </ScrollView>
+  return (
+    <FlatList
+      data={[{ key: "posts" }]} // FlatList necesita data; renderizamos 1 item que contiene Posts
+      keyExtractor={(item) => item.key}
+      ListHeaderComponent={<ListHeader />}
+      renderItem={() => (
+        <View style={styles.postsSection}>
+          <Posts navigation={navigation} />
+        </View>
+      )}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    />
   );
 };
 
