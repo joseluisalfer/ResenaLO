@@ -35,7 +35,7 @@ const Friends = ({ navigation }) => {
     try {
       const rawFriends = emailLogged?.results?.friends ?? [];
       const friendUrls = pickRandomUpToN(rawFriends, 5);
-
+      console.log(emailLogged.results.friends)
       const settled = await Promise.allSettled(
         friendUrls.map(async (url) => {
           const userData = await getData(url);
