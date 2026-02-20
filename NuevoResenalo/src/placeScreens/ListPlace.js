@@ -14,10 +14,13 @@ import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
 import { getData } from "../services/services";
 import Context from "../Context/Context";
+import { Searchbar } from "react-native-paper";
 
 const ListPlace = ({ navigation }) => {
   const { t } = useTranslation();
   const [places, setPlaces] = useState([]);
+  const [shownPlaces, setShownPlaces] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
   const { setSearchUrl } = useContext(Context);
 
@@ -31,35 +34,28 @@ const ListPlace = ({ navigation }) => {
       setLoading(true);
 
       const data = await getData("http://44.213.235.160:8080/resenalo/reviews");
-      const reviewUrls = data?.reviews ?? [];
+      console.log(data);
+
+      const reviewUrls = data.reviews;
 
       if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {
         setPlaces([]);
+        setShownPlaces([]);
         return;
       }
 
       const reviewDetails = await Promise.all(
-        reviewUrls.map(async (url) => {
+        reviewUrls.map(async (url, index) => {
           try {
             const reviewData = await getData(url);
-
-            const imgRaw = reviewData?.images;
-            const currentImage = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
-
-            if (!currentImage) return null;
-
-            const imageUri =
-              typeof currentImage === "string" &&
-              currentImage.startsWith("data:image")
-                ? currentImage
-                : `data:image/jpeg;base64,${currentImage}`;
+            console.log(reviewData);
 
             return {
-              id: reviewData?.id ?? url,
-              name: reviewData?.title ?? "Sin título",
-              image: { uri: imageUri },
-              rating: reviewData?.valoration ?? 0,
-              ruta: url,
+              id: index,
+              name: reviewData.title, // title
+              image: { uri: reviewData.image }, // NO TOCADO
+              rating: reviewData?.valoration,
+              ruta: reviewData.review,
             };
           } catch {
             return null;
@@ -67,18 +63,45 @@ const ListPlace = ({ navigation }) => {
         })
       );
 
-      setPlaces(reviewDetails.filter(Boolean));
+      const clean = reviewDetails.filter(Boolean);
+      setPlaces(clean);
+      setShownPlaces(clean);
     } catch (error) {
       console.error("Error al obtener las reseñas:", error);
       setPlaces([]);
+      setShownPlaces([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // --- búsqueda por title (item.name) ---
+  const handleSearch = () => {
+    const q = searchText.trim().toLowerCase();
+    if (!q) {
+      setShownPlaces(places);
+      return;
+    }
+    const result = places.filter((p) =>
+      (p.name || "").toLowerCase().includes(q)
+    );
+    setShownPlaces(result);
+  };
+
+  // --- limpiar búsqueda (X) ---
+  const handleClearSearch = () => {
+    setSearchText("");
+    setShownPlaces(places);
+  };
+
   useEffect(() => {
     fetchReviews();
   }, []);
+
+  // si se actualiza places, y no hay búsqueda activa, sincroniza shownPlaces
+  useEffect(() => {
+    if (!searchText.trim()) setShownPlaces(places);
+  }, [places]);
 
   if (loading) {
     return (
@@ -101,13 +124,28 @@ const ListPlace = ({ navigation }) => {
 
         <Text style={styles.title}>{t("buttonExplorer.list")}</Text>
 
-        {/* Spacer para centrar el título (equilibra el icono de la izquierda) */}
         <View style={styles.rightSpacer} />
+      </View>
+
+      {/* SEARCHBAR + X */}
+      <View style={styles.searchContainer}>
+        <Searchbar
+          placeholder="Buscar por título..."
+          value={searchText}
+          onChangeText={setSearchText}
+          onIconPress={handleSearch}
+          onSubmitEditing={handleSearch}
+          autoCapitalize="none"
+          style={styles.searchBarPaper}
+          inputStyle={styles.searchInput}
+          clearIcon="close" // X
+          onClearIconPress={handleClearSearch}
+        />
       </View>
 
       <View style={styles.listWrapper}>
         <FlatList
-          data={places}
+          data={shownPlaces}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingBottom: 30 }}
           renderItem={({ item }) => (
@@ -125,8 +163,12 @@ const ListPlace = ({ navigation }) => {
           )}
           ListEmptyComponent={
             <View style={styles.emptyBox}>
-              <Ionicons name="image-outline" size={50} color="#ccc" />
-              <Text style={styles.emptyText}>No hay reseñas para mostrar</Text>
+              <Ionicons name="search-outline" size={50} color="#ccc" />
+              <Text style={styles.emptyText}>
+                {searchText.trim()
+                  ? "No se encontraron reseñas con ese título"
+                  : "No hay reseñas para mostrar"}
+              </Text>
             </View>
           }
         />
@@ -146,13 +188,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
     width: "100%",
-    paddingTop: '12%', // en vez de marginTop: "30%"
+    paddingTop: "12%",
   },
   backButton: { width: 30 },
 
-  // centrado real del título
   title: {
     flex: 1,
     fontSize: 28,
@@ -161,8 +202,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // mismo ancho que el icono para centrar el título
   rightSpacer: { width: 30 },
+
+  searchContainer: {
+    width: "100%",
+    paddingHorizontal: 5,
+    marginBottom: 10,
+  },
+  searchBarPaper: {
+    borderRadius: 8,
+    height: 40,
+  },
+  searchInput: {
+    fontSize: 16,
+    minHeight: 40,
+  },
 
   listWrapper: { width: "100%", marginBottom: "10%" },
 
@@ -180,9 +234,9 @@ const styles = StyleSheet.create({
   image: { width: "50%", height: 100, borderRadius: 10, marginRight: 15 },
   textContainer: { flex: 1 },
   placeName: { fontSize: 18, fontWeight: "bold", color: "#000" },
-  rating: { fontWeight: 'bold', fontSize: 20, color: "#777" },
+  rating: { fontWeight: "bold", fontSize: 20, color: "#777" },
   emptyBox: { alignItems: "center", padding: 30 },
-  emptyText: { marginTop: 10, color: "#666" },
+  emptyText: { marginTop: 10, color: "#666", textAlign: "center" },
 });
-//oscarmartorellg@gmail.com
+
 export default ListPlace;
