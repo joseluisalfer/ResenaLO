@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,9 @@ const FindUser = ({ navigation }) => {
   const [shownUsers, setShownUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
 
+  const { emailLogged } = useContext(Context);
+  const myEmail = emailLogged?.results?.email;
+  
   // --- ESTADOS DE PAGINACIÓN ---
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -56,6 +59,11 @@ const FindUser = ({ navigation }) => {
         const userDetailsPromises = response.users.map(async (link) => {
           const res = await getData(link);
           if (res.results) {
+
+            if (res.results.email === myEmail) {
+              return null;
+            }
+
             let photoUrl = res.results.photo;
             photoUrl = await getImageUri(photoUrl);
 
