@@ -1,6 +1,7 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useCallback } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { Divider } from "react-native-paper";
+import { useFocusEffect } from '@react-navigation/native';
 import Posts from "../Componentes/Profile/Posts/Posts";
 import OwnInfo from "../Componentes/Profile/OwnInfo/OwnInfo";
 import CardInfo from "../Componentes/Profile/CardInfo/CardInfo";
@@ -10,16 +11,26 @@ import Context from "../Context/Context";
 const Profile = ({ navigation }) => {
   const { emailLogged, isLoged, setIsLoged } = useContext(Context);
 
+  const refreshProfile = () => {
+    console.log("Refreshing...");
+  };
+
   useEffect(() => {
-    console.log(emailLogged);
+    refreshProfile();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshProfile();
+    }, [])
+  );
 
   const handleLogOut = () => {
     setIsLoged(false);
   };
 
   const handleChangeLanguage = (language) => {
-    console.log("Idioma cambiado a: ", language);
+    console.log(language);
   };
 
   const Header = () => (
@@ -33,9 +44,9 @@ const Profile = ({ navigation }) => {
 
       <View style={styles.section}>
         <OwnInfo
-          name={emailLogged.results.name}
-          user={emailLogged.results.user}
-          description={emailLogged.results.description}
+          name={emailLogged?.results?.name}
+          user={emailLogged?.results?.user}
+          description={emailLogged?.results?.description}
         />
       </View>
 
@@ -59,6 +70,7 @@ const Profile = ({ navigation }) => {
       renderItem={() => <Header />}
       keyExtractor={(item) => item.key}
       contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
     />
   );
 };

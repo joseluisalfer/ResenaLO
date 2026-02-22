@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { ScrollView, View, StyleSheet, Text, ActivityIndicator, Pressable, Alert } from "react-native";
+import { useFocusEffect } from '@react-navigation/native'; 
 import { Ionicons } from "@expo/vector-icons";
 import Images from "../Componentes/Place/Images/images";
 import PlaceInfo from "../Componentes/Place/PlaceInfo/placeInfo";
@@ -25,60 +26,67 @@ const Place = ({ navigation }) => {
     latitude: 0, longitude: 0, latitudeDelta: 0.01, longitudeDelta: 0.01,
   });
 
-  const fetchComments = async (id) => {
-    const commentsUrl = `http://44.213.235.160:8080/resenalo/comment?idReview=${id}`;
-    const responseComments = await getData(commentsUrl);
-    setComments(Array.isArray(responseComments) ? responseComments : []);
+  const fetchAllData = async () => {
+    if (!searchUrl) return;
+    try {
+      const rawPlace = await getData(searchUrl);
+      if (rawPlace) {
+        setPlaceData(rawPlace);
+        
+        const commentsUrl = `http://44.213.235.160:8080/resenalo/comment?idReview=${rawPlace.id}`;
+        const responseComments = await getData(commentsUrl);
+        setComments(Array.isArray(responseComments) ? responseComments : []);
+
+        if (rawPlace.latitud && rawPlace.longitud) {
+          setRegion({
+            latitude: parseFloat(rawPlace.latitud),
+            longitude: parseFloat(rawPlace.longitud),
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }
+      }
+    } catch (e) {
+      console.error("Error cargando datos:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    let isMounted = true;
-    const fetchData = async () => {
-      if (!searchUrl) return;
-      setLoading(true);
-      try {
-        const rawPlace = await getData(searchUrl);
-        if (rawPlace && isMounted) {
-          setPlaceData(rawPlace);
-          await fetchComments(rawPlace.id);
-          if (rawPlace.latitud && rawPlace.longitud) {
-            setRegion(prev => ({
-              ...prev,
-              latitude: parseFloat(rawPlace.latitud),
-              longitude: parseFloat(rawPlace.longitud),
-            }));
-          }
-        }
-      } catch (e) { console.error(e); }
-      finally { if (isMounted) setLoading(false); }
-    };
-    fetchData();
-    return () => { isMounted = false; };
+    fetchAllData();
   }, [searchUrl]);
 
-  const handleConfirmDeletePlace = async () => {
-    try {
-      setIsModalVisible(false);
-      const deleteUrl = `http://44.213.235.160:8080/resenalo/deleteReview`;
-      await deleteData(deleteUrl, { idReview: placeData.id });
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert("Error", "No se pudo eliminar el lugar.");
-    }
-  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchAllData();
+    }, [searchUrl])
+  );
 
   const handleConfirmDeleteComment = async () => {
+    setIsModalCommentVisible(false);
     try {
-      setIsModalCommentVisible(false);
       const deleteUrl = `http://44.213.235.160:8080/resenalo/deleteComment`;
       await deleteData(deleteUrl, { idComment: idToDelete });
-      await fetchComments(placeData.id); 
+    
+      await fetchAllData(); 
+      setIdToDelete(null);
     } catch (error) {
-      Alert.alert("Error", "No se pudo eliminar el comentario.");
+      await fetchAllData();
     }
   };
 
-  if (loading || !placeData) {
+  const handleConfirmDeletePlace = async () => {
+    setIsModalVisible(false);
+    try {
+      await deleteData(`http://44.213.235.160:8080/resenalo/deleteReview`, { idReview: placeData.id });
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Error", "No se pudo eliminar.");
+    }
+  };
+
+  if (loading && !placeData) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#2654d1" />
@@ -86,43 +94,39 @@ const Place = ({ navigation }) => {
     );
   }
 
-  const isPlaceOwner = emailLogged?.results?.user === placeData?.user;
-
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Ionicons name="arrow-back" size={28} onPress={() => navigation.goBack()} />
-          {isPlaceOwner && (
-            <Ionicons 
-              name="trash-outline" 
-              size={28} 
-              onPress={() => setIsModalVisible(true)} 
-            />
+          {emailLogged?.results?.user === placeData?.user && (
+            <Ionicons name="trash-outline" size={28} onPress={() => setIsModalVisible(true)} />
           )}
         </View>
 
         <Images
-          images={placeData.images || []}
+          images={placeData?.images || []}
           imagePos={imagePos}
           nextImage={() => setImagePos((prev) => (placeData.images.length ? (prev + 1) % placeData.images.length : 0))}
           prevImage={() => setImagePos((prev) => (placeData.images.length ? (prev - 1 + placeData.images.length) % placeData.images.length : 0))}
         />
 
-        <PlaceInfo name={placeData.title} type={placeData.type} description={placeData.description} averageRating={placeData.valoration} />
-        <Map latitud={placeData.latitud} longitud={placeData.longitud} region={region} />
+        <PlaceInfo name={placeData?.title} type={placeData?.type} description={placeData?.description} averageRating={placeData?.valoration} />
+        
+        <Map latitud={placeData?.latitud} longitud={placeData?.longitud} region={region} />
 
         <View style={styles.reviewSection}>
           <Text style={styles.sectionTitle}>COMENTARIOS</Text>
+          
           <Pressable
             style={styles.btnPressable}
-            onPress={() => navigation.navigate("Review", { reviewId: placeData.id, user: emailLogged.results.user })}
+            onPress={() => navigation.navigate("Review", { reviewId: placeData.id })}
           >
-            <Text style={styles.btnText}>AÑADIR RESEÑA</Text>
+            <Text style={styles.btnText}>AÑADIR COMENTARIO</Text>
           </Pressable>
 
           {comments.map((item) => (
-            <View key={item._id} style={styles.commentRow}>
+            <View key={item._id || item.id} style={styles.commentRow}>
               <View style={{ flex: 1 }}>
                 <Review name={item.user} comment={item.text} stars={item.valoration} />
               </View>
@@ -132,7 +136,7 @@ const Place = ({ navigation }) => {
                   size={22} 
                   color="#DC3545" 
                   onPress={() => {
-                    setIdToDelete(item._id);
+                    setIdToDelete(item._id || item.id);
                     setIsModalCommentVisible(true);
                   }}
                 />
@@ -142,19 +146,8 @@ const Place = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      <DeleteModal
-        isVisible={isModalVisible}
-        title="¿Quieres borrar este lugar?"
-        onClose={() => setIsModalVisible(false)}
-        onConfirm={handleConfirmDeletePlace}
-      />
-
-      <DeleteModalComment
-        isVisible={isModalCommentVisible}
-        title="¿Quieres borrar este comentario?"
-        onClose={() => setIsModalCommentVisible(false)}
-        onConfirm={handleConfirmDeleteComment}
-      />
+      <DeleteModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} onConfirm={handleConfirmDeletePlace} />
+      <DeleteModalComment isVisible={isModalCommentVisible} onClose={() => setIsModalCommentVisible(false)} onConfirm={handleConfirmDeleteComment} />
     </View>
   );
 };
@@ -167,13 +160,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 15 },
   btnPressable: { backgroundColor: "#2654d1", paddingVertical: 14, borderRadius: 12, alignItems: "center", marginBottom: 20 },
   btnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  commentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    paddingVertical: 10
-  }
+  commentRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#f0f0f0', paddingVertical: 10 }
 });
 
 export default Place;
