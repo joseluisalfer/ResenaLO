@@ -5,7 +5,6 @@ import Context from "../../../Context/Context";
 
 const ProfileStatsFriend = () => {
   const { selectedFriend } = useContext(Context);
-
   if (!selectedFriend) {
     return (
       <View style={styles.container}>

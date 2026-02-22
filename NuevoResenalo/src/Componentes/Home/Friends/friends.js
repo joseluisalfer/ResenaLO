@@ -47,6 +47,7 @@ const Friends = ({ navigation }) => {
             description: r.description,
             user: r.user,
             reviews: r.reviews,
+            followers: r.followers
           };
         })
       );
