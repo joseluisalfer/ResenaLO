@@ -12,7 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
-import { getData } from "../services/services";
+import { getData } from "../services/Services";
 import Context from "../Context/Context";
 import { Searchbar } from "react-native-paper";
 

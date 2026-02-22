@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "react-native-paper";
-import Context from "../../../Context/Context";
+import Context from "../../Context/Context";
 
 const ProfileStatsFriend = () => {
   const { selectedFriend } = useContext(Context);

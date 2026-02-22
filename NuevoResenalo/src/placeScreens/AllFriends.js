@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../Context/Context";
-import { getData } from "../services/services";
+import { getData } from "../services/Services";
 import { Searchbar } from 'react-native-paper';
 
 const pickRandomUpToN = (arr, n = 5) => {
@@ -134,7 +134,7 @@ const Friends = ({ navigation }) => {
               ]}
               onPress={() => {
                 setSelectedFriend(item);
-                navigation.navigate("FriendScreens", {
+                navigation.navigate("Friend", {
                   friendId: item.id,
                   friendName: item.name,
                   friendPhoto: item.photo,

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Context from "../../../Context/Context";
+import Context from "../../Context/Context";
 
 const ProfileHeaderFriend = ({ navigation }) => {
   const { selectedFriend } = useContext(Context);

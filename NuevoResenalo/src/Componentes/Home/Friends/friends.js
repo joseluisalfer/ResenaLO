@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../../Context/Context";
-import { getData } from "../../../services/services";
+import { getData } from "../../../services/Services";
 
 const pickRandomUpToN = (arr, n = 5) => {
   const copy = [...arr];
@@ -56,8 +56,6 @@ const Friends = ({ navigation }) => {
         .filter((x) => x.status === "fulfilled")
         .map((x) => x.value)
         .filter(Boolean);
-
-      console.log("PHOTO 0 =>", ok[0]?.photo);
 
       setFriends(ok);
     } catch (err) {
@@ -108,7 +106,7 @@ const Friends = ({ navigation }) => {
             ]}
             onPress={() => {
               setSelectedFriend(item);
-              navigation.navigate("FriendScreens", {
+              navigation.navigate("Friend", {
                 friendId: item.id,
                 friendName: item.name,
                 friendPhoto: item.photo,

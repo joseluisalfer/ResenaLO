@@ -1,180 +1,70 @@
 import React from "react";
-import { View, StyleSheet, FlatList, Text, Image } from "react-native";
-import { Button, Card, Divider } from "react-native-paper";
+import { View, StyleSheet, FlatList } from "react-native";
+import { Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
-import { useTranslation } from 'react-i18next'
-import '../../assets/i18n/index';
-const mockPosts = [
-  {
-    id: "1",
-    title: "En Catarroja hay moros",
-    content: "No lo digo yo, lo dice la gente, ¡vaya locura! 😂",
-  },
-  { 
-    id: "2", 
-    title: "Que no lo vea mi madre!", 
-    content: "Que no vea mi madre ese mueble de la basura que se lo lleva para casa!!! 😲"
-  },
-  {
-    id: "3", 
-    title: "Un secretillo", 
-    content: "Y un secretillo... he comido jamón. 🤫"
-  },
-];
 
-const FriendProfile = () => {
+import ProfileHeaderFriend from "../Componentes/Friends/ProfileHeaderFriend";
+import ProfileStatsFriend from "../Componentes/Friends/ProfileStatsFriend";
+import Posts from "../Componentes/Friends/PostList";
+
+const Friend = () => {
   const navigation = useNavigation();
-  const { t } = useTranslation();
 
+  // ✅ Todo el contenido “de arriba” va en el header del FlatList
+  const ListHeader = () => (
+    <View>
+      {/* Header/info amigo */}
+      <View style={styles.section}>
+        <ProfileHeaderFriend navigation={navigation} />
+      </View>
 
-  const renderPost = ({ item }) => (
-    <Card style={styles.postCard}>
-      <Card.Content>
-        <Text variant="titleMedium">{item.title}</Text>
-        <Text variant="bodyMedium" style={{ marginTop: 4 }}>
-          {item.content}
-        </Text>
-      </Card.Content>
-    </Card>
+      {/* Stats */}
+      <View style={styles.section}>
+        <ProfileStatsFriend />
+      </View>
+
+      {/* Divider */}
+      <View style={styles.divider}>
+        <Divider style={styles.dividerLine} />
+      </View>
+    </View>
   );
 
   return (
     <FlatList
-      ListHeaderComponent={
-        <View style={styles.container}>
-          <Ionicons 
-            name="arrow-back" 
-            size={30} 
-            color="black" 
-            style={styles.backButton} 
-            onPress={() => navigation.goBack()} 
-          />
-          <View style={styles.profileImageContainer}>
-            <Image source={require("../../assets/images/Konoha.png")} style={styles.profileImage} />
-          </View>
-
-          <View style={{ alignItems: "center" }}>
-            <Text variant="bodyMedium" style={styles.username}>
-              @مثلي الجنس
-            </Text>
-          </View>
-
-          <View style={{ alignItems: "center" }}>
-            <Text variant="headlineSmall" style={styles.name}>
-              Aymane El Hamoudi
-            </Text>
-
-            <Text variant="bodyMedium" style={styles.ubication}>
-              Catarroja, España
-            </Text>
-
-            <Text variant="bodyMedium" style={styles.bio}>
-              Amante de ChatGPT | Portatil Nº8 | ¡Hazme un bizzum payo!
-            </Text>
-          </View>
-
-          <Card style={styles.statsCard}>
-            <Card.Content style={styles.statsContainer}>
-              <View style={styles.statItem}>
-                <Text variant="titleMedium">24</Text>
-                <Text variant="bodySmall">{t("profile.post")}</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text variant="titleMedium">100</Text>
-                <Text variant="bodySmall">{t("profile.comments")}</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text variant="titleMedium">180</Text>
-                <Text variant="bodySmall">{t("profile.friends")}</Text>
-              </View>
-            </Card.Content>
-          </Card>
-
-          <Divider style={styles.divider} />
-
-          <Text variant="titleLarge" style={{ marginBottom: 8 }}>
-            {t("profile.post")}
-          </Text>
+      data={[{ key: "posts" }]} // FlatList necesita data; renderizamos 1 item que contiene Posts
+      keyExtractor={(item) => item.key}
+      ListHeaderComponent={<ListHeader />}
+      renderItem={() => (
+        <View style={styles.postsSection}>
+          <Posts navigation={navigation} />
         </View>
-      }
-      data={mockPosts}
-      renderItem={renderPost}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+      )}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
     />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
-    marginTop: 40,
-    alignItems: "center",
+    backgroundColor: "white",
+    paddingBottom: 16,
+    paddingTop: 20,
   },
-  backButton: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-  },
-  profileImageContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+  section: {
     marginBottom: 16,
   },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-  },
-  name: {
-    marginTop: 12,
-    fontWeight: "bold",
-  },
-  username: {
-    color: "gray",
-    marginTop: 3,
-  },
-  ubication: {
-    color: "gray",
-    marginTop: 0,
-  },
-  bio: {
-    textAlign: "center",
-    marginTop: 8,
-    paddingHorizontal: 20,
-  },
-  statsCard: {
-    marginTop: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    marginHorizontal: 16,
-    width: "90%",
-  },
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    paddingVertical: 12,
-  },
-  statItem: {
-    alignItems: "center",
-    flex: 1,
-  },
-  postCard: {
-    marginBottom: 12,
-  },
-  publicationsTitle: {
-    textAlign: "left",
-    marginLeft: 16,
-    fontSize: 24,
-    fontWeight: "bold",
+  postsSection: {
+    paddingHorizontal: 16,
   },
   divider: {
+    alignItems: "center",
+  },
+  dividerLine: {
     marginVertical: 16,
-    width: "100%",
-    backgroundColor: "#ddd",
+    width: "80%",
   },
 });
 
-export default FriendProfile;
+export default Friend;

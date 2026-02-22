@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import { getData } from "../services/services";
+import { getData } from "../services/Services";
 import { Searchbar } from "react-native-paper";
 import Context from "../Context/Context";
 
@@ -20,7 +20,7 @@ const FindUser = ({ navigation }) => {
   const [shownUsers, setShownUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
 
-  const { emailLogged } = useContext(Context);
+  const { emailLogged, setSelectedFriend } = useContext(Context);
   const myEmail = emailLogged?.results?.email;
 
   const [page, setPage] = useState(0);
@@ -49,7 +49,6 @@ const FindUser = ({ navigation }) => {
 
       const url = `http://44.213.235.160:8080/resenalo/users?page=${pageToLoad}`;
       const response = await getData(url);
-
       if (response?.totalPages !== undefined) {
         setTotalPages(response.totalPages);
       }
@@ -65,9 +64,13 @@ const FindUser = ({ navigation }) => {
           let photoUrl = await getImageUri(r.photo);
 
           return {
+            id: r.id,
             name: r.name,
-            photo: photoUrl,
+            photo: r.photo, 
+            description: r.description,
             user: r.user,
+            reviews: r.reviews,
+            followers: r.followers,
           };
         });
 
@@ -106,28 +109,31 @@ const FindUser = ({ navigation }) => {
     try {
       const url = `http://44.213.235.160:8080/resenalo/searchUsers?user=${q}`;
       const list = await getData(url);
-
+      console.log(list)
       if (!Array.isArray(list) || list.length === 0) {
         setShownUsers([]);
         return;
       }
 
       const details = await Promise.all(
-        list.map(async (item) => {
+        list.results.map(async (item) => {
           const res = await getData(item.link);
           const r = res?.results;
           if (!r) return null;
 
           if (r.email === myEmail) return null;
 
-          let photoUrl = await getImageUri(r.photo || item.photo);
-
+          console.log(r);
           return {
+            id: r.id,
             name: r.name,
-            photo: photoUrl,
-            user: r.user || item.user,
+            photo: r.photo, // 👈 URL tal cual
+            description: r.description,
+            user: r.user,
+            reviews: r.reviews,
+            followers: r.followers,
           };
-        })
+        }),
       );
 
       setShownUsers(details.filter((x) => x !== null));
@@ -176,9 +182,17 @@ const FindUser = ({ navigation }) => {
               shownUsers.map((item, index) => (
                 <Pressable
                   key={`${item.user}-${index}`}
-                  onPress={() =>
-                    navigation.navigate("FriendScreens", { friendId: item.user })
-                  }
+                  onPress={() => {
+                    setSelectedFriend(item);
+                    navigation.navigate("Friend", {
+                      friendId: item.id,
+                      friendName: item.name,
+                      friendPhoto: item.photo,
+                      friendDescription: item.description,
+                      friendUser: item.user,
+                      friendReviews: item.reviews,
+                    });
+                  }}
                 >
                   <View style={styles.card}>
                     <Image source={{ uri: item.photo }} style={styles.image} />

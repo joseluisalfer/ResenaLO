@@ -10,7 +10,7 @@ import {
 import { Button } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
-import { postData, getData } from "../services/services";
+import { postData, getData } from "../services/Services";
 import Context from "../Context/Context";
 
 const Register = ({ navigation }) => {

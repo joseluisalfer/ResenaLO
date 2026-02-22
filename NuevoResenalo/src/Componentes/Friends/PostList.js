@@ -8,8 +8,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Card } from "react-native-paper";
-import { getData } from "../../../services/services";
-import Context from "../../../Context/Context";
+import { getData } from "../../services/Services";
+import Context from "../../Context/Context";
 
 const PLACEHOLDER_IMG = "https://via.placeholder.com/600x400.png?text=No+image";
 

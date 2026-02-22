@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
 import { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import "../../../../assets/i18n/index"; // Asegúrate de que esto está en el directorio adecuado
-import { getData, postData } from "../../../services/services"; // Asegúrate de que esta ruta sea correcta
+import { getData, postData } from "../../../services/Services"; // Asegúrate de que esta ruta sea correcta
 import Context from "../../../Context/Context";
 
 const PedirDatos = ({ navigation }) => {
