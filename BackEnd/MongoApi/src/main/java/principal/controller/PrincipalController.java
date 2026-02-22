@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
@@ -766,28 +768,33 @@ public class PrincipalController {
 				jsonR.put("reviews", new JSONArray());
 			}
 
-			int numFolloweds = 0;
-
+			// Crear arrays con los enlaces de followeds, followers y friends como strings
+			JSONArray followedsArray = new JSONArray();
 			if (user.getFolloweds() != null && !user.getFolloweds().isEmpty()) {
-				numFolloweds = user.getFolloweds().size();
+				for (String followedId : user.getFolloweds()) {
+					String followedLink = "http://44.213.235.160:8080/resenalo/user?userName=" + followedId;
+					followedsArray.put(followedLink); // Agregar solo el enlace como string
+				}
 			}
-			jsonR.put("followeds", numFolloweds);
+			jsonR.put("followeds", followedsArray);
 
-			int numFollowers = 0;
+			JSONArray followersArray = new JSONArray();
 			if (user.getFollowers() != null && !user.getFollowers().isEmpty()) {
-
-				numFollowers = user.getFollowers().size();
-
+				for (String followerId : user.getFollowers()) {
+					String followerLink = "http://44.213.235.160:8080/resenalo/user?userName=" + followerId;
+					followersArray.put(followerLink); // Agregar solo el enlace como string
+				}
 			}
-			jsonR.put("followers", numFollowers);
+			jsonR.put("followers", followersArray);
 
-			int numFriends = 0;
+			JSONArray friendsArray = new JSONArray();
 			if (user.getFriends() != null && !user.getFriends().isEmpty()) {
-
-				numFriends = user.getFriends().size();
-
+				for (String friendId : user.getFriends()) {
+					String friendLink = "http://44.213.235.160:8080/resenalo/user?userName=" + friendId;
+					friendsArray.put(friendLink); // Agregar solo el enlace como string
+				}
 			}
-			jsonR.put("friends", numFriends);
+			jsonR.put("friends", friendsArray);
 
 			// Agregar el objeto JSON de este usuario
 			jsonP.put("results", jsonR);
@@ -1199,4 +1206,23 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(top3Links);
 	}
 
+	@GetMapping("/searchUsers")
+	public ResponseEntity<List<Map<String, String>>> searchUsers(@RequestParam String user) {
+
+		if (user == null || user.trim().isEmpty()) {
+			  return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); 
+	    }
+
+	    List<User> users = userRepository.findByUserContainingIgnoreCase(user);
+
+	    List<Map<String, String>> result = users.stream().map(user2 -> {
+	        Map<String, String> map = new HashMap<>();
+	        map.put("user", user2.getUser());
+	        map.put("photo", user2.getImage() == null ? "" : user2.getImage());
+	        map.put("link", "http://44.213.235.160:8080/resenalo/userEmailOther?email=" + user2.getEmail());
+	        return map;
+	    }).toList();
+
+	    return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
 }
