@@ -1,17 +1,19 @@
 import React from "react";
 import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
 
-const DeleteModal = ({ isVisible, onClose, onConfirm }) => {
+const DeleteModal = ({ isVisible, onClose, onConfirm, title }) => {
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       visible={isVisible}
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>¿Estás seguro que quieres borrar esta ubicación?</Text>
+          <Text style={styles.modalTitle}>
+            {title || "¿Estás seguro que quieres borrar esta ubicación?"}
+          </Text>
           
           <View style={styles.modalButtonsRow}>
             <Pressable 
@@ -37,45 +39,57 @@ const DeleteModal = ({ isVisible, onClose, onConfirm }) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-start',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    justifyContent: 'center', 
     alignItems: 'center',
-    paddingTop: 80,
   },
   modalContent: {
-    width: '75%',
+    width: '80%', 
     backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 20,
+    borderRadius: 20, 
+    padding: 25,
     alignItems: 'center',
-    elevation: 10,
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
   modalTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 25,
     color: '#333',
   },
   modalButtonsRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     width: '100%',
   },
   modalBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-    marginHorizontal: 10,
+    flex: 1, 
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginHorizontal: 5,
+    alignItems: 'center',
   },
-  btnNo: { backgroundColor: '#2654d1' },
-  btnSi: { backgroundColor: '#DC3545' },
-  btnTextNo: { color: 'white', fontWeight: 'bold' },
-  btnTextSi: { color: 'white', fontWeight: 'bold' },
+  btnNo: { 
+    backgroundColor: '#2654d1' 
+  },
+  btnSi: { 
+    backgroundColor: '#DC3545' 
+  },
+  btnTextNo: { 
+    color: 'white', 
+    fontWeight: 'bold',
+    fontSize: 16 
+  },
+  btnTextSi: { 
+    color: 'white', 
+    fontWeight: 'bold',
+    fontSize: 16 
+  },
 });
 
 export default DeleteModal;

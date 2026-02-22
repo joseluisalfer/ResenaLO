@@ -1,7 +1,8 @@
 import React from "react";
 import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
 
-const DeleteModal = ({ isVisible, onClose, onConfirm, title }) => {
+ 
+const DeleteComment = ({ isVisible, onClose, onConfirm, title }) => {
   return (
     <Modal
       animationType="fade"
@@ -62,10 +63,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     alignItems: 'center',
   },
-  btnNo: { backgroundColor: '#f0f0f0' },
+  btnNo: { backgroundColor: '#2654d1' },
   btnSi: { backgroundColor: '#DC3545' },
-  btnTextNo: { color: '#333', fontWeight: 'bold' },
+  btnTextNo: { color: 'white', fontWeight: 'bold' },
   btnTextSi: { color: 'white', fontWeight: 'bold' },
 });
 
-export default DeleteModal;
+export default DeleteComment;
