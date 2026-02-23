@@ -1,20 +1,21 @@
 {
     "loginScreen": {
         "login": "Iniciar sessió",
-        "footer": "Introdueix la teua adreça de correu electrònic i contrasenya per iniciar sessió en esta aplicació",
+        "footer": "Introduïu la vostra adreça de correu electrònic i contrasenya per a iniciar sessió en aquesta aplicació",
         "createAccount": "Crear compte",
-        "textAccount": "Crea el teu compte per registrar-te a ReseñaLo i descobrir nous llocs.",
-        "register": "Registrarse"
+        "textAccount": "Crea el teu compte per a registrar-te en ReseñaLo i descobrir nous llocs.",
+        "register": "Registrar-se"
     },
     "registerScreen": {
         "createAccount": "Crear compte",
-        "footer": "Introdueix el teu correu electrònic i contrasenya per crear un compte:",
-        "email": "Correu electrònic",
-        "password": "Contrasenya",
+        "footer": "Introduïu el vostre correu electrònic i contrasenya per a crear un compte:",
+        "email": "correu electrònic",
+        "password": "contrasenya",
         "confirm": "Confirmar contrasenya",
         "user": "Nom d'usuari",
+        "name": "Nom",
         "date": "Data de naixement (DD/MM/AAAA)",
-        "register": "Registrar"
+        "register": "Registrar-se"
     },
     "home": {
         "places_week": "Llocs de la setmana",
@@ -22,16 +23,19 @@
         "buttonExplorer": "Explorar"
     },
     "publishScreen": {
-        "new_place": "Afegir nou lloc",
-        "name": "NOM",
-        "new_name": "Afegir nou lloc",
-        "location": "UBICACIÓ",
-        "new_location": "Afegir coordenades",
-        "type": "TIPUS DE DESTÍ",
-        "new_type": "Tria el tipus",
-        "description": "DESCRIPCIÓ",
-        "new_description": "Descriu el lloc",
-        "buttonAdd": "Afegir al mapa"
+        "header": "Afegir nou lloc",
+        "name": "Nom del lloc",
+        "new_name": "Nou lloc",
+        "location": "Ubicació",
+        "new_location": "Exemple 40.7128°,-74.0060°",
+        "type": "Tipus",
+        "new_type": "Tipus de lloc",
+        "description": "Descripció",
+        "new_description": "Descripció del lloc",
+        "buttonAdd": "Afegir al mapa",
+        "buttonRestart": "Restablir",
+        "buttonDelete": "Eliminar Foto",
+        "buttonAddMap": "Afegir al mapa"
     },
     "buttonAdd": {
         "add": "Afegir imatge",
@@ -45,32 +49,52 @@
         "post": "Publicacions",
         "logout": "Tancar sessió",
         "change_lang": "Canviar idioma",
-        "change_theme": "Canviar Tema",
-        "cancel": "Cancel·lar",
-        "comments": "Comentaris",
-        "friends": "Amics",
-        "save": "Guardar cavis",
-        "title": "Seleccionar idioma"
+        "change_theme": "Canviar tema",
+        "cancel": "cancel·lar",
+        "save": "Guardar canvis",
+        "title": "Seleccionar idioma",
+        "light_mode": "Tema clar",
+        "dark_mode": "Tema fosc",
+        "followers": "Seguidors"
+    },
+    "listUser": {
+        "search": "Buscar usuaris",
+        "search_placeholder": "Buscar usuari...",
+        "button": "Carregar més"
     },
     "language": {
-        "sp": "Espanyol",
+        "sp": "Castellà",
         "en": "Anglés",
         "ca": "Valencià"
     },
     "placeScreen": {
-        "podium": "Top 10 Llocs Més Valorats",
-        "anotherText": "Altres Llocs"
+        "buttonPodium": "Top 10 llocs",
+        "headerPodium": "Podi de ressenyes",
+        "anotherPlace": "Altres llocs destacats"
     },
     "friends": {
+        "friends": "Amics",
         "list": "Llista d'Amics",
-        "friends": "Amics"
+        "searchHolder": "Buscar per nom"
     },
     "buttonExplorer": {
-        "list": "Llista de Llocs"
+        "list": "Llista de llocs",
+        "searchHolder": "Buscar per títol"
+    },
+    "stackReview": {
+        "comments": "Comentaris",
+        "addComment": "Afegir comentari"
     },
     "modalReview": {
-        "location": "Ubicació:",
-        "calification": "Valoració",
-        "images": "Imatges"
+        "header": "Què t'ha semblat?",
+        "inputHolder": "Escriu ací la teua opinió sobre este lloc...",
+        "buttonAdd": "Publicar ressenya",
+        "buttonCancel": "Cancel·lar"
+    },
+    "profileFriend": {
+        "buttonFollow": "Seguir",
+        "buttonUnfollow": "Deixar de seguir",
+        "followers": "Seguidors",
+        "posts": "Publicacions"
     }
 }
