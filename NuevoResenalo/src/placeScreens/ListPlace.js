@@ -23,7 +23,6 @@ const ListPlace = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
   
-  // 1. Extraemos theme e isDark del Contexto
   const { setSearchUrl, theme, isDark } = useContext(Context);
 
   const changePageAndSendUri = (uri) => {
@@ -93,10 +92,6 @@ const ListPlace = ({ navigation }) => {
     fetchReviews();
   }, []);
 
-  useEffect(() => {
-    if (!searchText.trim()) setShownPlaces(places);
-  }, [places]);
-
   if (loading) {
     return (
       <View style={[styles.center, { backgroundColor: theme.background }]}>
@@ -107,23 +102,21 @@ const ListPlace = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      {/* HEADER FIXED */}
       <View style={styles.header}>
         <Ionicons
           name="arrow-back"
           size={30}
-          color={theme.text} // Icono dinámico
+          color={theme.text}
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         />
-
         <Text style={[styles.title, { color: theme.text }]}>
           {t("buttonExplorer.list")}
         </Text>
-
         <View style={styles.rightSpacer} />
       </View>
 
-      {/* SEARCHBAR DINÁMICA */}
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder="Buscar por título..."
@@ -144,42 +137,43 @@ const ListPlace = ({ navigation }) => {
         />
       </View>
 
-      <View style={styles.listWrapper}>
-        <FlatList
-          data={shownPlaces}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingBottom: 30 }}
-          renderItem={({ item }) => (
-            <Pressable onPress={() => changePageAndSendUri(item.ruta)}>
-              <View style={[
-                styles.item, 
-                { 
-                  backgroundColor: isDark ? "#121212" : "#f8f8f8",
-                  borderColor: isDark ? "#333" : "#ddd"
-                }
-              ]}>
-                <Image source={item.image} style={styles.image} />
-                <View style={styles.textContainer}>
-                  <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={2}>
-                    {item.name}
-                  </Text>
-                  <Text style={[styles.rating, { color: isDark ? "#AAA" : "#777" }]}>⭐ {item.rating}</Text>
-                </View>
+      {/* LISTADO - Eliminamos listWrapper y ajustamos el FlatList */}
+      <FlatList
+        data={shownPlaces}
+        keyExtractor={(item) => item.id.toString()}
+        // El secreto está aquí: 120 de padding al final para superar la Tab Bar
+        contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 120 }}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <Pressable onPress={() => changePageAndSendUri(item.ruta)}>
+            <View style={[
+              styles.item, 
+              { 
+                backgroundColor: isDark ? "#1E1E1E" : "#f8f8f8",
+                borderColor: isDark ? "#333" : "#ddd"
+              }
+            ]}>
+              <Image source={item.image} style={styles.image} />
+              <View style={styles.textContainer}>
+                <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={2}>
+                  {item.name}
+                </Text>
+                <Text style={[styles.rating, { color: isDark ? "#AAA" : "#777" }]}>⭐ {item.rating}</Text>
               </View>
-            </Pressable>
-          )}
-          ListEmptyComponent={
-            <View style={styles.emptyBox}>
-              <Ionicons name="search-outline" size={50} color={isDark ? "#444" : "#ccc"} />
-              <Text style={[styles.emptyText, { color: isDark ? "#888" : "#666" }]}>
-                {searchText.trim()
-                  ? "No se encontraron reseñas con ese título"
-                  : "No hay reseñas para mostrar"}
-              </Text>
             </View>
-          }
-        />
-      </View>
+          </Pressable>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyBox}>
+            <Ionicons name="search-outline" size={50} color={isDark ? "#444" : "#ccc"} />
+            <Text style={[styles.emptyText, { color: isDark ? "#888" : "#666" }]}>
+              {searchText.trim()
+                ? "No se encontraron reseñas con ese título"
+                : "No hay reseñas para mostrar"}
+            </Text>
+          </View>
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -187,8 +181,6 @@ const ListPlace = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 10,
-    marginBottom: "15%",
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   header: {
@@ -197,6 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: "100%",
     paddingTop: "12%",
+    paddingHorizontal: 15,
   },
   backButton: { width: 30 },
   title: {
@@ -208,31 +201,33 @@ const styles = StyleSheet.create({
   rightSpacer: { width: 30 },
   searchContainer: {
     width: "100%",
-    paddingHorizontal: 5,
+    paddingHorizontal: 15,
     marginBottom: 10,
   },
   searchBarPaper: {
     borderRadius: 8,
-    height: 40,
+    height: 45,
+    elevation: 0, // Quitamos sombra para que se vea más plano y limpio
+    borderWidth: 1,
+    borderColor: 'transparent'
   },
   searchInput: {
     fontSize: 16,
-    minHeight: 40,
+    alignSelf: 'center'
   },
-  listWrapper: { width: "100%", marginBottom: "10%" },
   item: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 6,
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 12,
     width: "100%",
     borderWidth: 1,
   },
-  image: { width: "50%", height: 100, borderRadius: 10, marginRight: 15 },
+  image: { width: "40%", height: 100, borderRadius: 10, marginRight: 15 },
   textContainer: { flex: 1 },
   placeName: { fontSize: 18, fontWeight: "bold" },
-  rating: { fontWeight: "bold", fontSize: 20 },
+  rating: { fontWeight: "bold", fontSize: 18, marginTop: 5 },
   emptyBox: { alignItems: "center", padding: 30 },
   emptyText: { marginTop: 10, textAlign: "center" },
 });
