@@ -264,6 +264,7 @@ public class PrincipalController {
 		resena.setTitle(title);
 		resena.setUser(user);
 		resena.setValoration(valoration);
+		resena.setValorationInitial(valoration);
 		resena.setDescription(description);
 		resena.setType(type);
 		resena.setLatitud(latitud);
@@ -323,7 +324,7 @@ public class PrincipalController {
 
 		// Agregar usuario a la lista de seguidores si no está ya presente
 		List<String> listFollowers = userFollow.getFollowers();
-		
+
 		if (!listFollowers.contains(user.getUser())) {
 			listFollowers.add(user.getUser());
 			userFollow.setFollowers(listFollowers);
@@ -440,57 +441,57 @@ public class PrincipalController {
 
 	@PutMapping("updateUser")
 	public ResponseEntity<Object> updateUser(@RequestBody String body) throws IOException {
-	    JSONObject json = new JSONObject(body);
+		JSONObject json = new JSONObject(body);
 
-	    // Requerido para localizar al usuario
-	    String email = json.getString("email");
+		// Requerido para localizar al usuario
+		String email = json.getString("email");
 
-	    User user = userRepository.findByEmail(email);
-	    if (user == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	    }
+		User user = userRepository.findByEmail(email);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 
-	    // Opcionales
-	    boolean changed = false;
+		// Opcionales
+		boolean changed = false;
 
-	    if (json.has("newUsername") && !json.isNull("newUsername")) {
-	        String newUsername = json.getString("newUsername").trim();
+		if (json.has("newUsername") && !json.isNull("newUsername")) {
+			String newUsername = json.getString("newUsername").trim();
 
-	        // Evitar username vacío
-	        if (newUsername.isEmpty()) {
-	            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-	        }
+			// Evitar username vacío
+			if (newUsername.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+			}
 
-	        // Si es distinto al actual, comprobar que no exista
-	        if (!newUsername.equals(user.getUser())) {
-	            User existing = userRepository.findByUser(newUsername);
-	            if (existing != null) {
-	                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-	            }
-	            user.setUser(newUsername);
-	            changed = true;
-	        }
-	    }
+			// Si es distinto al actual, comprobar que no exista
+			if (!newUsername.equals(user.getUser())) {
+				User existing = userRepository.findByUser(newUsername);
+				if (existing != null) {
+					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+				}
+				user.setUser(newUsername);
+				changed = true;
+			}
+		}
 
-	    if (json.has("newName") && !json.isNull("newName")) {
-	        String newName = json.getString("newName");
-	        user.setName(newName);
-	        changed = true;
-	    }
+		if (json.has("newName") && !json.isNull("newName")) {
+			String newName = json.getString("newName");
+			user.setName(newName);
+			changed = true;
+		}
 
-	    if (json.has("newDescription") && !json.isNull("newDescription")) {
-	        String newDescription = json.getString("newDescription");
-	        user.setDescription(newDescription);
-	        changed = true;
-	    }
+		if (json.has("newDescription") && !json.isNull("newDescription")) {
+			String newDescription = json.getString("newDescription");
+			user.setDescription(newDescription);
+			changed = true;
+		}
 
-	    // Si no vino ningún campo a actualizar
-	    if (!changed) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-	    }
+		// Si no vino ningún campo a actualizar
+		if (!changed) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
 
-	    userRepository.save(user);
-	    return ResponseEntity.status(HttpStatus.OK).build();
+		userRepository.save(user);
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PostMapping("/commentReview")
@@ -587,48 +588,74 @@ public class PrincipalController {
 
 	@DeleteMapping("deleteReview")
 	public ResponseEntity<Object> deleteReview(@RequestBody(required = false) String body) {
-	    if (body == null || body.isBlank()) {
-	        return ResponseEntity.badRequest().body("Body vacío");
-	    }
+		if (body == null || body.isBlank()) {
+			return ResponseEntity.badRequest().body("Body vacío");
+		}
 
-	    JSONObject json = new JSONObject(body);
-	    if (!json.has("idReview")) {
-	        return ResponseEntity.badRequest().body("Falta idReview");
-	    }
+		JSONObject json = new JSONObject(body);
+		if (!json.has("idReview")) {
+			return ResponseEntity.badRequest().body("Falta idReview");
+		}
 
-	    String idReview = json.getString("idReview");
+		String idReview = json.getString("idReview");
 
-	    Optional<Review> Oreview = reviewRepository.findById(idReview);
-	    if (Oreview.isEmpty()) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	    }
+		Optional<Review> Oreview = reviewRepository.findById(idReview);
+		if (Oreview.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 
-	    // 1) borrar comentarios asociados
-	    commentsRepository.deleteByReviewId(idReview);
+		// 1) borrar comentarios asociados
+		commentsRepository.deleteByReviewId(idReview);
 
-	    // 2) borrar la review
-	    reviewRepository.deleteById(idReview);
+		// 2) borrar la review
+		reviewRepository.deleteById(idReview);
 
-	    return ResponseEntity.noContent().build();
+		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("deleteComment")
 	public ResponseEntity<Object> deleteComment(@RequestBody String body) throws IOException {
-		// Parsear el cuerpo del JSON usando JSONObject
+
 		JSONObject json = new JSONObject(body);
 		String idComment = json.getString("idComment");
 
-		// Verificar si el comentario existe
 		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
 		if (Ocomment.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Devuelve 404 si no existe el comentario
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 
-		// Eliminar el comentario
 		Comments comment = Ocomment.get();
-		commentsRepository.delete(comment);
+		String reviewId = comment.getReviewId();
 
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Devuelve 204 si se elimina correctamente
+		// borrar comentario
+		commentsRepository.deleteById(idComment);
+
+		// buscar review
+		Optional<Review> Oreview = reviewRepository.findById(reviewId);
+		if (Oreview.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		}
+
+		Review review = Oreview.get();
+
+		List<Comments> remaining = commentsRepository.findByReviewId(reviewId);
+
+		double sum = review.getValorationInitial();
+		int count = 1;
+		for (Comments c : remaining) {
+			sum += c.getValoration();
+			count++;
+		}
+
+		if (count == 1) {
+			review.setValoration(review.getValorationInitial());
+			reviewRepository.save(review);
+		} else {
+			review.setValoration(sum / count);
+			reviewRepository.save(review);
+		}
+
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@GetMapping("/userEmail")
@@ -1051,7 +1078,6 @@ public class PrincipalController {
 			String reviewLink = "http://44.213.235.160:8080/resenalo/reviewP?id=" + review.getId();
 			jsonReviews.put(reviewLink);
 		}
-		
 
 		// Crear el objeto JSON con la paginación: número total de páginas, página
 		// actual, etc.
@@ -1197,22 +1223,90 @@ public class PrincipalController {
 	}
 
 	@GetMapping("/searchUsers")
-	public ResponseEntity<List<Map<String, String>>> searchUsers(@RequestParam String user) {
+	public ResponseEntity<String> searchUsers(@RequestParam(value = "user") String userQuery) {
+		try {
+			if (userQuery == null || userQuery.trim().isEmpty()) {
+				JSONObject empty = new JSONObject();
+				empty.put("results", new JSONArray());
+				return ResponseEntity.status(HttpStatus.OK).body(empty.toString());
+			}
 
-		if (user == null || user.trim().isEmpty()) {
-			  return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); 
-	    }
+			List<User> users = userRepository.findByUserContainingIgnoreCase(userQuery);
 
-	    List<User> users = userRepository.findByUserContainingIgnoreCase(user);
+			JSONArray resultsArray = new JSONArray();
 
-	    List<Map<String, String>> result = users.stream().map(user2 -> {
-	        Map<String, String> map = new HashMap<>();
-	        map.put("user", user2.getUser());
-	        map.put("photo", user2.getImage() == null ? "" : user2.getImage());
-	        map.put("link", "http://44.213.235.160:8080/resenalo/userEmailOther?email=" + user2.getEmail());
-	        return map;
-	    }).toList();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	    return ResponseEntity.status(HttpStatus.OK).body(result);
+			for (User user : users) {
+
+				// reviews del usuario
+				List<Review> listReviews = reviewRepository.findByUser(user.getUser());
+
+				JSONObject jsonR = new JSONObject();
+				JSONArray jsonA = new JSONArray();
+
+				jsonR.put("id", user.getId());
+				jsonR.put("user", user.getUser());
+				jsonR.put("name", user.getName() == null ? "" : user.getName());
+				jsonR.put("description", user.getDescription() == null ? "" : user.getDescription());
+				jsonR.put("email", user.getEmail());
+				jsonR.put("photo", user.getImage());
+
+				// reviews links
+				if (listReviews != null && !listReviews.isEmpty()) {
+					for (Review review : listReviews) {
+						String reviewLink = "http://44.213.235.160:8080/resenalo/review?id=" + review.getId();
+						jsonA.put(reviewLink);
+					}
+				}
+				jsonR.put("reviews", jsonA);
+
+				// created
+				if (user.getDate() != null) {
+					jsonR.put("created", sdf.format(user.getDate()));
+				} else {
+					jsonR.put("created", "");
+				}
+
+				// followeds links
+				JSONArray followedsArray = new JSONArray();
+				if (user.getFolloweds() != null) {
+					for (String followedUser : user.getFolloweds()) {
+						followedsArray.put("http://44.213.235.160:8080/resenalo/user?userName=" + followedUser);
+					}
+				}
+				jsonR.put("followeds", followedsArray);
+
+				// followers links
+				JSONArray followersArray = new JSONArray();
+				if (user.getFollowers() != null) {
+					for (String followerUser : user.getFollowers()) {
+						followersArray.put("http://44.213.235.160:8080/resenalo/user?userName=" + followerUser);
+					}
+				}
+				jsonR.put("followers", followersArray);
+
+				// friends links
+				JSONArray friendsArray = new JSONArray();
+				if (user.getFriends() != null) {
+					for (String friendUser : user.getFriends()) {
+						friendsArray.put("http://44.213.235.160:8080/resenalo/user?userName=" + friendUser);
+					}
+				}
+				jsonR.put("friends", friendsArray);
+
+				// añadir este usuario al array de resultados
+				resultsArray.put(jsonR);
+			}
+
+			JSONObject jsonP = new JSONObject();
+			jsonP.put("results", resultsArray);
+
+			return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
+
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Hubo un error al procesar la solicitud: " + e.getMessage());
+		}
 	}
 }

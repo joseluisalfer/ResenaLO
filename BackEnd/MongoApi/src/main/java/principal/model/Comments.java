@@ -71,5 +71,4 @@ public class Comments {
 	public void setValoration(double valoration) {
 		this.valoration = valoration;
 	}
-	
 }

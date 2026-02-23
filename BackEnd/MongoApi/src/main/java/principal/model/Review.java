@@ -19,6 +19,7 @@ public class Review {
 	private List<String> imageUrls;
 	private String user;
 	private double valoration;
+	private double valorationInitial;
 	private String description;
 	private Date date;
 
@@ -103,6 +104,14 @@ public class Review {
 
 	public void setLongitud(double longitud) {
 		this.longitud = longitud;
+	}
+
+	public double getValorationInitial() {
+		return valorationInitial;
+	}
+
+	public void setValorationInitial(double valorationInitial) {
+		this.valorationInitial = valorationInitial;
 	}
 
 }
