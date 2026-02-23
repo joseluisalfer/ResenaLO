@@ -7,6 +7,8 @@ import {
   Pressable,
   Text,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import DatosPublish from "../Componentes/Publish/PublishData/PublishData"; 
 import SelectorImagen from "../Componentes/Publish/ImageSelector/imageSelector"; 
@@ -18,8 +20,6 @@ import Context from "../Context/Context";
 const Publish = () => {
   const [imagenes, setImagenes] = useState([null]); 
   const { t } = useTranslation();
-  
-  // Extraemos theme e isDark para controlar los colores dinámicamente
   const { publishInfo, setPublishInfo, emailLogged, theme, isDark } = useContext(Context);
 
   const convertImageToBase64 = async (uri) => {
@@ -40,117 +40,112 @@ const Publish = () => {
   const handleAddMap = async () => {
     const { title, coords, type, description, valoration } = publishInfo;
 
-    if (
-      !title ||
-      !coords ||
-      !type ||
-      !description ||
-      !valoration ||
-      !imagenes.length ||
-      !imagenes[0]
-    ) {
-      alert("Por favor, completa todos los campos y asegúrate de haber agregado una imagen.");
-      return;
-    }
-
-    if (!coords.includes(",")) {
-      alert("Por favor, ingresa las coordenadas en el formato correcto (latitud,longitud).");
+    if (!title || !coords || !type || !description || !valoration || !imagenes[0]) {
+      alert("Por favor, completa todos los campos y agrega una imagen.");
       return;
     }
 
     const base64Images = await Promise.all(
-      imagenes
-        .filter((img) => img !== null)
-        .map((img) => convertImageToBase64(img.uri)),
+      imagenes.filter((img) => img !== null).map((img) => convertImageToBase64(img.uri)),
     );
 
     const data = {
-      title: title,
+      title,
       user: emailLogged?.results?.user || "Anónimo", 
-      valoration: valoration,
-      description: description,
-      type: type,
-      coords: coords, 
+      valoration,
+      description,
+      type,
+      coords, 
       files: base64Images, 
     };
 
     try {
-      const response = await postData(
-        "http://44.213.235.160:8080/resenalo/uploadReview",
-        data,
-      );
+      const response = await postData("http://44.213.235.160:8080/resenalo/uploadReview", data);
       if (response === null) {
         alert("Reseña publicada con éxito.");
       } else {
-        alert("Hubo un error al publicar la reseña.");
+        alert("Hubo un error al publicar.");
       }
     } catch (error) {
-      console.error("Error al enviar los datos:", error);
-      alert("Hubo un error al enviar los datos. Por favor, inténtalo de nuevo.");
+      alert("Error de conexión.");
     }
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      {/* Contenedor principal con fondo negro del tema */}
-      <View style={{ flex: 1, backgroundColor: theme.background }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1, backgroundColor: theme.background }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
-          style={{ backgroundColor: theme.background }}
-          contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: 16,
-            paddingBottom: 160, // Espacio extra para que los botones no tapen el contenido
-            flexGrow: 1,
-          }}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { backgroundColor: theme.background }
+          ]}
         >
-          {/* Título en blanco */}
           <Text style={[styles.title, { color: theme.text }]}>
             {t("publishScreen.new_place")}
           </Text>
 
-          {/* Formulario de publicación */}
+          {/* Formulario de datos */}
           <DatosPublish setFormData={setPublishInfo} />
 
           {/* Selector de imágenes */}
           <SelectorImagen imagenes={imagenes} setImagenes={setImagenes} />
+
+          {/* CONTENEDOR DE BOTONES AL FINAL DEL SCROLL */}
+          <View style={styles.buttonContainer}>
+            
+            {/* Botón Eliminar Fotos - Recuperado el estilo rojo */}
+            <Pressable 
+              style={[styles.removeButton, { backgroundColor: isDark ? "#A52A2A" : "#DC3545" }]} 
+              onPress={() => setImagenes([null])}
+            >
+              <Text style={styles.buttonText}>Eliminar fotos</Text>
+            </Pressable>
+
+            {/* Botón Publicar - Azul */}
+            <Pressable style={styles.button} onPress={handleAddMap}>
+              <Text style={styles.buttonText}>{t("publishScreen.buttonAdd")}</Text>
+            </Pressable>
+          </View>
+          
+          {/* Espacio extra final para asegurar que se vea todo al hacer scroll */}
+          <View style={{ height: 50 }} />
         </ScrollView>
-
-        {/* Botón para eliminar las fotos (Rojo oscuro en Dark Mode) */}
-        <Pressable 
-          style={[styles.removeButton, { backgroundColor: isDark ? "#8B0000" : "#DC3545" }]} 
-          onPress={() => setImagenes([null])}
-        >
-          <Text style={styles.buttonText}>Eliminar fotos</Text>
-        </Pressable>
-
-        {/* Botón principal */}
-        <Pressable style={styles.button} onPress={handleAddMap}>
-          <Text style={styles.buttonText}>{t("publishScreen.buttonAdd")}</Text>
-        </Pressable>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    paddingHorizontal: 16,
+    flexGrow: 1,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginTop: 30,
-    marginBottom: 20,
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    width: '100%',
   },
   button: {
-    position: "absolute",
-    bottom: 20,
-    left: 16,
-    right: 16,
     backgroundColor: "#1748ce",
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
-    elevation: 5,
+    marginTop: 12,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   buttonText: {
     color: "white",
@@ -158,14 +153,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   removeButton: {
-    position: "absolute",
-    bottom: 85, 
-    left: 16,
-    right: 16,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
     elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
 });
 

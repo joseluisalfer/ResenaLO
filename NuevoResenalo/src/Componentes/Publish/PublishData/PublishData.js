@@ -4,6 +4,7 @@ import { TextInput } from 'react-native-paper';
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from 'react-i18next';
 import Context from '../../../Context/Context';
+import { ScrollView } from 'react-native-gesture-handler';
 
 // 1. FormInput ahora usa theme.text para que cambie según el modo
 const FormInput = ({ label, placeholder, value, onChangeText, theme }) => (
@@ -96,6 +97,7 @@ const DatosPublish = () => {
   };
 
   return (
+    
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* 3. Pasamos el theme a cada input para que el texto sea negro o blanco según toque */}
       <FormInput label="Nombre del lugar" placeholder="Nuevo lugar" value={title} onChangeText={handleTitleChange} theme={theme} />
@@ -111,6 +113,7 @@ const DatosPublish = () => {
         <Text style={styles.buttonText}>Restablecer</Text>
       </Pressable>
     </View>
+    
   );
 };
 

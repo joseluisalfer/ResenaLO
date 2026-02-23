@@ -44,7 +44,7 @@ const Main = () => {
         // Color del icono cuando está seleccionado
         tabBarActiveTintColor: "#2654d1", 
         // Color del icono cuando NO está seleccionado (arreglado el "bala")
-        tabBarInactiveTintColor: isDark ? "#666" : "#BDC3C7", 
+        tabBarInactiveTintColor: "black", 
         headerShown: false,
       })}
     >
