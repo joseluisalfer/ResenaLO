@@ -299,63 +299,45 @@ public class PrincipalController {
 	}
 
 	@PostMapping("addFollow")
-	public ResponseEntity<Object> addFollow(@RequestBody String body) throws IOException {
-		JSONObject json = new JSONObject(body);
-		String us = json.getString("user");
-		String usFollow = json.getString("userFollow");
+	public ResponseEntity<String> addFollow(@RequestBody Map<String, String> body) {
+	    String username = body.get("user");
+	    String targetUsername = body.get("userFollow");
 
-		// Buscar usuario
-		User user = userRepository.findByUser(us);
-		if (user == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+	    if (username == null || targetUsername == null || username.equals(targetUsername)) {
+	        return ResponseEntity.badRequest().body("Datos inválidos o intento de auto-seguimiento");
+	    }
 
-		// Buscar usuario a seguir
-		User userFollow = userRepository.findByUser(usFollow);
-		if (userFollow == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+	    User user = userRepository.findByUser(username);
+	    User targetUser = userRepository.findByUser(targetUsername);
 
-		// Agregar usuario a la lista de seguidos si no está ya presente
-		List<String> listFollow = user.getFolloweds();
-		if (!listFollow.contains(userFollow.getUser())) {
-			listFollow.add(userFollow.getUser());
-			user.setFolloweds(listFollow);
-			userRepository.save(user);
-		}
+	    if (user == null || targetUser == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+	    }
 
-		// Agregar usuario a la lista de seguidores si no está ya presente
-		List<String> listFollowers = userFollow.getFollowers();
+	    boolean alreadyFollowing = user.getFolloweds().contains(targetUsername);
 
-		if (!listFollowers.contains(user.getUser())) {
-			listFollowers.add(user.getUser());
-			userFollow.setFollowers(listFollowers);
+	    if (!alreadyFollowing) {
+	        user.getFolloweds().add(targetUsername);
+	        targetUser.getFollowers().add(username);
+	        
 
-			userRepository.save(userFollow);
-		}
+	        if (targetUser.getFolloweds().contains(username)) {
+	            if (!user.getFriends().contains(targetUsername)) {
+	                user.getFriends().add(targetUsername);
+	            }
+	            if (!targetUser.getFriends().contains(username)) {
+	                targetUser.getFriends().add(username);
+	            }
+	        }
+	        userRepository.save(user);
+	        userRepository.save(targetUser);
+	        
+	        return ResponseEntity.status(HttpStatus.OK).body("Seguimiento realizado");
+	    }
 
-		// Verificar si ambos usuarios se siguen mutuamente
-
-		if (listFollow.contains(userFollow.getUser()) && listFollowers.contains(user.getUser())) {
-			// Añadir los usuarios a la lista de amigos si no están ya en ella
-			List<String> userFriends = user.getFriends();
-			if (!userFriends.contains(userFollow.getUser())) {
-				userFriends.add(userFollow.getUser());
-				user.setFriends(userFriends);
-			}
-
-			List<String> userFollowFriends = userFollow.getFriends();
-			if (!userFollowFriends.contains(user.getUser())) {
-				userFollowFriends.add(user.getUser());
-				userFollow.setFriends(userFollowFriends);
-			}
-			userRepository.save(user);
-			userRepository.save(userFollow);
-		}
-
-		return ResponseEntity.status(HttpStatus.OK).build();
+	    return ResponseEntity.status(HttpStatus.OK).body("Seguimiento realizado");
 	}
-
+	
 	@PostMapping("deleteFollow")
 	public ResponseEntity<Object> deleteFollow(@RequestBody String body) throws IOException {
 		JSONObject json = new JSONObject(body);
