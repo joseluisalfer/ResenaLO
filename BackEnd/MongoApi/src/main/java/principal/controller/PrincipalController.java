@@ -697,7 +697,8 @@ public class PrincipalController {
 
 			jsonR.put("email", user.getEmail());
 			jsonR.put("photo", user.getImage());
-
+			jsonR.put("theme", user.getTheme());
+			jsonR.put("language", user.getLanguage());
 			// Convertir reseñas en links (solo enlaces como strings)
 			if (listReviews != null && !listReviews.isEmpty()) {
 				for (Review review : listReviews) {
@@ -786,7 +787,9 @@ public class PrincipalController {
 			}
 			jsonR.put("email", user.getEmail());
 			jsonR.put("photo", user.getImage());
-
+			jsonR.put("theme", user.getTheme());
+			jsonR.put("language", user.getLanguage());
+			
 			// Convertir reseñas en links (solo enlaces como strings)
 			if (listReviews != null && !listReviews.isEmpty()) {
 				for (Review review : listReviews) {
@@ -870,7 +873,9 @@ public class PrincipalController {
 			}
 			jsonR.put("email", user.getEmail());
 			jsonR.put("photo", user.getImage());
-
+			jsonR.put("theme", user.getTheme());
+			jsonR.put("language", user.getLanguage());
+			
 			// Convertir reseñas en links (solo enlaces como strings)
 			if (listReviews != null && !listReviews.isEmpty()) {
 				for (Review review : listReviews) {
@@ -1240,8 +1245,6 @@ public class PrincipalController {
 
 			JSONArray resultsArray = new JSONArray();
 
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
 			for (User user : users) {
 
 				// reviews del usuario
@@ -1265,14 +1268,8 @@ public class PrincipalController {
 					}
 				}
 				jsonR.put("reviews", jsonA);
-
-				// created
-				if (user.getDate() != null) {
-					jsonR.put("created", sdf.format(user.getDate()));
-				} else {
-					jsonR.put("created", "");
-				}
-
+				jsonR.put("theme", user.getTheme());
+				jsonR.put("language", user.getLanguage());
 				// followeds links
 				JSONArray followedsArray = new JSONArray();
 				if (user.getFolloweds() != null) {
