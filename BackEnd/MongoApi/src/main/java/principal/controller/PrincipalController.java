@@ -152,6 +152,8 @@ public class PrincipalController {
 		newUser.setName(name);
 		newUser.setToken(token);
 		newUser.setDescription("");
+		newUser.setLanguage("en");
+		newUser.setTheme("light");
 		newUser.setImage("https://resenalo.s3.us-east-1.amazonaws.com/public/reviews/foto_default.png");
 		// Guardar el usuario en la base de datos
 		userRepository.save(newUser);
@@ -347,6 +349,8 @@ public class PrincipalController {
 				userFollowFriends.add(user.getUser());
 				userFollow.setFriends(userFollowFriends);
 			}
+			userRepository.save(user);
+			userRepository.save(userFollow);
 		}
 
 		return ResponseEntity.status(HttpStatus.OK).build();
@@ -522,7 +526,7 @@ public class PrincipalController {
 
 		// Sumar la valoración del comentario a la reseña
 		List<Comments> commentsList = commentsRepository.findByReviewId(reviewId);
-		double totalValoration = review.getValoration(); // Valoracion de la reseña
+		double totalValoration = review.getValorationInitial(); // Valoracion de la reseña
 		int totalCount = 1;
 
 		// Sumamos las valoraciones de todos los comentarios
@@ -530,7 +534,8 @@ public class PrincipalController {
 			totalValoration += c.getValoration();
 			totalCount++;
 		}
-
+		
+		
 		double newValoration = totalValoration / totalCount;
 		review.setValoration(newValoration);
 
@@ -1308,5 +1313,48 @@ public class PrincipalController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("Hubo un error al procesar la solicitud: " + e.getMessage());
 		}
+	}
+	
+	@PostMapping("/updateTheme")
+	public ResponseEntity<Object> updateTheme(@RequestBody String body) throws IOException {
+
+	    JSONObject json = new JSONObject(body);
+
+	    String email = json.getString("email");
+	    String theme = json.getString("theme"); // "light" o "dark"
+
+	    if (!theme.equals("light") && !theme.equals("dark")) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("El theme debe ser 'light' o 'dark'");
+	    }
+
+	    User user = userRepository.findByEmail(email);
+	    if (user == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+	    }
+
+	    user.setTheme(theme);
+	    userRepository.save(user);
+
+	    return ResponseEntity.status(HttpStatus.OK).body("Tema actualizado");
+	}
+	
+	@PostMapping("/updateLanguage")
+	public ResponseEntity<Object> updateLanguage(@RequestBody String body) throws IOException {
+
+	    JSONObject json = new JSONObject(body);
+
+	    String email = json.getString("email");
+	    String language = json.getString("language"); // "es", "en", etc.
+
+	    User user = userRepository.findByEmail(email);
+	    if (user == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+	    }
+
+	    user.setLanguage(language);
+	    userRepository.save(user);
+
+	    return ResponseEntity.status(HttpStatus.OK).body("Idioma actualizado");
 	}
 }
