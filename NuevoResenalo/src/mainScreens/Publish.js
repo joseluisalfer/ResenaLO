@@ -8,20 +8,20 @@ import {
   Text,
   StyleSheet,
 } from "react-native";
-import DatosPublish from "../Componentes/Publish/PublishData/PublishData"; // Formulario
-import SelectorImagen from "../Componentes/Publish/ImageSelector/imageSelector"; // Selector de imágenes
+import DatosPublish from "../Componentes/Publish/PublishData/PublishData"; 
+import SelectorImagen from "../Componentes/Publish/ImageSelector/imageSelector"; 
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
-import { postData } from "../services/Services"; // Asegúrate de que esta ruta sea correcta
+import { postData } from "../services/Services"; 
 import Context from "../Context/Context";
 
 const Publish = () => {
-  const [imagenes, setImagenes] = useState([null]); // Estado para almacenar las imágenes
+  const [imagenes, setImagenes] = useState([null]); 
   const { t } = useTranslation();
-  const { publishInfo, setPublishInfo } = useContext(Context);
-  const { emailLogged} = useContext(Context);
+  
+  // Extraemos theme e isDark para controlar los colores dinámicamente
+  const { publishInfo, setPublishInfo, emailLogged, theme, isDark } = useContext(Context);
 
-  // Función para convertir las imágenes a base64
   const convertImageToBase64 = async (uri) => {
     const response = await fetch(uri);
     const blob = await response.blob();
@@ -29,8 +29,7 @@ const Publish = () => {
     return new Promise((resolve, reject) => {
       reader.onloadend = () => {
         let base64 = reader.result;
-        // Eliminar el prefijo 'data:image/png;base64,' (o cualquier otro tipo)
-        base64 = base64.split(",")[1]; // Tomamos solo la parte después de la coma
+        base64 = base64.split(",")[1]; 
         resolve(base64);
       };
       reader.onerror = reject;
@@ -38,11 +37,9 @@ const Publish = () => {
     });
   };
 
-  // Función para enviar los datos cuando el usuario hace clic en el botón "Añadir mapa"
   const handleAddMap = async () => {
     const { title, coords, type, description, valoration } = publishInfo;
 
-    // Validar que todos los campos estén presentes
     if (
       !title ||
       !coords ||
@@ -52,40 +49,30 @@ const Publish = () => {
       !imagenes.length ||
       !imagenes[0]
     ) {
-      alert(
-        "Por favor, completa todos los campos y asegúrate de haber agregado una imagen.",
-      );
+      alert("Por favor, completa todos los campos y asegúrate de haber agregado una imagen.");
       return;
     }
 
-    // Validar que el campo de ubicación tenga el formato correcto
     if (!coords.includes(",")) {
-      alert(
-        "Por favor, ingresa las coordenadas en el formato correcto (latitud,longitud).",
-      );
+      alert("Por favor, ingresa las coordenadas en el formato correcto (latitud,longitud).");
       return;
     }
 
-    // Convertir las imágenes a base64
     const base64Images = await Promise.all(
       imagenes
         .filter((img) => img !== null)
         .map((img) => convertImageToBase64(img.uri)),
     );
 
-    // Crear el objeto con todos los datos del formulario usando `publishInfo` y las imágenes convertidas a base64
     const data = {
       title: title,
-      user: emailLogged.results.user, // Aquí puedes obtener el usuario de alguna forma, tal vez del contexto o autenticación
+      user: emailLogged?.results?.user || "Anónimo", 
       valoration: valoration,
       description: description,
       type: type,
-      coords: coords, // Enviamos la ubicación tal cual (latitud,longitud)
-      files: base64Images, // Aseguramos que las imágenes sean base64
+      coords: coords, 
+      files: base64Images, 
     };
-
-    // Imprimir los datos antes de enviarlos para depuración
-    console.log("Datos a enviar:", JSON.stringify(data));
 
     try {
       const response = await postData(
@@ -99,23 +86,28 @@ const Publish = () => {
       }
     } catch (error) {
       console.error("Error al enviar los datos:", error);
-      alert(
-        "Hubo un error al enviar los datos. Por favor, inténtalo de nuevo.",
-      );
+      alert("Hubo un error al enviar los datos. Por favor, inténtalo de nuevo.");
     }
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={{ flex: 1 }}>
+      {/* Contenedor principal con fondo negro del tema */}
+      <View style={{ flex: 1, backgroundColor: theme.background }}>
         <ScrollView
+          style={{ backgroundColor: theme.background }}
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 16,
-            paddingBottom: 120,
+            paddingBottom: 160, // Espacio extra para que los botones no tapen el contenido
+            flexGrow: 1,
           }}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.title}>{t("publishScreen.new_place")}</Text>
+          {/* Título en blanco */}
+          <Text style={[styles.title, { color: theme.text }]}>
+            {t("publishScreen.new_place")}
+          </Text>
 
           {/* Formulario de publicación */}
           <DatosPublish setFormData={setPublishInfo} />
@@ -124,11 +116,15 @@ const Publish = () => {
           <SelectorImagen imagenes={imagenes} setImagenes={setImagenes} />
         </ScrollView>
 
-        {/* Botón para eliminar las fotos */}
-        <Pressable style={styles.removeButton} onPress={() => setImagenes([null])}>
+        {/* Botón para eliminar las fotos (Rojo oscuro en Dark Mode) */}
+        <Pressable 
+          style={[styles.removeButton, { backgroundColor: isDark ? "#8B0000" : "#DC3545" }]} 
+          onPress={() => setImagenes([null])}
+        >
           <Text style={styles.buttonText}>Eliminar fotos</Text>
         </Pressable>
-        {/* Botón para "Añadir mapa" y enviar los datos al backend */}
+
+        {/* Botón principal */}
         <Pressable style={styles.button} onPress={handleAddMap}>
           <Text style={styles.buttonText}>{t("publishScreen.buttonAdd")}</Text>
         </Pressable>
@@ -139,35 +135,37 @@ const Publish = () => {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 24,
+    fontWeight: "bold",
     textAlign: "center",
     marginTop: 30,
-    marginBottom: 12,
+    marginBottom: 20,
   },
   button: {
     position: "absolute",
-    bottom: 16,
+    bottom: 20,
     left: 16,
     right: 16,
     backgroundColor: "#1748ce",
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
+    elevation: 5,
   },
   buttonText: {
     color: "white",
-    fontWeight: "600",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   removeButton: {
     position: "absolute",
-    bottom: 80, // Un poco arriba del botón de "Añadir mapa"
+    bottom: 85, 
     left: 16,
     right: 16,
-    backgroundColor: "#DC3545", // Color rojo para eliminar
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
+    elevation: 3,
   },
 });
 

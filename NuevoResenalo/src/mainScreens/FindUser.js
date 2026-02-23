@@ -20,7 +20,8 @@ const FindUser = ({ navigation }) => {
   const [shownUsers, setShownUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
 
-  const { emailLogged, setSelectedFriend } = useContext(Context);
+  // 1. Extraemos theme e isDark
+  const { emailLogged, setSelectedFriend, theme, isDark } = useContext(Context);
   const myEmail = emailLogged?.results?.email;
 
   const [page, setPage] = useState(0);
@@ -58,10 +59,7 @@ const FindUser = ({ navigation }) => {
           const res = await getData(link);
           const r = res?.results;
           if (!r) return null;
-
           if (r.email === myEmail) return null;
-
-          let photoUrl = await getImageUri(r.photo);
 
           return {
             id: r.id,
@@ -109,20 +107,16 @@ const FindUser = ({ navigation }) => {
     try {
       const url = `http://44.213.235.160:8080/resenalo/searchUsers?user=${q}`;
       const res = await getData(url);
-
       const results = res?.results || [];
-      const mapped = await Promise.all(
-        results.map(async (u) => ({
-          id: u.id,
-          name: u.name,
-          photo: u.photo,
-          description: u.description,
-          user: u.user,
-          reviews: u.reviews,
-          followers: u.followers,
-        }))
-      );
-
+      const mapped = results.map((u) => ({
+        id: u.id,
+        name: u.name,
+        photo: u.photo,
+        description: u.description,
+        user: u.user,
+        reviews: u.reviews,
+        followers: u.followers,
+      }));
       setShownUsers(mapped);
     } catch (e) {
       setShownUsers([]);
@@ -136,9 +130,10 @@ const FindUser = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Buscar Usuarios</Text>
+    // 2. Fondo dinámico para toda la pantalla
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={[styles.header, { borderBottomColor: isDark ? "#333" : "#ddd" }]}>
+        <Text style={[styles.title, { color: theme.text }]}>Buscar Usuarios</Text>
       </View>
 
       <View style={styles.searchContainer}>
@@ -149,8 +144,11 @@ const FindUser = ({ navigation }) => {
           onIconPress={handleSearch}
           onSubmitEditing={handleSearch}
           autoCapitalize="none"
-          style={styles.searchBarPaper}
-          inputStyle={styles.searchInput}
+          // 3. Adaptamos la Searchbar (Paper a veces necesita estilos específicos)
+          style={[styles.searchBarPaper, { backgroundColor: isDark ? "#222" : "#fff" }]}
+          inputStyle={[styles.searchInput, { color: theme.text }]}
+          placeholderTextColor={isDark ? "#888" : "#999"}
+          iconColor={isDark ? "#fff" : "#000"}
           clearIcon="close"
           onClearIconPress={handleClearSearch}
         />
@@ -158,11 +156,7 @@ const FindUser = ({ navigation }) => {
 
       <View style={{ flex: 1, width: "100%" }}>
         {loading ? (
-          <ActivityIndicator
-            size="large"
-            color="#2654d1"
-            style={styles.loader}
-          />
+          <ActivityIndicator size="large" color={theme.primary || "#2654d1"} style={styles.loader} />
         ) : (
           <ScrollView contentContainerStyle={styles.scrollView}>
             {shownUsers.length > 0 ? (
@@ -181,17 +175,18 @@ const FindUser = ({ navigation }) => {
                     });
                   }}
                 >
-                  <View style={styles.card}>
+                  {/* 4. Tarjetas con color dinámico */}
+                  <View style={[styles.card, { backgroundColor: isDark ? "#1E1E1E" : "#f0f0f0" }]}>
                     <Image source={{ uri: item.photo }} style={styles.image} />
                     <View style={styles.textContainer}>
-                      <Text style={styles.placeName}>{item.name}</Text>
-                      <Text style={styles.followingText}>@{item.user}</Text>
+                      <Text style={[styles.placeName, { color: theme.text }]}>{item.name}</Text>
+                      <Text style={[styles.followingText, { color: isDark ? "#AAA" : "#777" }]}>@{item.user}</Text>
                     </View>
                   </View>
                 </Pressable>
               ))
             ) : (
-              <Text style={{ textAlign: "center" }}>
+              <Text style={{ textAlign: "center", color: theme.text, marginTop: 20 }}>
                 No se encontraron usuarios.
               </Text>
             )}
@@ -199,7 +194,7 @@ const FindUser = ({ navigation }) => {
             {!searchText && page + 1 < totalPages && (
               <View style={styles.footerContainer}>
                 {loadingMore ? (
-                  <ActivityIndicator size="small" color="#2654d1" />
+                  <ActivityIndicator size="small" color={theme.primary || "#2654d1"} />
                 ) : (
                   <TouchableOpacity
                     style={styles.loadMoreBtn}
@@ -220,13 +215,11 @@ const FindUser = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   header: {
     padding: 15,
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
     marginTop: 30,
   },
   title: {
@@ -240,18 +233,18 @@ const styles = StyleSheet.create({
   },
   searchBarPaper: {
     borderRadius: 8,
-    height: 40,
+    height: 45, // Un poco más alta para Android
+    elevation: 2,
   },
   searchInput: {
     fontSize: 16,
-    minHeight: 40,
+    minHeight: 45,
   },
   card: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 12,
     width: "90%",
     alignSelf: "center",
     marginBottom: 15,
@@ -261,6 +254,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     marginRight: 15,
+    backgroundColor: '#ccc'
   },
   textContainer: { flex: 1 },
   placeName: {
@@ -269,11 +263,9 @@ const styles = StyleSheet.create({
   },
   followingText: {
     fontSize: 16,
-    color: "#777",
   },
   loader: { marginTop: 20 },
   scrollView: { paddingBottom: 20 },
-
   footerContainer: {
     paddingVertical: 20,
     alignItems: "center",

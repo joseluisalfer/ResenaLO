@@ -23,20 +23,17 @@ const EditUser = () => {
 
     const navigation = useNavigation();
 
-    // Obtenemos el objeto emailLogged del context
-    const { emailLogged, setEmailLogged } = useContext(Context);
+    const { emailLogged, setEmailLogged, theme, isDark } = useContext(Context);
 
-    // Accedemos directamente a la propiedad email del objeto
     const userEmail = emailLogged?.results?.email;
+
     const loadUser = async () => {
         try {
             setLoading(true);
-
             if (!userEmail) {
                 setLoading(false);
                 return;
             }
-
             const res = await getData(
                 `http://44.213.235.160:8080/resenalo/userEmail?email=${userEmail}`
             );
@@ -60,7 +57,6 @@ const EditUser = () => {
     const handleSave = async () => {
         try {
             if (saving) return;
-
             if (!userEmail) {
                 Alert.alert("Error", "No se encontró el email de sesión.");
                 return;
@@ -76,7 +72,6 @@ const EditUser = () => {
             }
 
             setSaving(true);
-
             const updatedUserData = {
                 email: userEmail,
                 newName: cleanName,
@@ -90,11 +85,6 @@ const EditUser = () => {
                     updatedUserData
                 );
             } catch (innerError) {
-                /**
-                 * Aquí capturamos el fallo del services.js.
-                 * Si el error es de JSON (SyntaxError), significa que el PUT 
-                 * llegó al servidor y se ejecutó, pero la respuesta no era un JSON.
-                 */
                 if (innerError.message.includes("JSON") || innerError.message.includes("Unexpected end")) {
                     console.log("Aviso: El servidor actualizó pero no envió un JSON. Todo OK.");
                 } else {
@@ -123,118 +113,155 @@ const EditUser = () => {
 
     if (loading) {
         return (
-            <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
-                <ActivityIndicator size="large" color="#1748ce" />
+            <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+                <ActivityIndicator size="large" color={theme.primary || "#1748ce"} />
             </View>
         );
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Nombre"
-                    value={name}
-                    onChangeText={setName}
-                />
+        /* Aplicamos el fondo a la vista que envuelve todo */
+        <View style={{ flex: 1, backgroundColor: theme.background }}>
+            <ScrollView 
+                style={styles.container}
+                contentContainerStyle={{ flexGrow: 1, backgroundColor: theme.background }}
+            >
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={[
+                            styles.input, 
+                            { 
+                                backgroundColor: isDark ? "#121212" : "#fff", 
+                                color: theme.text, 
+                                borderColor: isDark ? "#333" : "#ccc" 
+                            }
+                        ]}
+                        placeholder="Nombre"
+                        placeholderTextColor={isDark ? "#666" : "#999"}
+                        value={name}
+                        onChangeText={setName}
+                    />
 
-                <TextInput
-                    style={styles.input}
-                    placeholder="Nombre de usuario"
-                    value={username}
-                    onChangeText={setUsername}
-                    autoCapitalize="none"
-                />
+                    <TextInput
+                        style={[
+                            styles.input, 
+                            { 
+                                backgroundColor: isDark ? "#121212" : "#fff", 
+                                color: theme.text, 
+                                borderColor: isDark ? "#333" : "#ccc" 
+                            }
+                        ]}
+                        placeholder="Nombre de usuario"
+                        placeholderTextColor={isDark ? "#666" : "#999"}
+                        value={username}
+                        onChangeText={setUsername}
+                        autoCapitalize="none"
+                    />
 
-                <TextInput
-                    style={styles.bioInput}
-                    placeholder="Biografía"
-                    value={bio}
-                    onChangeText={setBio}
-                    multiline={true}
-                    numberOfLines={4}
-                />
-            </View>
+                    <TextInput
+                        style={[
+                            styles.bioInput, 
+                            { 
+                                backgroundColor: isDark ? "#121212" : "#fff", 
+                                color: theme.text, 
+                                borderColor: isDark ? "#333" : "#ccc" 
+                            }
+                        ]}
+                        placeholder="Biografía"
+                        placeholderTextColor={isDark ? "#666" : "#999"}
+                        value={bio}
+                        onChangeText={setBio}
+                        multiline={true}
+                        numberOfLines={4}
+                    />
+                </View>
 
-            <View style={{ justifyContent: "flex-end", alignItems: "center" }}>
-                <Pressable
-                    style={[styles.addReviewButton, saving ? { opacity: 0.7 } : null]}
-                    onPress={handleSave}
-                    disabled={saving}
-                >
-                    {saving ? (
-                        <ActivityIndicator color="#fff" />
-                    ) : (
-                        <Text style={styles.addReviewButtonText}>Guardar Cambios</Text>
-                    )}
-                </Pressable>
+                <View style={styles.buttonContainer}>
+                    <Pressable
+                        style={[styles.addReviewButton, saving ? { opacity: 0.7 } : null]}
+                        onPress={handleSave}
+                        disabled={saving}
+                    >
+                        {saving ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.addReviewButtonText}>Guardar Cambios</Text>
+                        )}
+                    </Pressable>
 
-                <Pressable
-                    style={[styles.cancelButton, saving ? { opacity: 0.7 } : null]}
-                    onPress={() => navigation.goBack()}
-                    disabled={saving}
-                >
-                    <Text style={styles.cancelButtonText}>Cancelar</Text>
-                </Pressable>
-            </View>
-        </ScrollView>
+                    <Pressable
+                        style={[styles.cancelButton, saving ? { opacity: 0.7 } : null]}
+                        onPress={() => navigation.goBack()}
+                        disabled={saving}
+                    >
+                        <Text style={styles.cancelButtonText}>Cancelar</Text>
+                    </Pressable>
+                </View>
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f0f0f0",
         padding: 20,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
     },
     inputContainer: {
         marginBottom: 20,
     },
+    buttonContainer: {
+        flex: 1,
+        justifyContent: "flex-end", 
+        alignItems: "center",
+        paddingBottom: 20,
+    },
     input: {
         height: 50,
-        backgroundColor: "#fff",
         borderRadius: 10,
-        borderColor: "#ccc",
         borderWidth: 1,
-        marginBottom: 10,
+        marginBottom: 15,
         paddingLeft: 15,
         fontSize: 16,
     },
+    bioInput: {
+        height: 150,
+        borderRadius: 10,
+        borderWidth: 1,
+        marginBottom: 20,
+        padding: 15,
+        fontSize: 16,
+        textAlignVertical: "top",
+    },
     addReviewButton: {
         backgroundColor: "#1748ce",
-        padding: 12,
-        borderRadius: 8,
+        padding: 15,
+        borderRadius: 10,
         marginTop: 20,
-        width: "80%",
+        width: "90%",
         alignItems: "center",
     },
     addReviewButtonText: {
         color: "white",
         fontSize: 18,
+        fontWeight: "bold",
     },
     cancelButton: {
         backgroundColor: "#DC3545",
-        padding: 8,
-        borderRadius: 8,
-        marginTop: 10,
+        padding: 10,
+        borderRadius: 10,
+        marginTop: 15,
         width: "60%",
         alignItems: "center",
     },
     cancelButtonText: {
         color: "white",
         fontSize: 16,
-    },
-    bioInput: {
-        height: 150,
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        borderColor: "#ccc",
-        borderWidth: 1,
-        marginBottom: 20,
-        padding: 15,
-        fontSize: 16,
-        textAlignVertical: "top",
     },
 });
 

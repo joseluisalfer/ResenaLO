@@ -6,14 +6,17 @@ import Explore from "../../src/Componentes/Home/Explore/Explore";
 import Context from "../Context/Context";
 
 const HomeScreen = ({ navigation }) => {  
+  // Extraemos el theme del contexto
+  const { theme } = useContext(Context);
+
   return (
-    <View style={styles.container}>
+    // Aplicamos el color de fondo dinámico al container
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.top}>
         <WeekPlace navigation={navigation} />
       </View>
 
       <View style={styles.mid}>
-        
         <Friends navigation={navigation} />
       </View>
 
@@ -29,7 +32,6 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     paddingHorizontal: 16,
     paddingTop: 30,
     paddingBottom: 8,
