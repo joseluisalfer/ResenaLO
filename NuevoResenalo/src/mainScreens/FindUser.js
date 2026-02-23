@@ -66,7 +66,7 @@ const FindUser = ({ navigation }) => {
           return {
             id: r.id,
             name: r.name,
-            photo: r.photo, 
+            photo: r.photo,
             description: r.description,
             user: r.user,
             reviews: r.reviews,
@@ -108,35 +108,22 @@ const FindUser = ({ navigation }) => {
     setLoading(true);
     try {
       const url = `http://44.213.235.160:8080/resenalo/searchUsers?user=${q}`;
-      const list = await getData(url);
-      console.log(list)
-      if (!Array.isArray(list) || list.length === 0) {
-        setShownUsers([]);
-        return;
-      }
+      const res = await getData(url);
 
-      const details = await Promise.all(
-        list.results.map(async (item) => {
-          const res = await getData(item.link);
-          const r = res?.results;
-          if (!r) return null;
-
-          if (r.email === myEmail) return null;
-
-          console.log(r);
-          return {
-            id: r.id,
-            name: r.name,
-            photo: r.photo, // 👈 URL tal cual
-            description: r.description,
-            user: r.user,
-            reviews: r.reviews,
-            followers: r.followers,
-          };
-        }),
+      const results = res?.results || [];
+      const mapped = await Promise.all(
+        results.map(async (u) => ({
+          id: u.id,
+          name: u.name,
+          photo: u.photo,
+          description: u.description,
+          user: u.user,
+          reviews: u.reviews,
+          followers: u.followers,
+        }))
       );
 
-      setShownUsers(details.filter((x) => x !== null));
+      setShownUsers(mapped);
     } catch (e) {
       setShownUsers([]);
     } finally {
