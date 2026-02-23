@@ -9,8 +9,7 @@ import ModalProfile from "../Componentes/Profile/ModalProfile/ModalProfile";
 import Context from "../Context/Context";
 
 const Profile = ({ navigation }) => {
-  // 1. Extraemos theme e isDark del contexto
-  const { emailLogged, isLoged, setIsLoged, theme, isDark } = useContext(Context);
+  const { emailLogged, isLoged, setIsLoged } = useContext(Context);
 
   const refreshProfile = () => {
     console.log("Refreshing...");
@@ -56,8 +55,7 @@ const Profile = ({ navigation }) => {
       </View>
 
       <View style={styles.divider}>
-        {/* 2. Ajustamos el color del divisor según el tema */}
-        <Divider style={[styles.dividerLine, { backgroundColor: isDark ? "#444" : "#e0e0e0" }]} />
+        <Divider style={styles.dividerLine} />
       </View>
 
       <View style={styles.postsSection}>
@@ -71,21 +69,17 @@ const Profile = ({ navigation }) => {
       data={[{ key: "content" }]}
       renderItem={() => <Header />}
       keyExtractor={(item) => item.key}
-      // 3. Aplicamos el color de fondo del tema al contenedor principal
-      contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}
+      contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
-      // Aseguramos que el estilo de la lista también herede el fondo
-      style={{ backgroundColor: theme.background }}
     />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // Quitamos el blanco fijo
+    backgroundColor: "white",
     paddingBottom: 16,
     paddingTop: 40,
-    minHeight: '100%', // Para asegurar que el fondo cubra toda la pantalla
   },
   section: {
     marginBottom: 16,
@@ -99,7 +93,6 @@ const styles = StyleSheet.create({
   dividerLine: {
     marginVertical: 16,
     width: "80%",
-    height: 1, // Un poco más definido
   },
 });
 

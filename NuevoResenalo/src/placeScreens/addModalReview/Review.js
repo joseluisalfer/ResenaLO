@@ -20,9 +20,7 @@ function Review({ route, navigation }) {
     const [reviewText, setReviewText] = useState('');
     const [rating, setRating] = useState(0);
     const [loading, setLoading] = useState(false);
-    
-    // Extraemos el theme del Contexto
-    const { emailLogged, theme, isDark } = useContext(Context);
+    const { emailLogged } = useContext(Context);
 
     const handleSubmitReview = async () => {
         if (rating === 0) {
@@ -48,6 +46,8 @@ function Review({ route, navigation }) {
         };
 
         try {
+            console.log("Enviando reseña:", data);
+            
             const response = await postData(
                 "http://44.213.235.160:8080/resenalo/commentReview",
                 data
@@ -74,7 +74,7 @@ function Review({ route, navigation }) {
                 <Ionicons
                     name={i <= rating ? 'star' : 'star-outline'}
                     size={45}
-                    color={i <= rating ? '#FFD700' : (isDark ? '#444' : '#BDC3C7')}
+                    color={i <= rating ? '#FFD700' : '#BDC3C7'}
                     style={{ marginHorizontal: 5 }}
                 />
             </Pressable>
@@ -83,39 +83,26 @@ function Review({ route, navigation }) {
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={[styles.layout, { backgroundColor: theme.background }]}>
-                <View style={[
-                    styles.card, 
-                    { backgroundColor: isDark ? "#1e1e1e" : "#fff" }
-                ]}>
-                    <Text style={[styles.title, { color: theme.text }]}>¿Qué te pareció?</Text>
+            <View style={styles.layout}>
+                <View style={styles.card}>
+                    <Text style={styles.title}>¿Qué te pareció?</Text>
                     
                     <View style={styles.starContainer}>
                         {renderStars()}
                     </View>
 
                     <TextInput
-                        style={[
-                            styles.input, 
-                            { 
-                                backgroundColor: isDark ? "#121212" : "#f9f9f9", 
-                                borderColor: isDark ? "#333" : "#eee",
-                                color: theme.text 
-                            }
-                        ]}
+                        style={styles.input}
                         multiline
                         numberOfLines={5}
                         placeholder="Escribe aquí tu opinión sobre este lugar..."
-                        placeholderTextColor={isDark ? "#666" : "#999"}
+                        placeholderTextColor="#999"
                         value={reviewText}
                         onChangeText={setReviewText}
                     />
                     
                     <Pressable 
-                        style={[
-                            styles.submitButton, 
-                            loading && (isDark ? styles.buttonDisabledDark : styles.buttonDisabled)
-                        ]} 
+                        style={[styles.submitButton, loading && styles.buttonDisabled]} 
                         onPress={handleSubmitReview}
                         disabled={loading}
                     >
@@ -131,9 +118,7 @@ function Review({ route, navigation }) {
                         onPress={() => navigation.goBack()} 
                         disabled={loading}
                     >
-                        <Text style={[styles.cancelText, { color: isDark ? "#ff5c5c" : "#DC3545" }]}>
-                            Cancelar
-                        </Text>
+                        <Text style={styles.cancelText}>Cancelar</Text>
                     </Pressable>
                 </View>
             </View>
@@ -144,10 +129,12 @@ function Review({ route, navigation }) {
 const styles = StyleSheet.create({
     layout: {
         flex: 1,
+        backgroundColor: '#f5f5f5',
         justifyContent: 'center',
         padding: 20,
     },
     card: {
+        backgroundColor: '#fff',
         borderRadius: 20,
         padding: 25,
         shadowColor: '#000',
@@ -161,6 +148,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
+        color: '#333'
     },
     starContainer: {
         flexDirection: 'row',
@@ -168,6 +156,8 @@ const styles = StyleSheet.create({
         marginBottom: 25,
     },
     input: {
+        backgroundColor: '#f9f9f9',
+        borderColor: '#eee',
         borderWidth: 1,
         borderRadius: 12,
         padding: 15,
@@ -175,6 +165,7 @@ const styles = StyleSheet.create({
         height: 120,
         textAlignVertical: 'top',
         marginBottom: 20,
+        color: '#333'
     },
     submitButton: {
         backgroundColor: '#2654d1',
@@ -184,9 +175,6 @@ const styles = StyleSheet.create({
     },
     buttonDisabled: {
         backgroundColor: '#a5b4e0',
-    },
-    buttonDisabledDark: {
-        backgroundColor: '#1a3582',
     },
     buttonText: {
         color: 'white',
@@ -198,6 +186,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     cancelText: {
+        color: '#DC3545',
         fontSize: 14,
         fontWeight: '500',
     }

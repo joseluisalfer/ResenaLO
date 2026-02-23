@@ -1,4 +1,4 @@
-import React, { useContext } from "react"; // Importamos useContext
+import React from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -6,16 +6,13 @@ import { useNavigation } from "@react-navigation/native";
 import ProfileHeaderFriend from "../Componentes/Friends/ProfileHeaderFriend";
 import ProfileStatsFriend from "../Componentes/Friends/ProfileStatsFriend";
 import Posts from "../Componentes/Friends/PostList";
-import Context from "../Context/Context"; // Importamos tu Contexto
 
 const Friend = () => {
   const navigation = useNavigation();
-  
-  // Extraemos theme e isDark del contexto
-  const { theme, isDark } = useContext(Context);
 
+  // ✅ Todo el contenido “de arriba” va en el header del FlatList
   const ListHeader = () => (
-    <View style={{ backgroundColor: theme.background }}>
+    <View>
       {/* Header/info amigo */}
       <View style={styles.section}>
         <ProfileHeaderFriend navigation={navigation} />
@@ -26,26 +23,24 @@ const Friend = () => {
         <ProfileStatsFriend />
       </View>
 
-      {/* Divider dinámico */}
+      {/* Divider */}
       <View style={styles.divider}>
-        <Divider style={[styles.dividerLine, { backgroundColor: isDark ? "#333" : "#ddd" }]} />
+        <Divider style={styles.dividerLine} />
       </View>
     </View>
   );
 
   return (
     <FlatList
-      data={[{ key: "posts" }]}
+      data={[{ key: "posts" }]} // FlatList necesita data; renderizamos 1 item que contiene Posts
       keyExtractor={(item) => item.key}
       ListHeaderComponent={<ListHeader />}
       renderItem={() => (
-        <View style={[styles.postsSection, { backgroundColor: theme.background }]}>
+        <View style={styles.postsSection}>
           <Posts navigation={navigation} />
         </View>
       )}
-      // Fondo dinámico para el contenedor y la lista
-      contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}
-      style={{ backgroundColor: theme.background }}
+      contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
     />
   );
@@ -53,9 +48,9 @@ const Friend = () => {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "white",
     paddingBottom: 16,
     paddingTop: 20,
-    flexGrow: 1, // Para que el color de fondo cubra toda la pantalla
   },
   section: {
     marginBottom: 16,
@@ -69,7 +64,6 @@ const styles = StyleSheet.create({
   dividerLine: {
     marginVertical: 16,
     width: "80%",
-    height: 1,
   },
 });
 

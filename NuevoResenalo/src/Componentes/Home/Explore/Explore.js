@@ -9,9 +9,7 @@ const Explore = ({ navigation }) => {
   const [reviewsUrls, setReviewsUrls] = useState([]);
   const [reviewsData, setReviewsData] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Extraemos el theme del contexto
-  const { setSearchUrl, theme, isDark } = useContext(Context);
+  const { setSearchUrl } = useContext(Context);
 
   const fetchUrls = async () => {
     try {
@@ -52,34 +50,26 @@ const Explore = ({ navigation }) => {
   );
 
   const handleOnPress = (url) => {
-    setSearchUrl(url);
-    navigation.navigate("Place");
+    setSearchUrl(url); 
+    navigation.navigate("Place"); 
   };
 
   if (loading) {
     return (
-      <View style={[styles.loadingWrapper, { backgroundColor: theme.background }]}>
+      <View style={styles.loadingWrapper}>
         <ActivityIndicator size="large" color="#2654d1" />
       </View>
     );
   }
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: theme.background }]}
-      showsVerticalScrollIndicator={false}
-    >
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Pressable
         style={styles.header}
         onPress={() => navigation?.navigate("ListPlace")}
       >
-        {/* Texto dinámico según el tema */}
-        <Text style={[styles.title, { color: theme.text }]}>Explorar</Text>
-        <Ionicons
-          name="chevron-forward-outline"
-          size={25}
-          color={theme.text} // Chevron dinámico
-        />
+        <Text style={styles.title}>Explorar</Text>
+        <Ionicons name="chevron-forward-outline" size={25} color="#000000" />
       </Pressable>
 
       <View style={styles.grid}>
@@ -88,12 +78,7 @@ const Explore = ({ navigation }) => {
             key={index}
             style={({ pressed }) => [
               styles.card,
-              {
-                opacity: pressed ? 0.8 : 1,
-                // Color de la tarjeta dinámico para evitar bordes blancos en modo oscuro
-                backgroundColor: isDark ? "#1e1e1e" : "#fff",
-                shadowColor: isDark ? "#000" : "#000"
-              }
+              { opacity: pressed ? 0.8 : 1 }
             ]}
             onPress={() => handleOnPress(review.review)}
           >
@@ -119,11 +104,11 @@ const Explore = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { paddingTop: 5 },
+  container: { backgroundColor: '#fff', paddingTop: 5 },
   header: { flexDirection: "row", alignItems: "center", marginBottom: 15, paddingHorizontal: '4%' },
-  title: { fontSize: 22, fontWeight: "700" },
+  title: { fontSize: 22, fontWeight: "700", color: "#000" },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", paddingHorizontal: '4%', paddingBottom: 20 },
-  card: { width: "48%", marginBottom: 15, borderRadius: 15, overflow: "hidden", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  card: { width: "48%", marginBottom: 15, borderRadius: 15, overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, backgroundColor: '#fff' },
   image: { width: '100%', height: 120 },
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: "#2654d1", paddingVertical: 10, paddingHorizontal: 12 },
   place: { fontSize: 14, fontWeight: "bold", color: "#ffffff", flex: 1 },
