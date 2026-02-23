@@ -6,11 +6,12 @@ import {
   TextInput,
   Pressable,
   Modal,
+  Alert,
 } from "react-native";
 import { Button } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
-import { postData, getData } from "../services/Services";
+import { postData } from "../services/Services";
 import Context from "../Context/Context";
 
 const Register = ({ navigation }) => {
@@ -20,31 +21,29 @@ const Register = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const { t } = useTranslation();
-  const { setIsLoged, setEmailLogged } = useContext(Context);
+  
+  // Extraemos theme e isDark del contexto
+  const { theme, isDark } = useContext(Context);
 
-  // Verificación del código
   const [verificationCode, setVerificationCode] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Validación de campos vacíos
   const validateForm = () => {
     if (!email || !password || !confirmPassword || !username || !name) {
-      alert("Todos los campos son obligatorios");
+      Alert.alert("Error", "Todos los campos son obligatorios");
       return false;
     }
     if (password !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      Alert.alert("Error", "Las contraseñas no coinciden");
       return false;
     }
     if (!validateEmail(email)) {
-      alert("Por favor, ingresa un correo electrónico válido");
+      Alert.alert("Error", "Por favor, ingresa un correo electrónico válido");
       return false;
     }
     return true;
   };
 
-  //serranotarazonadavid@gmail.com
-  // Validación del correo electrónico con expresión regular
   const validateEmail = (email) => {
     const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     return regex.test(email);
@@ -66,31 +65,24 @@ const Register = ({ navigation }) => {
         registrationData,
       );
 
-      // Verifica si la respuesta es válida y tiene un estado adecuado
-
       if (response === null) {
-        setModalVisible(true); // Muestra el modal de verificación después de registrar
+        setModalVisible(true);
       } else {
-        console.error("Respuesta no exitosa:", response);
-        alert("Hubo un problema con el registro");
+        Alert.alert("Error", "Hubo un problema con el registro");
       }
     } catch (error) {
-      console.error("Error en la conexión", error);
-      alert("Hubo un problema con la conexión");
+      Alert.alert("Error", "Hubo un problema con la conexión");
     }
   };
 
   const handleModalConfirm = async () => {
     if (!verificationCode.trim()) {
-      alert("Por favor, ingresa el código de verificación.");
+      Alert.alert("Error", "Por favor, ingresa el código.");
       return;
     }
 
     try {
-      const data = {
-        token: verificationCode,
-        email: email,
-      };
+      const data = { token: verificationCode, email: email };
       const response = await postData(
         "http://44.213.235.160:8080/resenalo/verifyEmail",
         data,
@@ -100,42 +92,44 @@ const Register = ({ navigation }) => {
         setModalVisible(false);
         navigation.goBack();
       } else {
-        setModalVisible(false);
-        alert("Código de verificación incorrecto");
+        Alert.alert("Error", "Código de verificación incorrecto");
       }
     } catch (error) {
-      console.error("Error en la conexión", error);
-      alert("Hubo un problema con la conexión");
+      Alert.alert("Error", "Hubo un problema con la conexión");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t("registerScreen.createAccount")}</Text>
-      <Text style={styles.subtitle}>{t("registerScreen.footer")}</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.title, { color: theme.text }]}>{t("registerScreen.createAccount")}</Text>
+      <Text style={[styles.subtitle, { color: isDark ? "#aaa" : "#555" }]}>{t("registerScreen.footer")}</Text>
 
-      {/* Modal de verificación */}
+      {/* Modal de verificación adaptado */}
       <Modal
-        visible={modalVisible} // Controla si el modal es visible o no
+        visible={modalVisible}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setModalVisible(false)} // Cerrar modal cuando presionan fuera del modal
+        onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>
-              Introduce el código de verificación enviado a su correo
-              electrónico
+          <View style={[styles.modalContent, { backgroundColor: isDark ? "#1e1e1e" : "white" }]}>
+            <Text style={[styles.modalText, { color: theme.text }]}>
+              Introduce el código de verificación enviado a su correo electrónico
             </Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: isDark ? "#121212" : "#fff", 
+                color: theme.text,
+                borderColor: isDark ? "#444" : "#ccc"
+              }]}
               placeholder="Código de verificacion"
+              placeholderTextColor={isDark ? "#666" : "#999"}
               autoCapitalize="none"
               value={verificationCode}
               onChangeText={setVerificationCode}
             />
             {verificationCode.trim().length > 0 && (
-              <Button onPress={handleModalConfirm} mode="contained">
+              <Button onPress={handleModalConfirm} mode="contained" buttonColor="#2654d1">
                 Confirmar
               </Button>
             )}
@@ -151,41 +145,69 @@ const Register = ({ navigation }) => {
 
       {/* Formulario de registro */}
       <TextInput
-        style={styles.input}
+        style={[styles.input, { 
+            backgroundColor: isDark ? "#121212" : "#fff", 
+            color: theme.text,
+            borderColor: isDark ? "#333" : "#ccc"
+        }]}
         placeholder={t("registerScreen.email")}
+        placeholderTextColor={isDark ? "#666" : "#999"}
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { 
+            backgroundColor: isDark ? "#121212" : "#fff", 
+            color: theme.text,
+            borderColor: isDark ? "#333" : "#ccc"
+        }]}
         placeholder={t("registerScreen.password")}
+        placeholderTextColor={isDark ? "#666" : "#999"}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { 
+            backgroundColor: isDark ? "#121212" : "#fff", 
+            color: theme.text,
+            borderColor: isDark ? "#333" : "#ccc"
+        }]}
         placeholder={t("registerScreen.confirm")}
+        placeholderTextColor={isDark ? "#666" : "#999"}
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { 
+            backgroundColor: isDark ? "#121212" : "#fff", 
+            color: theme.text,
+            borderColor: isDark ? "#333" : "#ccc"
+        }]}
         placeholder={t("registerScreen.user")}
+        placeholderTextColor={isDark ? "#666" : "#999"}
         value={username}
         onChangeText={setUsername}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { 
+            backgroundColor: isDark ? "#121212" : "#fff", 
+            color: theme.text,
+            borderColor: isDark ? "#333" : "#ccc"
+        }]}
         placeholder={t("registerScreen.name")}
+        placeholderTextColor={isDark ? "#666" : "#999"}
         value={name}
         onChangeText={setName}
       />
 
-      <Pressable style={styles.button} onPress={handleRegister}>
+      <Pressable 
+        style={[styles.button, { backgroundColor: isDark ? "#2654d1" : "black" }]} 
+        onPress={handleRegister}
+      >
         <Text style={styles.buttonText}>{t("registerScreen.register")}</Text>
       </Pressable>
     </View>
@@ -196,70 +218,65 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "center", // Ajustado para centrar mejor el form
     paddingHorizontal: 20,
-    backgroundColor: "#f7f7f7",
-    marginTop: 20,
-  },
-  banner: {
-    marginBottom: -20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     marginBottom: 5,
   },
   subtitle: {
     fontSize: 14,
-    color: "#555",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 25,
   },
   input: {
     width: "100%",
-    height: 45,
-    borderColor: "#ccc",
+    height: 50,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 12,
     paddingHorizontal: 15,
-    marginBottom: 10,
+    marginBottom: 15,
     fontSize: 16,
   },
   button: {
-    backgroundColor: "black",
     justifyContent: "center",
     padding: 12,
     height: 50,
-    width: 300,
-    borderRadius: 10,
+    width: "100%",
+    borderRadius: 12,
+    marginTop: 10,
   },
   buttonText: {
     color: "white",
     textAlign: "center",
-    fontSize: 15,
+    fontSize: 16,
+    fontWeight: "bold",
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   modalContent: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 20,
-    width: "80%",
+    borderRadius: 20,
+    padding: 25,
+    width: "85%",
+    elevation: 10,
   },
   cancelButton: {
-    color: "red",
+    color: "#DC3545",
     textAlign: "center",
-    marginTop: 15,
+    marginTop: 20,
+    fontWeight: "bold",
   },
   modalText: {
-    justifyContent: "center",
-    alignItems: "center",
     textAlign: "center",
     marginBottom: 20,
+    fontSize: 16,
+    lineHeight: 22,
   },
 });
 

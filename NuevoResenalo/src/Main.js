@@ -1,18 +1,31 @@
+import React, { useContext } from "react"; // Importamos useContext
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
 import Home from "./placeScreens/PlaceStacks";
 import Publish from "./mainScreens/Publish";
 import Find from "./mainScreens/stackNotification/StackNotification";
 import Profile from "./editScreen/ProfileScreens";
+import Context from "./Context/Context"; // Ajusta la ruta a tu Context
 
 const Tab = createBottomTabNavigator();
 
-const Main = () => (
+const Main = () => {
+  // Extraemos theme e isDark del contexto
+  const { theme, isDark } = useContext(Context);
+
+  return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarShowLabel: false,
+        // Estilos de la barra
+        tabBarStyle: {
+          backgroundColor: isDark ? "#121212" : "#fff", // Fondo oscuro o claro
+          borderTopColor: isDark ? "#333" : "#eee",     // Borde superior sutil
+          height: 60,
+          position: 'absolute', // Opcional: si quieres que flote o tenga margen
+          elevation: 5,
+        },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -28,8 +41,10 @@ const Main = () => (
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#2654d1",
-        tabBarInactiveTintColor: "gray",
+        // Color del icono cuando está seleccionado
+        tabBarActiveTintColor: "#2654d1", 
+        // Color del icono cuando NO está seleccionado (arreglado el "bala")
+        tabBarInactiveTintColor: isDark ? "#666" : "#BDC3C7", 
         headerShown: false,
       })}
     >
@@ -38,6 +53,7 @@ const Main = () => (
       <Tab.Screen name="Find" component={Find} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
-);
+  );
+};
 
 export default Main;

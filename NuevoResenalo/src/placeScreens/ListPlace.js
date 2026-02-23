@@ -22,7 +22,9 @@ const ListPlace = ({ navigation }) => {
   const [shownPlaces, setShownPlaces] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
-  const { setSearchUrl } = useContext(Context);
+  
+  // 1. Extraemos theme e isDark del Contexto
+  const { setSearchUrl, theme, isDark } = useContext(Context);
 
   const changePageAndSendUri = (uri) => {
     setSearchUrl(uri);
@@ -32,10 +34,7 @@ const ListPlace = ({ navigation }) => {
   const fetchReviews = async () => {
     try {
       setLoading(true);
-
       const data = await getData("http://44.213.235.160:8080/resenalo/reviews");
-      console.log(data);
-
       const reviewUrls = data.reviews;
 
       if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {
@@ -48,12 +47,10 @@ const ListPlace = ({ navigation }) => {
         reviewUrls.map(async (url, index) => {
           try {
             const reviewData = await getData(url);
-            console.log(reviewData);
-
             return {
               id: index,
-              name: reviewData.title, // title
-              image: { uri: reviewData.image }, // NO TOCADO
+              name: reviewData.title,
+              image: { uri: reviewData.image },
               rating: reviewData?.valoration,
               ruta: reviewData.review,
             };
@@ -75,7 +72,6 @@ const ListPlace = ({ navigation }) => {
     }
   };
 
-  // --- búsqueda por title (item.name) ---
   const handleSearch = () => {
     const q = searchText.trim().toLowerCase();
     if (!q) {
@@ -88,7 +84,6 @@ const ListPlace = ({ navigation }) => {
     setShownPlaces(result);
   };
 
-  // --- limpiar búsqueda (X) ---
   const handleClearSearch = () => {
     setSearchText("");
     setShownPlaces(places);
@@ -98,47 +93,53 @@ const ListPlace = ({ navigation }) => {
     fetchReviews();
   }, []);
 
-  // si se actualiza places, y no hay búsqueda activa, sincroniza shownPlaces
   useEffect(() => {
     if (!searchText.trim()) setShownPlaces(places);
   }, [places]);
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
         <ActivityIndicator size="large" color="#1748ce" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
         <Ionicons
           name="arrow-back"
           size={30}
-          color="black"
+          color={theme.text} // Icono dinámico
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         />
 
-        <Text style={styles.title}>{t("buttonExplorer.list")}</Text>
+        <Text style={[styles.title, { color: theme.text }]}>
+          {t("buttonExplorer.list")}
+        </Text>
 
         <View style={styles.rightSpacer} />
       </View>
 
-      {/* SEARCHBAR + X */}
+      {/* SEARCHBAR DINÁMICA */}
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder="Buscar por título..."
+          placeholderTextColor={isDark ? "#AAA" : "#666"}
           value={searchText}
           onChangeText={setSearchText}
           onIconPress={handleSearch}
           onSubmitEditing={handleSearch}
           autoCapitalize="none"
-          style={styles.searchBarPaper}
-          inputStyle={styles.searchInput}
-          clearIcon="close" // X
+          style={[
+            styles.searchBarPaper, 
+            { backgroundColor: isDark ? "#1E1E1E" : "#f0f0f0" }
+          ]}
+          inputStyle={[styles.searchInput, { color: theme.text }]}
+          iconColor={theme.text}
+          clearIcon="close"
           onClearIconPress={handleClearSearch}
         />
       </View>
@@ -150,21 +151,27 @@ const ListPlace = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 30 }}
           renderItem={({ item }) => (
             <Pressable onPress={() => changePageAndSendUri(item.ruta)}>
-              <View style={styles.item}>
+              <View style={[
+                styles.item, 
+                { 
+                  backgroundColor: isDark ? "#121212" : "#f8f8f8",
+                  borderColor: isDark ? "#333" : "#ddd"
+                }
+              ]}>
                 <Image source={item.image} style={styles.image} />
                 <View style={styles.textContainer}>
-                  <Text style={styles.placeName} numberOfLines={2}>
+                  <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={2}>
                     {item.name}
                   </Text>
-                  <Text style={styles.rating}>⭐ {item.rating}</Text>
+                  <Text style={[styles.rating, { color: isDark ? "#AAA" : "#777" }]}>⭐ {item.rating}</Text>
                 </View>
               </View>
             </Pressable>
           )}
           ListEmptyComponent={
             <View style={styles.emptyBox}>
-              <Ionicons name="search-outline" size={50} color="#ccc" />
-              <Text style={styles.emptyText}>
+              <Ionicons name="search-outline" size={50} color={isDark ? "#444" : "#ccc"} />
+              <Text style={[styles.emptyText, { color: isDark ? "#888" : "#666" }]}>
                 {searchText.trim()
                   ? "No se encontraron reseñas con ese título"
                   : "No hay reseñas para mostrar"}
@@ -180,12 +187,10 @@ const ListPlace = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     paddingHorizontal: 10,
     marginBottom: "15%",
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -194,17 +199,13 @@ const styles = StyleSheet.create({
     paddingTop: "12%",
   },
   backButton: { width: 30 },
-
   title: {
     flex: 1,
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
     textAlign: "center",
   },
-
   rightSpacer: { width: 30 },
-
   searchContainer: {
     width: "100%",
     paddingHorizontal: 5,
@@ -218,26 +219,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minHeight: 40,
   },
-
   listWrapper: { width: "100%", marginBottom: "10%" },
-
   item: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 10,
     padding: 10,
-    backgroundColor: "#f0f0f0",
     borderRadius: 8,
     width: "100%",
     borderWidth: 1,
-    borderColor: "#ddd",
   },
   image: { width: "50%", height: 100, borderRadius: 10, marginRight: 15 },
   textContainer: { flex: 1 },
-  placeName: { fontSize: 18, fontWeight: "bold", color: "#000" },
-  rating: { fontWeight: "bold", fontSize: 20, color: "#777" },
+  placeName: { fontSize: 18, fontWeight: "bold" },
+  rating: { fontWeight: "bold", fontSize: 20 },
   emptyBox: { alignItems: "center", padding: 30 },
-  emptyText: { marginTop: 10, color: "#666", textAlign: "center" },
+  emptyText: { marginTop: 10, textAlign: "center" },
 });
 
 export default ListPlace;

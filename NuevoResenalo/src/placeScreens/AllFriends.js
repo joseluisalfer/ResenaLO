@@ -13,19 +13,11 @@ import Context from "../Context/Context";
 import { getData } from "../services/Services";
 import { Searchbar } from 'react-native-paper';
 
-const pickRandomUpToN = (arr, n = 5) => {
-  const copy = [...arr];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy.slice(0, Math.min(n, copy.length));
-};
-
 const Friends = ({ navigation }) => {
-  const { setSelectedFriend, emailLogged } = useContext(Context);
+  // 1. Extraemos el theme del Contexto
+  const { setSelectedFriend, emailLogged, theme, isDark } = useContext(Context);
   const [friends, setFriends] = useState([]);
-  const [filteredFriends, setFilteredFriends] = useState([]); // Estado para la lista filtrada
+  const [filteredFriends, setFilteredFriends] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchFriend, setSearchFriend] = useState("");
 
@@ -33,28 +25,23 @@ const Friends = ({ navigation }) => {
     obtainUsers();
   }, []);
 
-  // Efecto para filtrar cuando cambia el texto de búsqueda o la lista original
   useEffect(() => {
-    const result = friends.filter(friend => 
+    const result = friends.filter(friend =>
       friend.name.toLowerCase().includes(searchFriend.toLowerCase()) ||
       friend.user.toLowerCase().includes(searchFriend.toLowerCase())
     );
     setFilteredFriends(result);
   }, [searchFriend, friends]);
 
- const obtainUsers = async () => {
+  const obtainUsers = async () => {
     setLoading(true);
     try {
-      // 1. Obtenemos todos los URLs sin recortar
       const friendUrls = emailLogged?.results?.friends ?? [];
-      
-      // 2. Mapeamos sobre todos los URLs (ya no usamos pickRandomUpToN)
       const settled = await Promise.allSettled(
         friendUrls.map(async (url) => {
           const userData = await getData(url);
           const r = userData?.results;
-          if (!r) return null; // Validación de seguridad
-          
+          if (!r) return null;
           return {
             id: r.id,
             name: r.name,
@@ -72,7 +59,7 @@ const Friends = ({ navigation }) => {
         .filter(Boolean);
 
       setFriends(ok);
-      setFilteredFriends(ok); 
+      setFilteredFriends(ok);
     } catch (err) {
       console.error("Error crítico en obtainUsers:", err);
       setFriends([]);
@@ -83,46 +70,52 @@ const Friends = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.loaderContainer}>
+      <View style={[styles.loaderContainer, { backgroundColor: theme.background }]}>
         <ActivityIndicator size="large" color="#4F46E5" />
       </View>
     );
   }
 
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.headerContainer}>
+    <View style={[styles.wrapper, { backgroundColor: theme.background }]}>
+      {/* HEADER DINÁMICO */}
+      <View style={[styles.headerContainer, { backgroundColor: theme.background, borderBottomColor: isDark ? "#333" : "#F3F4F6" }]}>
         <Ionicons
           name="arrow-back"
           size={28}
-          color="#1F2937"
+          color={theme.text}
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         />
-        <Text style={styles.headerTitle}>Lista de amigos</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Lista de amigos</Text>
       </View>
 
-      <View style={styles.searchContainer}>
+      {/* SEARCHBAR ADAPTADA */}
+      <View style={[styles.searchContainer, { backgroundColor: theme.background }]}>
         <Searchbar
           placeholder="Buscar por nombre..."
+          placeholderTextColor={isDark ? "#AAA" : "#6B7280"}
           onChangeText={setSearchFriend}
           value={searchFriend}
-          style={styles.searchBar}
-          inputStyle={styles.searchInput}
-         
-          elevation={1} 
+          style={[
+            styles.searchBar,
+            { backgroundColor: isDark ? "#1E1E1E" : "#F3F4F6" }
+          ]}
+          inputStyle={[styles.searchInput, { color: theme.text }]}
+          iconColor={theme.text}
+          elevation={1}
         />
       </View>
 
       {filteredFriends.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.noFriendsText}>
+          <Text style={[styles.noFriendsText, { color: isDark ? "#888" : "#9CA3AF" }]}>
             {searchFriend ? "No se encontraron resultados" : "Todavía no tienes amigos"}
           </Text>
         </View>
       ) : (
         <FlatList
-          data={filteredFriends} // Usamos la lista filtrada aquí
+          data={filteredFriends}
           keyExtractor={(item) => String(item.id)}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
@@ -130,6 +123,10 @@ const Friends = ({ navigation }) => {
             <Pressable
               style={[
                 styles.item,
+                {
+                  backgroundColor: isDark ? "#121212" : "#FFF",
+                  borderColor: isDark ? "#333" : "#E5E7EB"
+                },
                 index !== filteredFriends.length - 1 && styles.itemGap,
               ]}
               onPress={() => {
@@ -147,20 +144,20 @@ const Friends = ({ navigation }) => {
               <View style={styles.itemRow}>
                 <Image
                   source={{ uri: item.photo.trim() }}
-                  style={styles.avatar}
+                  style={[styles.avatar, { backgroundColor: isDark ? "#333" : "#E5E7EB" }]}
                   resizeMode="cover"
                 />
 
                 <View style={styles.textContainer}>
-                  <Text style={styles.info} numberOfLines={1}>
+                  <Text style={[styles.info, { color: theme.text }]} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text style={styles.username} numberOfLines={1}>
+                  <Text style={[styles.username, { color: isDark ? "#AAA" : "#6B7280" }]} numberOfLines={1}>
                     @{item.user}
                   </Text>
                 </View>
 
-                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+                <Ionicons name="chevron-forward" size={18} color={isDark ? "#555" : "#9CA3AF"} />
               </View>
             </Pressable>
           )}
@@ -171,17 +168,9 @@ const Friends = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: "#F9FAFB"
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center"
-  },
+  wrapper: { flex: 1 },
+  loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   headerContainer: {
-    backgroundColor: "#FFF",
     paddingTop: 50,
     paddingBottom: 15,
     paddingHorizontal: 16,
@@ -189,83 +178,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
   },
   backButton: {
-    position: "absolute", 
+    position: "absolute",
     left: 16,
-    top: 50,              
-    zIndex: 15,           
+    top: 50,
+    zIndex: 15,
   },
-  headerTitle: {
-    fontSize: 25,
-    fontWeight: "800",
-    color: "#1F2937",
-    textAlign: "center",
-  },
-  searchContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#FFF',
-  },
-  searchBar: {
-    backgroundColor: "#F3F4F6",
-    borderRadius: 8, // Menos redondeado para que sea rectangular
-    height: 45,
-  },
-  searchInput: {
-    minHeight: 0, // Corrige alineación vertical en Android
-    fontSize: 15,
-  },
-  listContent: {
-    padding: 16,
-  },
-  item: {
-    backgroundColor: "#f0f0f0", // Cambiado a blanco para mejor contraste
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  itemRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  itemGap: {
-    marginBottom: 12,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#E5E7EB",
-  },
-  textContainer: {
-    flex: 1,
-    marginLeft: 14,
-  },
-  info: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "black",
-  },
-  username: {
-    fontSize: 13,
-    color: "#6B7280",
-    marginTop: 2,
-    fontWeight: "500",
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  noFriendsText: {
-    textAlign: "center",
-    color: "#9CA3AF",
-    fontSize: 15,
-    fontWeight: "500"
-  },
+  headerTitle: { fontSize: 25, fontWeight: "800", textAlign: "center" },
+  searchContainer: { paddingHorizontal: 16, paddingVertical: 12 },
+  searchBar: { borderRadius: 8, height: 45 },
+  searchInput: { minHeight: 0, fontSize: 15 },
+  listContent: { padding: 16 },
+  item: { padding: 14, borderRadius: 12, borderWidth: 1 },
+  itemRow: { flexDirection: "row", alignItems: "center" },
+  itemGap: { marginBottom: 12 },
+  avatar: { width: 50, height: 50, borderRadius: 25 },
+  textContainer: { flex: 1, marginLeft: 14 },
+  info: { fontSize: 16, fontWeight: "bold" },
+  username: { fontSize: 13, marginTop: 2, fontWeight: "500" },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  noFriendsText: { textAlign: "center", fontSize: 15, fontWeight: "500" },
 });
 
 export default Friends;
