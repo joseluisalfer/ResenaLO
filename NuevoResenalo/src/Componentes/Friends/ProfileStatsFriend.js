@@ -15,8 +15,8 @@ const ProfileStatsFriend = () => {
         const data = await getData(`http://44.213.235.160:8080/resenalo/user?userName=${selectedFriend.user}`);
         if (data && data.results) {
           setStats({
-            reviews: data.results.reviews || [],
-            followers: data.results.followers || []
+            reviews: data?.results?.reviews ?? [],
+            followers: data?.results?.followers ?? []
           });
         }
       } catch (error) {

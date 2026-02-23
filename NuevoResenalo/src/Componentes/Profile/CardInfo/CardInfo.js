@@ -7,8 +7,8 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const CardInfo = () => {
   const { emailLogged } = useContext(Context);
-  const [reviews, setReviews] = useState(emailLogged.results.reviews || []); // Asegúrate de que reviews es un array
-  const [followers, setFollowers] = useState(emailLogged.results.followers || []); // Asegúrate de que reviews es un array
+  const reviews = emailLogged?.results?.reviews ?? [];
+  const followers = emailLogged?.results?.followers ?? [];
 
   useEffect(() => {
     console.log(reviews);
