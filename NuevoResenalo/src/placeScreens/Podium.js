@@ -8,7 +8,7 @@ import Context from "../Context/Context";
 const Podium = ({ navigation }) => {
   const [top10, setTop10] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { setSearchUrl } = useContext(Context);
+  const { setSearchUrl, theme, isDark } = useContext(Context);
 
   useEffect(() => {
     const fetchTop10 = async () => {
@@ -53,10 +53,11 @@ const Podium = ({ navigation }) => {
           style={styles.podiumImage}
         />
         <View style={styles.podiumDetails}>
+          {/* El texto sobre el podio siempre debe ser oscuro para contraste con el Oro/Plata/Bronce */}
           <Text style={styles.place} numberOfLines={1}>{item.title}</Text>
           <View style={styles.ratingRow}>
             <Text style={styles.rating}>{item.valoration}</Text>
-            <Ionicons name="star" size={14} color="#fdeb81" style={{ marginLeft: 2 }} />
+            <Ionicons name="star" size={14} color="#000" style={{ marginLeft: 2 }} />
           </View>
         </View>
       </Pressable>
@@ -66,16 +67,22 @@ const Podium = ({ navigation }) => {
   const renderOtherPlaces = ({ item, index }) => (
     <Pressable
       onPress={() => handlePress(item.review)}
-      style={styles.card}
+      style={[
+        styles.card, 
+        { 
+            backgroundColor: isDark ? "#1e1e1e" : "#fff", 
+            borderColor: isDark ? "#333" : "#eee" 
+        }
+      ]}
     >
-      <Card.Content style={styles.cardContent}>
+      <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardNumber}>{index + 4}#</Text>
+          <Text style={[styles.cardNumber, { color: theme.text }]}>{index + 4}#</Text>
         </View>
         <View style={styles.cardDetails}>
-          <Text style={styles.placeName} numberOfLines={1}>{item.title}</Text>
+          <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={1}>{item.title}</Text>
           <View style={styles.ratingRow}>
-            <Text style={styles.placeRating}>{item.valoration}</Text>
+            <Text style={[styles.placeRating, { color: isDark ? "#aaa" : "#444" }]}>{item.valoration}</Text>
             <Ionicons name="star" size={14} color="#FFD700" style={{ marginLeft: 4 }} />
           </View>
         </View>
@@ -83,29 +90,29 @@ const Podium = ({ navigation }) => {
           source={{ uri: item.image }}
           style={styles.cardImage}
         />
-      </Card.Content>
+      </View>
     </Pressable>
   );
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
         <ActivityIndicator size="large" color="#2654d1" />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Ionicons
         name="arrow-back"
         size={30}
-        color="black"
+        color={theme.text}
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       />
 
-      <Text style={styles.title}>Podio de Reseñas</Text>
+      <Text style={[styles.title, { color: theme.text }]}>Podio de Reseñas</Text>
 
       {top10.length >= 3 && (
         <View style={styles.podium}>
@@ -123,7 +130,7 @@ const Podium = ({ navigation }) => {
         </View>
       )}
 
-      <Text style={styles.subTitle}>Otros lugares destacados</Text>
+      <Text style={[styles.subTitle, { color: theme.text }]}>Otros lugares destacados</Text>
 
       <FlatList
         data={top10.slice(3)}
@@ -139,8 +146,7 @@ const Podium = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 40,
+    paddingTop: 45,
     paddingHorizontal: 16,
   },
   center: {
@@ -150,6 +156,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginBottom: 10,
+    width: 40,
   },
   title: {
     fontSize: 24,
@@ -159,6 +166,7 @@ const styles = StyleSheet.create({
   },
   podium: {
     marginBottom: 20,
+    marginTop: 10,
   },
   podiumRow: {
     flexDirection: "row",
@@ -169,20 +177,25 @@ const styles = StyleSheet.create({
   podiumItemContainerCenter: { flex: 1, alignItems: "center" },
   podiumItemContainerRight: { flex: 1, alignItems: "center" },
   podiumItem: {
-    width: '95%',
+    width: '92%',
     alignItems: "center",
     paddingVertical: 15,
     borderRadius: 12,
-    backgroundColor: "#f4f4f4",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  gold: { backgroundColor: "#ffd700", height: 180, justifyContent: 'center' },
-  silver: { backgroundColor: "#c0c0c0", height: 150, justifyContent: 'center' },
-  bronze: { backgroundColor: "#cd7f32", height: 130, justifyContent: 'center' },
+  gold: { backgroundColor: "#FFD700", height: 180, justifyContent: 'center' },
+  silver: { backgroundColor: "#C0C0C0", height: 150, justifyContent: 'center' },
+  bronze: { backgroundColor: "#CD7F32", height: 130, justifyContent: 'center' },
   podiumImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#eee'
+    width: 65,
+    height: 65,
+    borderRadius: 35,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.5)',
   },
   podiumDetails: {
     marginTop: 10,
@@ -197,12 +210,12 @@ const styles = StyleSheet.create({
   place: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: "#000",
+    color: "#000", // Mantenemos negro para leer sobre metalizados
     textAlign: 'center'
   },
   rating: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: "#000",
   },
   subTitle: {
@@ -213,12 +226,9 @@ const styles = StyleSheet.create({
   card: {
     width: "100%",
     marginBottom: 12,
-    borderRadius: 12,
-    elevation: 2,
-    backgroundColor: "#fff",
-    padding: 10,
+    borderRadius: 15,
+    padding: 12,
     borderWidth: 1,
-    borderColor: '#eee'
   },
   cardContent: {
     flexDirection: "row",
@@ -226,31 +236,28 @@ const styles = StyleSheet.create({
   },
   cardHeader: { width: 50 },
   cardNumber: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#000000",
   },
   cardDetails: {
     flex: 1,
-    paddingLeft: 10,
+    paddingLeft: 5,
   },
   placeName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#000",
   },
   placeRating: {
     fontSize: 14,
     fontWeight: '600',
-    color: "#444",
   },
   cardImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 55,
+    height: 55,
+    borderRadius: 12,
   },
   otherPlacesList: {
-    paddingBottom: 30,
+    paddingBottom: 40,
   },
 });
 

@@ -16,15 +16,13 @@ const PLACEHOLDER_IMG = "https://via.placeholder.com/600x400.png?text=No+image";
 const Posts = ({ navigation }) => {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { selectedFriend, setSearchUrl } = useContext(Context);
+  
+  // Extraemos theme e isDark del contexto
+  const { selectedFriend, setSearchUrl, theme, isDark } = useContext(Context);
 
   const normalizeImageToUri = (imgRaw) => {
     const first = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
-
-    const value =
-      typeof first === "string" ? first :
-      first?.url ? first.url :
-      null;
+    const value = typeof first === "string" ? first : first?.url ? first.url : null;
 
     if (!value || typeof value !== "string") return PLACEHOLDER_IMG;
     if (value.startsWith("http")) return value;
@@ -42,15 +40,7 @@ const Posts = ({ navigation }) => {
   const fetchReviews = async () => {
     try {
       setLoading(true);
-
-      const reviewUrls =
-        selectedFriend?.reviews ??
-        selectedFriend?.results?.reviews ??
-        [];
-
-      // ✅ Debug rápido
-      console.log("selectedFriend:", selectedFriend);
-      console.log("reviewUrls:", reviewUrls);
+      const reviewUrls = selectedFriend?.reviews ?? selectedFriend?.results?.reviews ?? [];
 
       if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {
         setPlaces([]);
@@ -61,7 +51,6 @@ const Posts = ({ navigation }) => {
         reviewUrls.map(async (url, index) => {
           try {
             const reviewData = await getData(url);
-
             return {
               id: reviewData?.id ?? `review_${index}_${url}`,
               name: reviewData?.title ?? reviewData?.type ?? "Sin título",
@@ -70,7 +59,6 @@ const Posts = ({ navigation }) => {
               uri: url,
             };
           } catch (e) {
-            console.log("Error cargando review:", url, e);
             return {
               id: `error_${index}_${url}`,
               name: "Error al cargar",
@@ -81,10 +69,8 @@ const Posts = ({ navigation }) => {
           }
         })
       );
-
       setPlaces(reviewDetails.filter(Boolean));
     } catch (error) {
-      console.error("Error al obtener las reseñas:", error);
       setPlaces([]);
     } finally {
       setLoading(false);
@@ -97,39 +83,44 @@ const Posts = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
         <ActivityIndicator size="large" color="#1748ce" />
       </View>
     );
   }
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, { backgroundColor: theme.background }]}>
       <FlatList
         key={selectedFriend?.id ?? selectedFriend?.results?.id ?? "no_friend"}
         data={places}
-        extraData={places}
         keyExtractor={(item) => String(item.id)}
         numColumns={2}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item, index }) => {
-          const backgroundColor =
-            index % 3 === 0 ? "#1748ce" : index % 3 === 1 ? "#DC3545" : "white";
-          const textColor = backgroundColor === "white" ? "black" : "white";
+          // Lógica de colores adaptada al tema
+          const isThirdCard = index % 3 === 2;
+          const backgroundColor = 
+            index % 3 === 0 ? "#1748ce" : 
+            index % 3 === 1 ? "#DC3545" : 
+            (isDark ? "#1e1e1e" : "white"); // En Dark Mode, la tarjeta "blanca" es gris oscuro
+
+          const textColor = isThirdCard ? theme.text : "white";
 
           return (
             <Pressable
               style={styles.card}
               onPress={() => changePageAndSendUri(item.uri)}
             >
-              <Card style={[styles.cardContainer, { backgroundColor }]}>
+              <Card style={[
+                styles.cardContainer, 
+                { backgroundColor, borderColor: isDark ? "#333" : "transparent", borderWidth: isDark ? 1 : 0 }
+              ]}>
                 <Card.Cover
                   source={item.image}
                   style={styles.image}
                   resizeMode="cover"
-                  onError={(e) =>
-                    console.log("❌ Error imagen:", item.image, e?.nativeEvent)
-                  }
                 />
                 <Card.Content style={styles.cardContent}>
                   <Text
@@ -148,7 +139,9 @@ const Posts = ({ navigation }) => {
         }}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
-            <Text style={styles.emptyText}>No hay reseñas disponibles</Text>
+            <Text style={[styles.emptyText, { color: isDark ? "#777" : "#aaa" }]}>
+                No hay reseñas disponibles
+            </Text>
           </View>
         }
       />
@@ -160,34 +153,25 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     paddingHorizontal: 8,
-    backgroundColor: "#fff",
     width: "100%"
   },
-
-  debugText: {
-    paddingTop: 8,
-    paddingHorizontal: 8,
-    fontSize: 12,
-    opacity: 0.7,
-  },
-
   card: {
     flex: 1,
     margin: 8,
-    justifyContent: "center",
   },
   cardContainer: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: 16, // Un poco más redondeadas queda más moderno
     overflow: "hidden",
-    height: 200,
+    height: 210,
+    elevation: 4,
   },
   image: {
     height: 120,
     width: "100%",
   },
   cardContent: {
-    padding: 8,
+    padding: 10,
     justifyContent: "space-between",
   },
   placeName: {
@@ -195,22 +179,19 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   rating: {
-    fontSize: 12,
+    fontSize: 13,
     marginTop: 4,
   },
-
   emptyWrap: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
+    marginTop: 50,
   },
   emptyText: {
     textAlign: "center",
-    opacity: 0.7,
-    fontSize: 14,
+    fontSize: 16,
   },
-
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
 

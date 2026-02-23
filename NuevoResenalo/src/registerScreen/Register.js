@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -12,7 +12,6 @@ import { Button } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
 import { postData } from "../services/Services";
-import Context from "../Context/Context";
 
 const Register = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -22,9 +21,6 @@ const Register = ({ navigation }) => {
   const [name, setName] = useState("");
   const { t } = useTranslation();
   
-  // Extraemos theme e isDark del contexto
-  const { theme, isDark } = useContext(Context);
-
   const [verificationCode, setVerificationCode] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -100,11 +96,11 @@ const Register = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.title, { color: theme.text }]}>{t("registerScreen.createAccount")}</Text>
-      <Text style={[styles.subtitle, { color: isDark ? "#aaa" : "#555" }]}>{t("registerScreen.footer")}</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>{t("registerScreen.createAccount")}</Text>
+      <Text style={styles.subtitle}>{t("registerScreen.footer")}</Text>
 
-      {/* Modal de verificación adaptado */}
+      {/* Modal de verificación */}
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -112,18 +108,14 @@ const Register = ({ navigation }) => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: isDark ? "#1e1e1e" : "white" }]}>
-            <Text style={[styles.modalText, { color: theme.text }]}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>
               Introduce el código de verificación enviado a su correo electrónico
             </Text>
             <TextInput
-              style={[styles.input, { 
-                backgroundColor: isDark ? "#121212" : "#fff", 
-                color: theme.text,
-                borderColor: isDark ? "#444" : "#ccc"
-              }]}
+              style={styles.input}
               placeholder="Código de verificacion"
-              placeholderTextColor={isDark ? "#666" : "#999"}
+              placeholderTextColor="#999"
               autoCapitalize="none"
               value={verificationCode}
               onChangeText={setVerificationCode}
@@ -145,67 +137,47 @@ const Register = ({ navigation }) => {
 
       {/* Formulario de registro */}
       <TextInput
-        style={[styles.input, { 
-            backgroundColor: isDark ? "#121212" : "#fff", 
-            color: theme.text,
-            borderColor: isDark ? "#333" : "#ccc"
-        }]}
+        style={styles.input}
         placeholder={t("registerScreen.email")}
-        placeholderTextColor={isDark ? "#666" : "#999"}
+        placeholderTextColor="#999"
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
-        style={[styles.input, { 
-            backgroundColor: isDark ? "#121212" : "#fff", 
-            color: theme.text,
-            borderColor: isDark ? "#333" : "#ccc"
-        }]}
+        style={styles.input}
         placeholder={t("registerScreen.password")}
-        placeholderTextColor={isDark ? "#666" : "#999"}
+        placeholderTextColor="#999"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
       />
       <TextInput
-        style={[styles.input, { 
-            backgroundColor: isDark ? "#121212" : "#fff", 
-            color: theme.text,
-            borderColor: isDark ? "#333" : "#ccc"
-        }]}
+        style={styles.input}
         placeholder={t("registerScreen.confirm")}
-        placeholderTextColor={isDark ? "#666" : "#999"}
+        placeholderTextColor="#999"
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
       <TextInput
-        style={[styles.input, { 
-            backgroundColor: isDark ? "#121212" : "#fff", 
-            color: theme.text,
-            borderColor: isDark ? "#333" : "#ccc"
-        }]}
+        style={styles.input}
         placeholder={t("registerScreen.user")}
-        placeholderTextColor={isDark ? "#666" : "#999"}
+        placeholderTextColor="#999"
         value={username}
         onChangeText={setUsername}
       />
       <TextInput
-        style={[styles.input, { 
-            backgroundColor: isDark ? "#121212" : "#fff", 
-            color: theme.text,
-            borderColor: isDark ? "#333" : "#ccc"
-        }]}
+        style={styles.input}
         placeholder={t("registerScreen.name")}
-        placeholderTextColor={isDark ? "#666" : "#999"}
+        placeholderTextColor="#999"
         value={name}
         onChangeText={setName}
       />
 
       <Pressable 
-        style={[styles.button, { backgroundColor: isDark ? "#2654d1" : "black" }]} 
+        style={styles.button} 
         onPress={handleRegister}
       >
         <Text style={styles.buttonText}>{t("registerScreen.register")}</Text>
@@ -218,27 +190,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center", // Ajustado para centrar mejor el form
+    justifyContent: "center",
     paddingHorizontal: 20,
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 5,
+    color: "#000",
   },
   subtitle: {
     fontSize: 14,
     textAlign: "center",
     marginBottom: 25,
+    color: "#555",
   },
   input: {
     width: "100%",
     height: 50,
     borderWidth: 1,
+    borderColor: "#ccc",
     borderRadius: 12,
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 16,
+    backgroundColor: "#fff",
+    color: "#000",
   },
   button: {
     justifyContent: "center",
@@ -247,6 +225,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 12,
     marginTop: 10,
+    backgroundColor: "black",
   },
   buttonText: {
     color: "white",
@@ -265,6 +244,7 @@ const styles = StyleSheet.create({
     padding: 25,
     width: "85%",
     elevation: 10,
+    backgroundColor: "white",
   },
   cancelButton: {
     color: "#DC3545",
@@ -277,6 +257,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 16,
     lineHeight: 22,
+    color: "#000",
   },
 });
 

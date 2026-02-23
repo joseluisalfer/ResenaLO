@@ -61,7 +61,7 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
                                     mode="outlined" 
                                     style={styles.modalButton}
                                     textColor={theme.text}
-                                    icon={isDark ? "weather-sunny" : "weather-night"}
+                                   
                                 >
                                     {isDark ? "Modo Claro" : "Modo Oscuro"}
                                 </Button>
