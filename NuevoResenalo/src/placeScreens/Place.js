@@ -8,7 +8,7 @@ import Map from "../Componentes/Place/Map/map";
 import Review from "../Componentes/Place/Review/review";
 import DeleteModal from "../placeScreens/addModalReview/DeletePlace";
 import DeleteModalComment from "../placeScreens/addModalReview/DeleteComment"; 
-import { getData, deleteData } from "../services/services";
+import { getData, deleteData } from "../services/Services";
 import Context from "../Context/Context";
 
 const Place = ({ navigation }) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback  } from "react";
 import { View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getData } from "../../../services/services";
+import { getData } from "../../../services/Services";
 import Context from "../../../Context/Context";
 import { useFocusEffect } from '@react-navigation/native';
 

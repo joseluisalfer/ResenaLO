@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { useContext, useEffect } from 'react';
 import Context from './Context/Context'; // Asegúrate de importar Context correctamente
 import Login from './loginScreen/login';
-import Register from './registerScreen/register';
+import Register from './registerScreen/Register';
 import Main from './Main'; // Asegúrate de que esta ruta sea correcta
 
 const Stack = createStackNavigator();

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, StyleSheet, Text, Image, ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
-import { getData } from "../../../services/services";
+import { getData } from "../../../services/Services";
 import Context from "../../../Context/Context";
 
 const Explore = ({ navigation }) => {

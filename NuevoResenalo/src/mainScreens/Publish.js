@@ -12,7 +12,7 @@ import DatosPublish from "../Componentes/Publish/PublishData/PublishData"; // Fo
 import SelectorImagen from "../Componentes/Publish/ImageSelector/imageSelector"; // Selector de imágenes
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
-import { postData } from "../services/services"; // Asegúrate de que esta ruta sea correcta
+import { postData } from "../services/Services"; // Asegúrate de que esta ruta sea correcta
 import Context from "../Context/Context";
 
 const Publish = () => {

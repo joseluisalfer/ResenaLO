@@ -11,7 +11,7 @@ import {
     TouchableWithoutFeedback 
 } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
-import { postData } from "../../services/services";
+import { postData } from "../../services/Services";
 import Context from "../../Context/Context";
 
 function Review({ route, navigation }) {

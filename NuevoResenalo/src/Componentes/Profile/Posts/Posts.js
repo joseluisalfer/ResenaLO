@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Card } from "react-native-paper";
-import { getData } from "../../../services/services";
+import { getData } from "../../../services/Services";
 import Context from "../../../Context/Context";
 import { useFocusEffect } from '@react-navigation/native';
 

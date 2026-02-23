@@ -10,7 +10,7 @@ import {
     Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { getData, updateData } from "../../../services/services";
+import { getData, updateData } from "../../../services/Services";
 import Context from "../../../Context/Context";
 
 const EditUser = () => {
