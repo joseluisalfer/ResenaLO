@@ -49,7 +49,7 @@ const Podium = ({ navigation }) => {
         onPress={() => handlePress(item.review)}
       >
         <Image
-          source={{ uri: `data:${item.mimeType};base64,${item.image}` }}
+          source={{ uri: item.image }}
           style={styles.podiumImage}
         />
         <View style={styles.podiumDetails}>
@@ -80,7 +80,7 @@ const Podium = ({ navigation }) => {
           </View>
         </View>
         <Image
-          source={{ uri: `data:${item.mimeType};base64,${item.image}` }}
+          source={{ uri: item.image }}
           style={styles.cardImage}
         />
       </Card.Content>
