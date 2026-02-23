@@ -1,10 +1,40 @@
-import React, { useContext } from "react";
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
+import React, { useContext, useState, useCallback } from "react";
+import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../Context/Context";
+import { postData, getData } from "../../services/Services";
 
 const ProfileHeaderFriend = ({ navigation }) => {
-  const { selectedFriend } = useContext(Context);
+  const { selectedFriend, emailLogged, setEmailLogged } = useContext(Context);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [friendDetails, setFriendDetails] = useState(null);
+
+  const updateFollowStatus = useCallback(async () => {
+    if (!selectedFriend || !emailLogged) return;
+
+    try {
+      const userRes = await getData(`http://44.213.235.160:8080/resenalo/user?userName=${emailLogged.results.user}`);
+      if (userRes) {
+        setEmailLogged(userRes);
+        const friendUrl = `http://44.213.235.160:8080/resenalo/user?userName=${selectedFriend.user}`;
+        setIsFollowing(userRes.results.followeds.includes(friendUrl));
+      }
+
+      const friendRes = await getData(`http://44.213.235.160:8080/resenalo/user?userName=${selectedFriend.user}`);
+      if (friendRes) {
+        setFriendDetails(friendRes.results);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [selectedFriend, emailLogged]);
+
+  useFocusEffect(
+    useCallback(() => {
+      updateFollowStatus();
+    }, [updateFollowStatus])
+  );
 
   if (!selectedFriend) {
     return (
@@ -14,11 +44,26 @@ const ProfileHeaderFriend = ({ navigation }) => {
     );
   }
 
-  const { user, description, name, photo } = selectedFriend;
+  const handleFollowAction = async () => {
+    const url = isFollowing 
+      ? "http://44.213.235.160:8080/resenalo/deleteFollow"
+      : "http://44.213.235.160:8080/resenalo/addFollow";
+
+    const body = {
+      user: emailLogged.results.user,
+      userFollow: selectedFriend.user
+    };
+
+    try {
+      await postData(url, body);
+      await updateFollowStatus();
+    } catch (error) {
+      Alert.alert("Error", "No se pudo actualizar el seguimiento");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* ✅ Flecha atrás */}
       <Pressable
         style={styles.backButton}
         onPress={() => navigation.goBack()}
@@ -27,86 +72,55 @@ const ProfileHeaderFriend = ({ navigation }) => {
         <Ionicons name="arrow-back" size={30} color="#000" />
       </Pressable>
 
-      {/* ✅ Imagen estilo ProfileImage */}
+      <Pressable
+        style={styles.actionButton}
+        onPress={handleFollowAction}
+        hitSlop={12}
+      >
+        <Ionicons 
+          name={isFollowing ? "close-outline" : "checkmark-outline"} 
+          size={28} 
+          color={isFollowing ? "red" : "#2654d1"} 
+        />
+        <Text style={[styles.actionText, { color: isFollowing ? "red" : "#2654d1" }]}>
+          {isFollowing ? "Dejar de seguir" : "Seguir"}
+        </Text>
+      </Pressable>
+
       <View style={styles.photoWrap}>
         <View style={styles.photoSquare}>
-          <Image source={{ uri: photo }} style={styles.photo} resizeMode="cover" />
+          <Image 
+            source={{ uri: friendDetails?.photo || selectedFriend.photo }} 
+            style={styles.photo} 
+            resizeMode="cover" 
+          />
         </View>
       </View>
 
-      {/* ✅ Texto estilo OwnInfo */}
       <View style={{ alignItems: "center" }}>
-        <Text style={styles.username}>@{user}</Text>
+        <Text style={styles.username}>@{selectedFriend.user}</Text>
       </View>
 
       <View style={{ alignItems: "center" }}>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.bio}>{description}</Text>
+        <Text style={styles.name}>{friendDetails?.name || selectedFriend.name}</Text>
+        <Text style={styles.bio}>{friendDetails?.description || selectedFriend.description}</Text>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // Igual que OwnInfo container
-  container: {
-    marginBottom: 16,
-    marginTop: 40,
-  },
-
-  // Flecha fija arriba izq
-  backButton: {
-    position: "absolute",
-    top: -10,
-    left: 16,
-    zIndex: 999,
-    padding: 6,
-  },
-
-  // Igual que ProfileImage styles
-  photoWrap: {
-    marginTop: 35,
-    alignItems: "center",
-  },
-  photoSquare: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    position: "relative",
-  },
-  photo: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 60,
-  },
-
-  // Igual que OwnInfo
-  username: {
-    color: "gray",
-    marginTop: 3,
-  },
-  name: {
-    marginTop: 5,
-    fontSize: 25,
-    fontWeight: "bold",
-  },
-  bio: {
-    textAlign: "center",
-    marginTop: 8,
-    paddingHorizontal: 20,
-  },
-
-  emptyText: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginTop: 40,
-  },
+  container: { marginBottom: 16, marginTop: 40 },
+  backButton: { position: "absolute", top: -10, left: 16, zIndex: 999, padding: 6 },
+  actionButton: { position: "absolute", top: -10, right: 12, zIndex: 999, padding: 6, alignItems: "center", width: 85 },
+  actionText: { fontSize: 9, fontWeight: "600", marginTop: -2, textAlign: "center" },
+  photoWrap: { marginTop: 35, alignItems: "center" },
+  photoSquare: { width: 120, height: 120, borderRadius: 60, borderWidth: 1, borderColor: "#ccc", justifyContent: "center", alignItems: "center", backgroundColor: "#f5f5f5" },
+  photo: { width: "100%", height: "100%", borderRadius: 60 },
+  username: { color: "gray", marginTop: 3 },
+  name: { marginTop: 5, fontSize: 25, fontWeight: "bold" },
+  bio: { textAlign: "center", marginTop: 8, paddingHorizontal: 20 },
+  emptyText: { fontSize: 16, color: "#666", textAlign: "center", marginTop: 40 }
 });
 
 export default ProfileHeaderFriend;
