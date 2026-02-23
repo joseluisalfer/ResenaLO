@@ -51,7 +51,9 @@
         "comments": "Comentarios",
         "friends": "Amigos",
         "save": "Guardar cambios",
-        "title": "Seleccionar idioma"
+        "title": "Seleccionar idioma",
+        "light_mode": "Tema Claro",
+        "dark_mode": "Tema oscuro"
     },
     "language": {
         "sp": "Español",

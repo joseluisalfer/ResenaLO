@@ -1,17 +1,14 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, Modal, Pressable, Text } from "react-native";
 import { Button } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
-import Context from "../../../Context/Context";
-
-const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
+import { useTranslation } from "react-i18next";
+import "../../../../assets/i18n/index"
+const ModalProfile = ({ handleLogOut }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [showLanguageOptions, setShowLanguageOptions] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState("Español");
-
-    // 1. Extraemos theme además de isDark y toggleTheme
-    const { isDark, toggleTheme, theme } = useContext(Context);
-
+    const { t, i18n } = useTranslation()
     const handleCancelLanguageChange = () => {
         setShowLanguageOptions(false);
     };
@@ -20,13 +17,18 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
         setShowLanguageOptions(true);
     };
 
+    const handleChangeLanguage = (lang) => {
+        i18n.changeLanguage(lang)
+    }
+
     return (
         <View style={styles.container}>
+            {/* Icono de configuración */}
             <Pressable onPress={() => setModalVisible(true)} style={styles.iconContainer}>
-                {/* 2. El color del icono ahora depende del tema */}
-                <Ionicons name="settings-outline" size={30} color={theme.text} />
+                <Ionicons name="settings-outline" size={30} color="black" />
             </Pressable>
 
+            {/* Modal de opciones */}
             <Modal
                 visible={modalVisible}
                 transparent={true}
@@ -34,58 +36,41 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
                 onRequestClose={() => setModalVisible(false)}
             >
                 <View style={styles.modalOverlay}>
-                    {/* 3. Fondo dinámico para el cuadro del modal */}
-                    <View style={[styles.modalContent, { backgroundColor: isDark ? "#1E1E1E" : "white" }]}>
+                    <View style={styles.modalContent}>
                         {!showLanguageOptions ? (
                             <>
-                                {/* 4. Añadimos textColor a los botones para que se vean en fondo oscuro */}
-                                <Button 
-                                    onPress={handleLogOut} 
-                                    mode="outlined" 
-                                    style={styles.modalButton}
-                                    textColor={theme.text}
-                                >
-                                    Log Out
+                                {/* Opciones generales */}
+                                <Button onPress={handleLogOut} mode="outlined" style={styles.modalButton}>
+                                    {t("profile.logout")}
                                 </Button>
-                                <Button 
-                                    onPress={handleChangeToLanguageSelection} 
-                                    mode="outlined" 
-                                    style={styles.modalButton}
-                                    textColor={theme.text}
-                                >
-                                    Cambiar Idioma
+                                <Button onPress={handleChangeToLanguageSelection} mode="outlined" style={styles.modalButton}>
+                                    {t("profile.change_lang")}
                                 </Button>
-
-                                <Button 
-                                    onPress={toggleTheme} 
-                                    mode="outlined" 
-                                    style={styles.modalButton}
-                                    textColor={theme.text}
-                                   
-                                >
-                                    {isDark ? "Modo Claro" : "Modo Oscuro"}
+                                <Button mode="outlined" style={styles.modalButton}>
+                                    {t("profile.change_theme")}
                                 </Button>
-
                                 <Button
-                                  onPress={() => setModalVisible(false)}
-                                  mode="contained"
-                                  style={styles.cancelButton}
-                                  labelStyle={styles.cancelButtonText}
+                                    onPress={() => setModalVisible(false)}
+                                    mode="contained"
+                                    style={styles.cancelButton}
+                                    labelStyle={styles.cancelButtonText}
                                 >
-                                  Cancelar
+                                    Cancelar
                                 </Button>
                             </>
                         ) : (
                             <>
-                                <Button onPress={() => handleChangeLanguage("es")} textColor={theme.text}>Español</Button>
-                                <Button onPress={() => handleChangeLanguage("ca")} textColor={theme.text}>Valenciano</Button>
-                                <Button onPress={() => handleChangeLanguage("en")} textColor={theme.text}>English</Button>
+                                {/* Opciones de idioma */}
+                                <Button onPress={() => handleChangeLanguage("es")}>Español</Button>
+                                <Button onPress={() => handleChangeLanguage("ca")}>Valenciano</Button>
+                                <Button onPress={() => handleChangeLanguage("en")}>English</Button>
+                                {/* Botón Salir con color rojo y texto blanco */}
                                 <Button
-                                  style={styles.exitButton}
-                                  onPress={handleCancelLanguageChange}
-                                  labelStyle={styles.exitButtonText}
+                                    style={styles.exitButton}
+                                    onPress={handleCancelLanguageChange}
+                                    labelStyle={styles.exitButtonText}
                                 >
-                                  Salir
+                                    Salir
                                 </Button>
                             </>
                         )}
@@ -111,21 +96,16 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.6)", // Un poco más oscuro el fondo exterior
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
     modalContent: {
-        borderRadius: 15, // Un poco más redondeado para look moderno
+        backgroundColor: "white",
+        borderRadius: 10,
         padding: 20,
         width: "80%",
-        elevation: 5, // Sombra para Android
-        shadowColor: "#000", // Sombra para iOS
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
     },
     modalButton: {
         marginBottom: 10,
-        borderColor: "#555", // Borde grisáceo para que se vea en ambos temas
     },
     cancelButton: {
         backgroundColor: "#DC3545",

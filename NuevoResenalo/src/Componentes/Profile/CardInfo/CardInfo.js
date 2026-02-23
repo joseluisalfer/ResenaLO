@@ -25,7 +25,7 @@ const CardInfo = () => {
           <View style={styles.statItem}>
             <Text variant="titleMedium">{reviewsCount}</Text>
             {/* Muestra la cantidad de reviews */}
-            <Text variant="bodySmall">Posts</Text>
+            <Text variant="bodySmall">{t("profile.")}</Text>
           </View>
           <View style={styles.statItem}>
             <Text variant="titleMedium">{followersCount}</Text>
