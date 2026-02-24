@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
-import { Appearance } from "react-native";
 import { postData } from "../services/Services";  // Asegúrate de importar la función postData
+import { useTranslation } from 'react-i18next';
 
 const Context = createContext();
 
@@ -30,6 +30,11 @@ export const Provider = ({ children }) => {
   const [searchUrl, setSearchUrl] = useState('');
   const [selectedFriend, setSelectedFriend] = useState(null);
 
+  const { i18n } = useTranslation();
+
+  // New state for language
+  const [language, setLanguage] = useState(emailLogged?.results?.language || 'en');
+
   // --- NUEVA LÓGICA DE TEMA ---
   const [isDark, setIsDark] = useState(
     emailLogged?.results?.theme === 'dark' ? true : false
@@ -55,12 +60,32 @@ export const Provider = ({ children }) => {
       console.error('Error al actualizar el tema:', error);
     }
   };
-  // ----------------------------
+
+  // Function to update the language
+  const updateLanguage = async (selectedLanguage) => {
+    setLanguage(selectedLanguage);
+    i18n.changeLanguage(selectedLanguage);  // Update the i18n language
+
+    // Send a POST request to update the language in the database
+    try {
+      const response = await postData('http://44.213.235.160:8080/resenalo/updateLanguage', {
+        email: emailLogged?.results?.email, // Asumiendo que el email está en emailLogged.results.email
+        language: selectedLanguage,
+      });
+
+      if (response) {
+        console.log('Idioma actualizado correctamente en la base de datos');
+      }
+    } catch (error) {
+      console.error('Error al actualizar el idioma:', error);
+    }
+  };
 
   useEffect(() => {
-    // Verificar y actualizar el estado de isDark cuando emailLogged cambia
-    if (emailLogged?.results?.theme) {
-      setIsDark(emailLogged.results.theme === 'dark');
+    // Update language if the emailLogged state changes
+    if (emailLogged?.results?.language) {
+      setLanguage(emailLogged.results.language);
+      i18n.changeLanguage(emailLogged.results.language); // Change the language in i18n
     }
   }, [emailLogged]);
 
@@ -72,7 +97,8 @@ export const Provider = ({ children }) => {
         emailLogged, setEmailLogged,
         searchUrl, setSearchUrl,
         selectedFriend, setSelectedFriend,
-        theme, isDark, toggleTheme
+        theme, isDark, toggleTheme,
+        language, setLanguage, updateLanguage  // Add language and updateLanguage to the context
       }}
     >
       {children}

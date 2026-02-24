@@ -1,17 +1,19 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { View, StyleSheet, Modal, Pressable, Text } from "react-native";
 import { Button } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../../Context/Context";
 import { useTranslation } from "react-i18next";
-import "../../../../assets/i18n/index";
+import "../../../../assets/i18n/index"; // Ensure this imports your i18n configurations
+import { postData } from "../../../services/Services"; // Ensure this is available for making POST requests
+
 const ModalProfile = ({ handleLogOut }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("Español");
   const { t, i18n } = useTranslation();
+
   // 1. Extraemos theme además de isDark y toggleTheme
-  const { isDark, toggleTheme, theme } = useContext(Context);
+  const { isDark, toggleTheme, theme, emailLogged } = useContext(Context);
 
   const handleCancelLanguageChange = () => {
     setShowLanguageOptions(false);
@@ -21,8 +23,22 @@ const ModalProfile = ({ handleLogOut }) => {
     setShowLanguageOptions(true);
   };
 
-  const handleChangeLanguage = (lang) => {
-    i18n.changeLanguage(lang);
+  const handleChangeLanguage = async (lang) => {
+    i18n.changeLanguage(lang); // Update the language in i18n
+
+    // Save the selected language to the backend
+    try {
+      const response = await postData('http://44.213.235.160:8080/resenalo/updateLanguage', {
+        email: emailLogged?.results?.email,  // Ensure this data exists
+        language: lang,
+      });
+
+      if (response) {
+        console.log('Idioma actualizado correctamente en la base de datos');
+      }
+    } catch (error) {
+      console.error('Error al actualizar el idioma:', error);
+    }
   };
 
   return (
@@ -44,10 +60,7 @@ const ModalProfile = ({ handleLogOut }) => {
         <View style={styles.modalOverlay}>
           {/* 3. Fondo dinámico para el cuadro del modal */}
           <View
-            style={[
-              styles.modalContent,
-              { backgroundColor: isDark ? "#1E1E1E" : "white" },
-            ]}
+            style={[styles.modalContent, { backgroundColor: isDark ? "#1E1E1E" : "white" }]}
           >
             {!showLanguageOptions ? (
               <>
@@ -93,7 +106,7 @@ const ModalProfile = ({ handleLogOut }) => {
                   onPress={() => handleChangeLanguage("es")}
                   textColor={theme.text}
                 >
-                  {t("language.sp")}
+                  {t("language.es")}
                 </Button>
                 <Button
                   onPress={() => handleChangeLanguage("ca")}

@@ -3,13 +3,13 @@ import { initReactI18next } from 'react-i18next';
 import ca from './ca/ca.json'
 import es from './es/es.json';
 import en from './en/en.json';
-import zh from './zh/zh.json';  // Add your Chinese translations here
+import zh from './zh/zh.json';  
 
 const resources = {
     ca: { translation: ca },
     es: { translation: es },
     en: { translation: en },
-    zh: { translation: zh },  // Include Chinese (Simplified) here
+    zh: { translation: zh },  
 };
 
 i18n
@@ -22,5 +22,10 @@ i18n
             escapeValue: false,
         },
     });
+
+// Listen for changes in language and update i18n language
+i18n.on('languageChanged', (lng) => {
+    console.log('Language changed to: ', lng);
+});
 
 export default i18n;
