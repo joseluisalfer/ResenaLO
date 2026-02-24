@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
 import Context from "../../Context/Context"; // Ajusta la ruta
-
+import { useTranslation } from "react-i18next";
 const DeleteModal = ({ isVisible, onClose, onConfirm, title }) => {
   const { theme, isDark } = useContext(Context);
-
+  const { t } = useTranslation();
   return (
     <Modal
       animationType="fade"
@@ -26,14 +26,14 @@ const DeleteModal = ({ isVisible, onClose, onConfirm, title }) => {
               style={[styles.modalBtn, styles.btnNo]} 
               onPress={onClose}
             >
-              <Text style={styles.btnTextNo}>No</Text>
+              <Text style={styles.btnTextNo}>{t("response.negative")}</Text>
             </Pressable>
 
             <Pressable 
               style={[styles.modalBtn, styles.btnSi]} 
               onPress={onConfirm}
             >
-              <Text style={styles.btnTextSi}>Sí</Text>
+              <Text style={styles.btnTextSi}>{t("response.afirmative")}</Text>
             </Pressable>
           </View>
         </View>

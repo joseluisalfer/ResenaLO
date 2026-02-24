@@ -10,13 +10,13 @@ import DeleteModal from "../placeScreens/addModalReview/DeletePlace";
 import DeleteModalComment from "../placeScreens/addModalReview/DeleteComment"; 
 import { getData, deleteData } from "../services/Services";
 import Context from "../Context/Context";
-
+import { useTranslation } from "react-i18next";
 const Place = ({ navigation }) => {
   const [placeData, setPlaceData] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imagePos, setImagePos] = useState(0);
-  
+  const { t } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalCommentVisible, setIsModalCommentVisible] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
@@ -133,13 +133,13 @@ const Place = ({ navigation }) => {
         <Map latitud={placeData?.latitud} longitud={placeData?.longitud} region={region} />
 
         <View style={styles.reviewSection}>
-          <Text style={[styles.sectionTitle, { color: theme.text }]}>COMENTARIOS</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>{t("stackReview.comments")}</Text>
           
           <Pressable
             style={styles.btnPressable}
             onPress={() => navigation.navigate("Review", { reviewId: placeData.id })}
           >
-            <Text style={styles.btnText}>AÑADIR COMENTARIO</Text>
+            <Text style={styles.btnText}>{t("stackReview.addComment")}</Text>
           </Pressable>
 
           {comments.map((item) => (

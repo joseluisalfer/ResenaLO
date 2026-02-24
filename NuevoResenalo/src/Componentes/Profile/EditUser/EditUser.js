@@ -12,7 +12,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { getData, updateData } from "../../../services/Services";
 import Context from "../../../Context/Context";
-
+import { useTranslation } from "react-i18next";
 const EditUser = () => {
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
@@ -24,7 +24,7 @@ const EditUser = () => {
     const navigation = useNavigation();
 
     const { emailLogged, setEmailLogged, theme, isDark } = useContext(Context);
-
+    const { t } = useTranslation();
     const userEmail = emailLogged?.results?.email;
 
     const loadUser = async () => {
@@ -122,21 +122,21 @@ const EditUser = () => {
     return (
         /* Aplicamos el fondo a la vista que envuelve todo */
         <View style={{ flex: 1, backgroundColor: theme.background }}>
-            <ScrollView 
+            <ScrollView
                 style={styles.container}
                 contentContainerStyle={{ flexGrow: 1, backgroundColor: theme.background }}
             >
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={[
-                            styles.input, 
-                            { 
-                                backgroundColor: isDark ? "#121212" : "#fff", 
-                                color: theme.text, 
-                                borderColor: isDark ? "#333" : "#ccc" 
+                            styles.input,
+                            {
+                                backgroundColor: isDark ? "#121212" : "#fff",
+                                color: theme.text,
+                                borderColor: isDark ? "#333" : "#ccc"
                             }
                         ]}
-                        placeholder="Nombre"
+                        placeholder={t("profile.name")}
                         placeholderTextColor={isDark ? "#666" : "#999"}
                         value={name}
                         onChangeText={setName}
@@ -144,14 +144,14 @@ const EditUser = () => {
 
                     <TextInput
                         style={[
-                            styles.input, 
-                            { 
-                                backgroundColor: isDark ? "#121212" : "#fff", 
-                                color: theme.text, 
-                                borderColor: isDark ? "#333" : "#ccc" 
+                            styles.input,
+                            {
+                                backgroundColor: isDark ? "#121212" : "#fff",
+                                color: theme.text,
+                                borderColor: isDark ? "#333" : "#ccc"
                             }
                         ]}
-                        placeholder="Nombre de usuario"
+                        placeholder={t("profile.username")}
                         placeholderTextColor={isDark ? "#666" : "#999"}
                         value={username}
                         onChangeText={setUsername}
@@ -160,14 +160,14 @@ const EditUser = () => {
 
                     <TextInput
                         style={[
-                            styles.bioInput, 
-                            { 
-                                backgroundColor: isDark ? "#121212" : "#fff", 
-                                color: theme.text, 
-                                borderColor: isDark ? "#333" : "#ccc" 
+                            styles.bioInput,
+                            {
+                                backgroundColor: isDark ? "#121212" : "#fff",
+                                color: theme.text,
+                                borderColor: isDark ? "#333" : "#ccc"
                             }
                         ]}
-                        placeholder="Biografía"
+                        placeholder={t("profile.bio")}
                         placeholderTextColor={isDark ? "#666" : "#999"}
                         value={bio}
                         onChangeText={setBio}
@@ -185,7 +185,7 @@ const EditUser = () => {
                         {saving ? (
                             <ActivityIndicator color="#fff" />
                         ) : (
-                            <Text style={styles.addReviewButtonText}>Guardar Cambios</Text>
+                            <Text style={styles.addReviewButtonText}>{t("profile.save")}</Text>
                         )}
                     </Pressable>
 
@@ -194,7 +194,7 @@ const EditUser = () => {
                         onPress={() => navigation.goBack()}
                         disabled={saving}
                     >
-                        <Text style={styles.cancelButtonText}>Cancelar</Text>
+                        <Text style={styles.cancelButtonText}>{t("profile.cancel")}</Text>
                     </Pressable>
                 </View>
             </ScrollView>
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flex: 1,
-        justifyContent: "flex-end", 
+        justifyContent: "flex-end",
         alignItems: "center",
         paddingBottom: 20,
     },

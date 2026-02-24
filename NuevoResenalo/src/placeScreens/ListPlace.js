@@ -119,7 +119,7 @@ const ListPlace = ({ navigation }) => {
 
       <View style={styles.searchContainer}>
         <Searchbar
-          placeholder="Buscar por título..."
+          placeholder={t("buttonExplorer.searchHolder")}
           placeholderTextColor={isDark ? "#AAA" : "#666"}
           value={searchText}
           onChangeText={setSearchText}

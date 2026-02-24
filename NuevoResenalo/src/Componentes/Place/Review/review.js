@@ -2,11 +2,11 @@ import React, { useContext } from "react"; // Importamos useContext
 import { View, Text, StyleSheet } from "react-native"; 
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../../Context/Context"; // Ajusta la ruta según tu carpeta
-
+import { useTranslation } from "react-i18next";
 const Review = ({ name, comment, stars }) => {
   // Extraemos theme e isDark del contexto
   const { theme, isDark } = useContext(Context);
-
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <View style={[

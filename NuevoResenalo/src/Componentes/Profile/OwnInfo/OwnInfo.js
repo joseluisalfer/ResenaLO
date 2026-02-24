@@ -4,10 +4,10 @@ import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import ProfileImage from "../ProfileImage/ProfileImage";
 import Context from "../../../Context/Context"; // 2. Importamos tu Context
-
+import { useTranslation } from "react-i18next";
 const OwnInfo = ({ user, description, name}) => {
     const navigation = useNavigation();
-
+    const { t } = useTranslation();
     // 3. Extraemos theme e isDark del contexto
     const { theme, isDark } = useContext(Context);
 
@@ -41,7 +41,7 @@ const OwnInfo = ({ user, description, name}) => {
                 onPress={() => navigation.navigate("EditProfile")}
                 style={styles.editButton}
             >
-                Editar Perfil
+                {t("profile.buttonEdit")}
             </Button>
         </View>
     );

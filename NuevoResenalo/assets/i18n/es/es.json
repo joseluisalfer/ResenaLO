@@ -18,11 +18,11 @@
         "register": "Registrarse"
     },
     "home": {
-        "places_week": "Lugares de la semana",
         "buttonFriend": "Amigos",
         "buttonExplorer": "Explorar"
     },
     "publishScreen": {
+        "new_place": "Nuevo lugar",
         "header": "Añadir nuevo lugar",
         "name": "Nombre del lugar",
         "new_name": "Nuevo lugar",
@@ -34,7 +34,7 @@
         "new_description": "Descripción del lugar",
         "buttonAdd": "Añadir al mapa",
         "buttonRestart": "Restablecer",
-        "buttonDelete": "Eliminar Foto",
+        "buttonDelete": "Eliminar Fotos",
         "buttonAddMap": "Añadir al mapa"
     },
     "buttonAdd": {
@@ -45,69 +45,66 @@
         "cancel": "CANCELAR"
     },
     "profile": {
-        "buttonEdit": "Editar perfil",
+        "buttonEdit": "Editar Perfil",
         "post": "Publicaciones",
         "logout": "Cerrar sesión",
         "change_lang": "Cambiar idioma",
         "change_theme": "Cambiar Tema",
-        "cancel": "cancelar",
+        "cancel": "Cancelar",
         "save": "Guardar cambios",
         "title": "Seleccionar idioma",
         "light_mode": "Tema Claro",
         "dark_mode": "Tema oscuro",
-        "followers": "Seguidores"
+        "followers": "Seguidores",
+        "name":"Nombre",
+        "username":"Nombre de usuario",
+        "bio": "Biografía",
+        "exit": "Salir"
     },
-
-     "listUser": {
+    "listUser": {
         "search": "Buscar usuarios",
         "search_placeholder": "Buscar usuario...",
-        "button": "Cargar más"
+        "button": "Cargar más",
+        "error": " No se encontraron usuarios."
     },
-
     "language": {
         "sp": "Español",
         "en": "Ingles",
         "ca": "Valenciano"
     },
-
     "placeScreen": {
         "buttonPodium": "Top 10 lugares",
         "headerPodium": "Podio de reseñas",
         "anotherPlace": "Otros lugares destacados"
     },
-
     "friends": {
         "friends": "Amigos",
-         "list": "Lista de Amigos",
-         "searchHolder": "Buscar por nombre"
+        "list": "Lista de Amigos",
+        "searchHolder": "Buscar por nombre",
+        "notFound": "Todavia no tienes amigos"
     },
-
-    "buttonExplorer":{
+    "buttonExplorer": {
         "list": "Lista de sitios",
         "searchHolder": "Buscar por título"
     },
-
-
-    "stackReview":{
-       "comments": "Comentarios",
-         "addComment": "Añadir comentario"
+    "stackReview": {
+        "comments": "COMENTARIOS ",
+        "addComment": "AÑADIR COMENTARIO"
     },
-
-    "modalReview":{
-     "header": "¿Qué te pareció?",
+    "modalReview": {
+        "header": "¿Qué te pareció?",
         "inputHolder": "Escribe aquí tu opinión sobre este lugar...",
         "buttonAdd": "Publicar reseña",
         "buttonCancel": "Cancelar"
-    }, 
-
-    "profileFriend":{
-       "buttonFollow": "Seguir",
+    },
+    "profileFriend": {
+        "buttonFollow": "Seguir",
         "buttonUnfollow": "Dejar de seguir",
-        "followers": "Seguidores" , 
+        "followers": "Seguidores",
         "posts": "Publicaciones"
+    },
+    "response": {
+        "afirmative": "Sí",
+        "negative": "No"
     }
-
-
-    
-    
 }

@@ -18,23 +18,23 @@
         "register": "Register"
     },
     "home": {
-        "places_week": "Places of the Week",
         "buttonFriend": "Friends",
         "buttonExplorer": "Explore"
     },
     "publishScreen": {
+        "new_place": "New place",
         "header": "Add New Place",
         "name": "Place Name",
         "new_name": "New Place",
         "location": "Location",
-        "new_location": "Example: 40.7128°,-74.0060°",
+        "new_location": "Example 40.7128°,-74.0060°",
         "type": "Type",
         "new_type": "Place Type",
         "description": "Description",
         "new_description": "Place Description",
         "buttonAdd": "Add to Map",
         "buttonRestart": "Reset",
-        "buttonDelete": "Delete Photo",
+        "buttonDelete": "Delete Photos",
         "buttonAddMap": "Add to Map"
     },
     "buttonAdd": {
@@ -55,12 +55,17 @@
         "title": "Select Language",
         "light_mode": "Light Mode",
         "dark_mode": "Dark Mode",
-        "followers": "Followers"
+        "followers": "Followers",
+        "name": "Name",
+        "username": "Username",
+        "bio": "Bio",
+        "exit": "Exit"
     },
     "listUser": {
-        "search": "Search Users",
+        "search": "Search users",
         "search_placeholder": "Search user...",
-        "button": "Load More"
+        "button": "Load more",
+        "error": "No users found."
     },
     "language": {
         "sp": "Spanish",
@@ -75,19 +80,20 @@
     "friends": {
         "friends": "Friends",
         "list": "Friends List",
-        "searchHolder": "Search by name"
+        "searchHolder": "Search by name",
+        "notFound": "You don't have any friends yet"
     },
     "buttonExplorer": {
-        "list": "Site List",
+        "list": "List of Sites",
         "searchHolder": "Search by title"
     },
     "stackReview": {
-        "comments": "Comments",
-        "addComment": "Add Comment"
+        "comments": "COMMENTS",
+        "addComment": "ADD COMMENT"
     },
     "modalReview": {
         "header": "What did you think?",
-        "inputHolder": "Write your review about this place here...",
+        "inputHolder": "Write your opinion about this place here...",
         "buttonAdd": "Post Review",
         "buttonCancel": "Cancel"
     },
@@ -96,5 +102,9 @@
         "buttonUnfollow": "Unfollow",
         "followers": "Followers",
         "posts": "Posts"
+    },
+    "response": {
+        "afirmative": "Yes",
+        "negative": "No"
     }
 }

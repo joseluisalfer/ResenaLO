@@ -4,10 +4,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../Context/Context";
 import { postData, getData } from "../../services/Services";
-
+import { useTranslation } from "react-i18next";
 const ProfileHeaderFriend = ({ navigation }) => {
   const { selectedFriend, emailLogged, setEmailLogged, theme, isDark } = useContext(Context);
-
+  const { t } = useTranslation();
   const myUserName = emailLogged?.results?.user; // Protegido
   const [isFollowing, setIsFollowing] = useState(false);
   const [friendDetails, setFriendDetails] = useState(null);
@@ -108,7 +108,7 @@ const ProfileHeaderFriend = ({ navigation }) => {
           color={followColor}
         />
         <Text style={[styles.actionText, { color: followColor }]}>
-          {isFollowing ? "Dejar de seguir" : "Seguir"}
+          {isFollowing ? t('profileFriend.buttonUnfollow') : t('profileFriend.buttonFollow')}
         </Text>
       </Pressable>
 
