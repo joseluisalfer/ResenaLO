@@ -8,11 +8,15 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../../Context/Context";
 import { getData } from "../../../services/Services";
 import { useTranslation } from "react-i18next";
+
+/**
+ * Utility to shuffle an array and return the first N elements
+ */
 const pickRandomUpToN = (arr, n = 5) => {
   const copy = [...arr];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -22,19 +26,24 @@ const pickRandomUpToN = (arr, n = 5) => {
   return copy.slice(0, Math.min(n, copy.length));
 };
 
+/**
+ * Friends Component: Displays a horizontal list of 5 random friends
+ */
 const Friends = ({ navigation }) => {
-  // 1. Extraemos theme e isDark del Contexto
   const { setSelectedFriend, emailLogged, theme, isDark } = useContext(Context);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
 
+  /**
+   * Fetches data for random friends from the user's friend list
+   */
   const obtainUsers = useCallback(async () => {
     setLoading(true);
     try {
       const rawFriends = emailLogged?.results?.friends ?? [];
       const friendUrls = pickRandomUpToN(rawFriends, 5);
-      
+
       const settled = await Promise.allSettled(
         friendUrls.map(async (url) => {
           const userData = await getData(url);
@@ -47,9 +56,9 @@ const Friends = ({ navigation }) => {
             description: r.description,
             user: r.user,
             reviews: r.reviews,
-            followers: r.followers
+            followers: r.followers,
           };
-        })
+        }),
       );
 
       const ok = settled
@@ -59,17 +68,17 @@ const Friends = ({ navigation }) => {
 
       setFriends(ok);
     } catch (err) {
-      console.error("Error crítico en obtainUsers:", err);
       setFriends([]);
     } finally {
       setLoading(false);
     }
   }, [emailLogged]);
 
+  // Refreshes friend list every time the screen gains focus
   useFocusEffect(
     useCallback(() => {
       obtainUsers();
-    }, [obtainUsers])
+    }, [obtainUsers]),
   );
 
   if (loading) {
@@ -83,9 +92,10 @@ const Friends = ({ navigation }) => {
   if (friends.length === 0) {
     return (
       <View style={styles.wrapper}>
-        {/* Color de texto dinámico para "Todavía no tienes amigos" */}
-        <Text style={[styles.noFriendsText, { color: isDark ? '#aaa' : '#666' }]}>
-          {t('friends.notFound')}
+        <Text
+          style={[styles.noFriendsText, { color: isDark ? "#aaa" : "#666" }]}
+        >
+          {t("friends.notFound")}
         </Text>
       </View>
     );
@@ -97,13 +107,10 @@ const Friends = ({ navigation }) => {
         style={styles.header}
         onPress={() => navigation.navigate("AllFriends")}
       >
-        {/* 2. Aplicamos color dinámico al título y al icono */}
-        <Text style={[styles.title, { color: theme.text }]}>{t('friends.friends')}</Text>
-        <Ionicons 
-          name="chevron-forward-outline" 
-          size={25} 
-          color={theme.text} // El chevron ahora cambia según el tema
-        />
+        <Text style={[styles.title, { color: theme.text }]}>
+          {t("friends.friends")}
+        </Text>
+        <Ionicons name="chevron-forward-outline" size={25} color={theme.text} />
       </Pressable>
 
       <FlatList
@@ -124,18 +131,17 @@ const Friends = ({ navigation }) => {
             }}
           >
             <Image
-
               source={{ uri: item.photo.trim(), cache: "reload" }}
               style={[
-                styles.avatar, 
-                { backgroundColor: isDark ? "#333" : "#f0f0f0" } // Fondo de imagen dinámico
+                styles.avatar,
+                { backgroundColor: isDark ? "#333" : "#f0f0f0" },
               ]}
               resizeMode="cover"
             />
-
-            {/* 3. Nombre del amigo en color dinámico */}
-            <Text style={[styles.name, { color: theme.text }]} numberOfLines={1}>
-
+            <Text
+              style={[styles.name, { color: theme.text }]}
+              numberOfLines={1}
+            >
               {item.name}
             </Text>
           </Pressable>

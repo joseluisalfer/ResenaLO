@@ -16,20 +16,31 @@ import { getData } from "../services/Services";
 import Context from "../Context/Context";
 import { Searchbar } from "react-native-paper";
 
+/**
+ * ListPlace Screen: Fetches and displays a searchable list of all public reviews.
+ * Includes a robust loading state and handles deep-linking to specific place details.
+ */
 const ListPlace = ({ navigation }) => {
   const { t } = useTranslation();
   const [places, setPlaces] = useState([]);
   const [shownPlaces, setShownPlaces] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
-  
+
   const { setSearchUrl, theme, isDark } = useContext(Context);
 
+  /**
+   * Updates global context with the selected review URL and navigates to details.
+   */
   const changePageAndSendUri = (uri) => {
     setSearchUrl(uri);
     navigation.navigate("Place");
   };
 
+  /**
+   * Orchestrates fetching the main review list and individual review details.
+   * Uses Promise.all to fetch metadata for all reviews concurrently.
+   */
   const fetchReviews = async () => {
     try {
       setLoading(true);
@@ -54,16 +65,16 @@ const ListPlace = ({ navigation }) => {
               ruta: reviewData.review,
             };
           } catch {
-            return null;
+            return null; // Skip reviews that fail to load
           }
-        })
+        }),
       );
 
-      const clean = reviewDetails.filter(Boolean);
-      setPlaces(clean);
-      setShownPlaces(clean);
+      const cleanList = reviewDetails.filter(Boolean);
+      setPlaces(cleanList);
+      setShownPlaces(cleanList);
     } catch (error) {
-      console.error("Error al obtener las reseñas:", error);
+      console.error("Error fetching reviews list:", error);
       setPlaces([]);
       setShownPlaces([]);
     } finally {
@@ -71,16 +82,19 @@ const ListPlace = ({ navigation }) => {
     }
   };
 
+  /**
+   * Filters the master list of places based on text input.
+   */
   const handleSearch = () => {
-    const q = searchText.trim().toLowerCase();
-    if (!q) {
+    const query = searchText.trim().toLowerCase();
+    if (!query) {
       setShownPlaces(places);
       return;
     }
-    const result = places.filter((p) =>
-      (p.name || "").toLowerCase().includes(q)
+    const filtered = places.filter((p) =>
+      (p.name || "").toLowerCase().includes(query),
     );
-    setShownPlaces(result);
+    setShownPlaces(filtered);
   };
 
   const handleClearSearch = () => {
@@ -92,17 +106,24 @@ const ListPlace = ({ navigation }) => {
     fetchReviews();
   }, []);
 
+  // Update list dynamically as the user types
+  useEffect(() => {
+    handleSearch();
+  }, [searchText]);
+
   if (loading) {
     return (
       <View style={[styles.center, { backgroundColor: theme.background }]}>
-        <ActivityIndicator size="large" color="#1748ce" />
+        <ActivityIndicator size="large" color={theme.primary || "#1748ce"} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* HEADER FIXED */}
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+    >
+      {/* Dynamic Header */}
       <View style={styles.header}>
         <Ionicons
           name="arrow-back"
@@ -117,6 +138,7 @@ const ListPlace = ({ navigation }) => {
         <View style={styles.rightSpacer} />
       </View>
 
+      {/* Search Input Area */}
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder={t("buttonExplorer.searchHolder")}
@@ -127,8 +149,8 @@ const ListPlace = ({ navigation }) => {
           onSubmitEditing={handleSearch}
           autoCapitalize="none"
           style={[
-            styles.searchBarPaper, 
-            { backgroundColor: isDark ? "#1E1E1E" : "#f0f0f0" }
+            styles.searchBarPaper,
+            { backgroundColor: isDark ? "#1E1E1E" : "#f0f0f0" },
           ]}
           inputStyle={[styles.searchInput, { color: theme.text }]}
           iconColor={theme.text}
@@ -137,38 +159,53 @@ const ListPlace = ({ navigation }) => {
         />
       </View>
 
-      {/* LISTADO - Eliminamos listWrapper y ajustamos el FlatList */}
+      {/* Review List */}
       <FlatList
         data={shownPlaces}
         keyExtractor={(item) => item.id.toString()}
-        // El secreto está aquí: 120 de padding al final para superar la Tab Bar
-        contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 120 }}
+        // Bottom padding allows scrolling past fixed UI elements like TabBars
+        contentContainerStyle={{ paddingHorizontal: 15, paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <Pressable onPress={() => changePageAndSendUri(item.ruta)}>
-            <View style={[
-              styles.item, 
-              { 
-                backgroundColor: isDark ? "#1E1E1E" : "#f8f8f8",
-                borderColor: isDark ? "#333" : "#ddd"
-              }
-            ]}>
+            <View
+              style={[
+                styles.item,
+                {
+                  backgroundColor: isDark ? "#1E1E1E" : "#f8f8f8",
+                  borderColor: isDark ? "#333" : "#ddd",
+                },
+              ]}
+            >
               <Image source={item.image} style={styles.image} />
               <View style={styles.textContainer}>
-                <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={2}>
+                <Text
+                  style={[styles.placeName, { color: theme.text }]}
+                  numberOfLines={2}
+                >
                   {item.name}
                 </Text>
-                <Text style={[styles.rating, { color: isDark ? "#AAA" : "#777" }]}>⭐ {item.rating}</Text>
+                <Text
+                  style={[styles.rating, { color: isDark ? "#AAA" : "#777" }]}
+                >
+                  ⭐ {item.rating}
+                </Text>
               </View>
             </View>
           </Pressable>
         )}
         ListEmptyComponent={
           <View style={styles.emptyBox}>
-            <Ionicons name="search-outline" size={50} color={isDark ? "#444" : "#ccc"} />
-            <Text style={[styles.emptyText, { color: isDark ? "#888" : "#666" }]}>
+            <Ionicons
+              name="search-outline"
+              size={50}
+              color={isDark ? "#444" : "#ccc"}
+            />
+            <Text
+              style={[styles.emptyText, { color: isDark ? "#888" : "#666" }]}
+            >
               {searchText.trim()
-                ? t("buttonExplorer.errorSearch") + searchText
+                ? `${t("buttonExplorer.errorSearch")} "${searchText}"`
                 : t("buttonExplorer.noReview")}
             </Text>
           </View>
@@ -179,13 +216,12 @@ const ListPlace = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   header: {
     flexDirection: "row",
     alignItems: "center",
+    paddingTop: 10,
     marginBottom: 10,
     width: "100%",
     paddingHorizontal: 15,
@@ -206,13 +242,13 @@ const styles = StyleSheet.create({
   searchBarPaper: {
     borderRadius: 8,
     height: 45,
-    elevation: 0, // Quitamos sombra para que se vea más plano y limpio
+    elevation: 0,
     borderWidth: 1,
-    borderColor: 'transparent'
+    borderColor: "transparent",
   },
   searchInput: {
     fontSize: 16,
-    alignSelf: 'center'
+    alignSelf: "center",
   },
   item: {
     flexDirection: "row",
@@ -220,15 +256,14 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     padding: 10,
     borderRadius: 12,
-    width: "100%",
     borderWidth: 1,
   },
-  image: { width: "40%", height: 100, borderRadius: 10, marginRight: 15 },
+  image: { width: "35%", height: 90, borderRadius: 10, marginRight: 15 },
   textContainer: { flex: 1 },
   placeName: { fontSize: 18, fontWeight: "bold" },
   rating: { fontWeight: "bold", fontSize: 18, marginTop: 5 },
-  emptyBox: { alignItems: "center", padding: 30 },
-  emptyText: { marginTop: 10, textAlign: "center" },
+  emptyBox: { alignItems: "center", padding: 50 },
+  emptyText: { marginTop: 10, textAlign: "center", fontSize: 16 },
 });
 
 export default ListPlace;

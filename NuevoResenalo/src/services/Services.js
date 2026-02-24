@@ -1,4 +1,7 @@
-// Función para hacer una petición GET
+/**
+ * Performs a GET request to fetch data.
+ * Returns the JSON object if the response is successful.
+ */
 export const getData = async (url) => {
   try {
     const response = await fetch(url);
@@ -6,99 +9,102 @@ export const getData = async (url) => {
       const data = await response.json();
       return data;
     } else {
-      throw new Error('Error al obtener los datos');
+      throw new Error("Error fetching data");
     }
   } catch (error) {
-    console.log('Error en GET:', error);
     throw error;
   }
 };
 
+/**
+ * Performs a POST request sending a JSON object.
+ * Handles responses that can be JSON, plain text, or empty.
+ * Returns the parsed object or null if it's not valid JSON or if it's empty.
+ */
 export const postData = async (url, data) => {
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data), // Convertimos el objeto en JSON
+      body: JSON.stringify(data),
     });
 
-    // Verificar si la respuesta es exitosa
     if (response.ok) {
-      const textResponse = await response.text(); // Leer como texto
+      const textResponse = await response.text();
 
-      console.log('Respuesta del servidor:', textResponse); // Imprimir lo que devuelve el servidor
-
-      // Si la respuesta no está vacía, intentamos convertirla en JSON
       if (textResponse) {
         try {
-          const result = JSON.parse(textResponse); // Intentamos convertir el texto en JSON
-          return result; // Devolvemos el resultado JSON
+          // Tries to convert the response text into a JSON object
+          const result = JSON.parse(textResponse);
+          return result;
         } catch (jsonError) {
-          console.log('Error al analizar JSON:', jsonError);
-          console.log('Respuesta no es JSON válido:', textResponse);
-          return null; // Si no es JSON válido, devolvemos null
+          // If the server responds successfully but it's not JSON (e.g., success string), returns null
+          return null;
         }
       } else {
-        console.log('Respuesta vacía del servidor');
-        return null; // Si la respuesta está vacía, devolvemos null
+        // Successful response but empty body
+        return null;
       }
     } else {
-      // Si la respuesta no es exitosa, leer el cuerpo del error como texto
       const errorText = await response.text();
-      console.log('Error en la solicitud:', errorText); // Depuración
-      throw new Error(`Error en la solicitud: ${errorText}`);
+      throw new Error(`Request error: ${errorText}`);
     }
   } catch (error) {
-    console.log('Error en POST:', error);
     throw error;
   }
 };
 
-
-// Función para hacer una petición PUT (actualización de datos)
+/**
+ * Performs a PUT request to update existing data.
+ * Returns the updated JSON object.
+ */
 export const updateData = async (url, data) => {
   try {
     const response = await fetch(url, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data), // Convertimos el objeto en JSON
+      body: JSON.stringify(data),
     });
 
     if (response.ok) {
       const result = await response.json();
       return result;
     } else {
-      throw new Error('Error al actualizar los datos');
+      throw new Error("Error updating data");
     }
   } catch (error) {
-    console.log('Error en PUT:', error);
     throw error;
   }
 };
 
-// Función para hacer una petición DELETE
+/**
+ * Performs a DELETE request to remove resources.
+ * Handles 204 (No Content) status and optional response bodies.
+ */
 export const deleteData = async (url, data) => {
   try {
     const response = await fetch(url, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
 
+    // 204 status indicates success with no content to return
     if (response.status === 204) {
-      return { success: true }; 
+      return { success: true };
     }
 
     if (response.ok) {
       try {
         return await response.json();
       } catch {
+        // If there is no JSON in the successful response, confirms success manually
         return { success: true };
       }
     } else {
@@ -106,7 +112,6 @@ export const deleteData = async (url, data) => {
       throw new Error(`Error ${response.status}: ${errorText}`);
     }
   } catch (error) {
-    console.log('Error en DELETE:', error);
     throw error;
   }
 };

@@ -1,25 +1,28 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, Keyboard, StyleSheet, Pressable } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import React, { useState, useContext } from "react";
+import { View, Text, Keyboard, StyleSheet, Pressable } from "react-native";
+import { TextInput } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { useTranslation } from 'react-i18next';
-import Context from '../../../Context/Context';
+import { useTranslation } from "react-i18next";
+import Context from "../../../Context/Context";
 
-// 1. FormInput ahora usa theme.text para que cambie según el modo
+/**
+ * FormInput: A specialized input field that adapts its colors
+ * based on the current theme (Light/Dark mode).
+ */
 const FormInput = ({ label, placeholder, value, onChangeText, theme }) => (
-  <View style={[styles.row, { borderBottomColor: theme.isDark ? '#333' : '#ddd' }]}>
+  <View
+    style={[styles.row, { borderBottomColor: theme.isDark ? "#333" : "#ddd" }]}
+  >
     <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
     <TextInput
       mode="outlined"
       placeholder={placeholder}
       placeholderTextColor={theme.isDark ? "#666" : "#999"}
       style={[styles.input, { backgroundColor: theme.background }]}
-      
-      // COLORES DINÁMICOS AQUÍ:
-      textColor={theme.text} 
-      outlineColor={theme.text} 
+      // Dynamic color mapping for text and borders
+      textColor={theme.text}
+      outlineColor={theme.isDark ? "#444" : "#ccc"}
       activeOutlineColor={theme.primary || theme.text}
-      
       value={value}
       onChangeText={onChangeText}
       onSubmitEditing={Keyboard.dismiss}
@@ -28,58 +31,74 @@ const FormInput = ({ label, placeholder, value, onChangeText, theme }) => (
   </View>
 );
 
-const DatosPublish = () => {
+/**
+ * PublishData Component: Collects data for a new review/post,
+ * including title, location, type, description, and star rating.
+ */
+const PublishData = () => {
   const { t } = useTranslation();
-  // 2. Extraemos el theme del Contexto
+
+  // Access global state and theme from Context
   const { publishInfo, setPublishInfo, theme } = useContext(Context);
 
   const [title, setTitle] = useState(publishInfo.title);
-  const [ubication, setUbication] = useState(publishInfo.coords); 
+  const [ubication, setUbication] = useState(publishInfo.coords);
   const [type, setType] = useState(publishInfo.type);
   const [description, setDescription] = useState(publishInfo.description);
   const [rating, setRating] = useState(publishInfo.valoration);
 
+  // Helper to update both local and global state
+  const updateInfo = (key, value) => {
+    setPublishInfo({ ...publishInfo, [key]: value });
+  };
+
   const handleTitleChange = (text) => {
     setTitle(text);
-    setPublishInfo({ ...publishInfo, title: text });
+    updateInfo("title", text);
   };
 
   const handleUbicationChange = (text) => {
     setUbication(text);
-    setPublishInfo({ ...publishInfo, coords: text });
+    updateInfo("coords", text);
   };
 
   const handleTypeChange = (text) => {
     setType(text);
-    setPublishInfo({ ...publishInfo, type: text });
+    updateInfo("type", text);
   };
 
   const handleDescriptionChange = (text) => {
     setDescription(text);
-    setPublishInfo({ ...publishInfo, description: text });
+    updateInfo("description", text);
   };
 
   const handleRatingChange = (newRating) => {
     setRating(newRating);
-    setPublishInfo({ ...publishInfo, valoration: newRating });
+    updateInfo("valoration", newRating);
   };
 
+  /**
+   * Renders 5 interactive stars for the rating system.
+   */
   const renderStars = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
         <Pressable key={i} onPress={() => handleRatingChange(i)}>
           <Ionicons
-            name={i <= rating ? 'star' : 'star-outline'}
+            name={i <= rating ? "star" : "star-outline"}
             size={40}
-            color={i <= rating ? 'gold' : 'gray'}
+            color={i <= rating ? "gold" : "gray"}
           />
-        </Pressable>
+        </Pressable>,
       );
     }
     return stars;
   };
 
+  /**
+   * Clears all local inputs and resets the global publishInfo object.
+   */
   const resetForm = () => {
     setTitle("");
     setUbication("");
@@ -97,18 +116,42 @@ const DatosPublish = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* 3. Pasamos el theme a cada input para que el texto sea negro o blanco según toque */}
-      <FormInput label={t('publishScreen.name')} placeholder={t('publishScreen.new_name')} value={title} onChangeText={handleTitleChange} theme={theme} />
-      <FormInput label={t('publishScreen.location')} placeholder={t('publishScreen.new_location')} value={ubication} onChangeText={handleUbicationChange} theme={theme} />
-      <FormInput label={t('publishScreen.type')} placeholder={t('publishScreen.new_type')} value={type} onChangeText={handleTypeChange} theme={theme} />
-      <FormInput label={t('publishScreen.description')} placeholder={t('publishScreen.new_description')} value={description} onChangeText={handleDescriptionChange} theme={theme} />
+      {/* Input group with localized labels and placeholders */}
+      <FormInput
+        label={t("publishScreen.name")}
+        placeholder={t("publishScreen.new_name")}
+        value={title}
+        onChangeText={handleTitleChange}
+        theme={theme}
+      />
+      <FormInput
+        label={t("publishScreen.location")}
+        placeholder={t("publishScreen.new_location")}
+        value={ubication}
+        onChangeText={handleUbicationChange}
+        theme={theme}
+      />
+      <FormInput
+        label={t("publishScreen.type")}
+        placeholder={t("publishScreen.new_type")}
+        value={type}
+        onChangeText={handleTypeChange}
+        theme={theme}
+      />
+      <FormInput
+        label={t("publishScreen.description")}
+        placeholder={t("publishScreen.new_description")}
+        value={description}
+        onChangeText={handleDescriptionChange}
+        theme={theme}
+      />
 
-      <View style={styles.starContainer}>
-        {renderStars()}
-      </View>
+      <View style={styles.starContainer}>{renderStars()}</View>
 
       <Pressable style={styles.resetButton} onPress={resetForm}>
-        <Text style={styles.buttonText}>{t("publishScreen.buttonRestart")}</Text>
+        <Text style={styles.buttonText}>
+          {t("publishScreen.buttonRestart")}
+        </Text>
       </Pressable>
     </View>
   );
@@ -119,37 +162,37 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 8,
     borderBottomWidth: 1,
   },
   label: {
     width: 120,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   input: {
     flex: 1,
     height: 40,
   },
   starContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 20,
     marginBottom: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   resetButton: {
     marginTop: 20,
-    backgroundColor: '#DC3545',
+    backgroundColor: "#DC3545",
     padding: 10,
     borderRadius: 5,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
   },
 });
 
-export default DatosPublish;
+export default PublishData;

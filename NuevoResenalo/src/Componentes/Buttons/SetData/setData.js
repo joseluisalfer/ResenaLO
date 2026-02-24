@@ -1,65 +1,63 @@
 import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
 import { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
-import "../../../../assets/i18n/index"; // Asegúrate de que esto está en el directorio adecuado
-import { getData, postData } from "../../../services/Services"; // Asegúrate de que esta ruta sea correcta
+import { getData, postData } from "../../../services/Services";
 import Context from "../../../Context/Context";
 
-const PedirDatos = ({ navigation }) => {
-  const { setIsLoged } = useContext(Context); // Usamos el contexto para manejar el estado global
+/**
+ * PedirDatos Component: Handles user input and login logic
+ */
+const SetData = ({ navigation }) => {
+  const { setIsLoged, setEmailLogged } = useContext(Context);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { t } = useTranslation();
-  const {emailLogged, setEmailLogged} = useContext(Context);
-  // Función para validar si el email tiene un formato correcto
+
+  // Basic email format validation
   const validateEmail = (email) => {
-    // Expresión regular básica para email
     const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
     return emailRegex.test(email);
   };
 
+  /**
+   * Processes the authentication and fetches user data
+   */
   const handleOnPress = async () => {
-    // Validar que los campos no estén vacíos
+    // Validation for empty fields and email format
     if (email === "" || password === "") {
       alert(t("alerts.empptyData"));
       return;
     }
 
-    // Validar que el correo electrónico sea correcto
     if (!validateEmail(email)) {
       alert(t("alerts.invalidEmail"));
       return;
     }
 
-    const data = {
-      email: email,
-      password: password,
-    };
+    const data = { email, password };
 
     try {
-      // Enviar datos al servidor con POST
+      // POST request to perform login
       const response = await postData(
         "http://44.213.235.160:8080/resenalo/login",
         data,
       );
 
-      const dataEmail = await getData(`http://44.213.235.160:8080/resenalo/userEmail?email=${email}`);
-      
-      console.log(dataEmail);
+      // Fetch user profile data based on login email
+      const dataEmail = await getData(
+        `http://44.213.235.160:8080/resenalo/userEmail?email=${email}`,
+      );
       setEmailLogged(dataEmail);
-      // Verificar si la respuesta es exitosa (status 200 OK)oscarmartorellg@gmail.com
-      //
+
+      // Successfully logged in if the response is null
       if (response === null) {
-        // Si la respuesta es null (vacía), consideramos que el login es exitoso
-        setIsLoged(true); // Actualiza el estado isLoged a true@
+        setIsLoged(true);
       } else {
-        // Si la respuesta contiene un error
         const errorMessage =
           response && response.error ? response.error : t("Error");
-        alert(errorMessage); // Mostrar el mensaje de error
+        alert(errorMessage);
       }
     } catch (error) {
-      console.error("Error al enviar los datos:", error);
       alert(t("alerts.loginError"));
     }
   };
@@ -88,16 +86,12 @@ const PedirDatos = ({ navigation }) => {
           <Text style={styles.text_buttom}>{t("loginScreen.login")}</Text>
         </Pressable>
       </View>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          width: "80%",
-        }}
-      >
-        <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
-        <Text style={{ marginHorizontal: 8 }}>o</Text>
-        <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
+
+      {/* Visual separator */}
+      <View style={styles.dividerContainer}>
+        <View style={styles.line} />
+        <Text style={styles.dividerText}>o</Text>
+        <View style={styles.line} />
       </View>
     </View>
   );
@@ -136,6 +130,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 15,
   },
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "80%",
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "black",
+  },
+  dividerText: {
+    marginHorizontal: 8,
+  },
 });
 
-export default PedirDatos;
+export default SetData;

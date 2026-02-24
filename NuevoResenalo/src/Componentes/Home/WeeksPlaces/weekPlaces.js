@@ -1,49 +1,70 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+  Image,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../../services/Services";
 import Context from "../../../Context/Context";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
+
+/**
+ * WeekPlace Component: Displays a visual "Top 3" podium of the week's best reviews
+ */
 const WeekPlace = ({ navigation }) => {
   const [podiumData, setPodiumData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { setSearchUrl } = useContext(Context);
   const { t } = useTranslation();
 
+  /**
+   * Fetches the Top 3 review URLs and their corresponding details
+   */
   const obtainData = async () => {
     try {
       setLoading(true);
-      const urls = await getData("http://44.213.235.160:8080/resenalo/top3Reviews");
+      const urls = await getData(
+        "http://44.213.235.160:8080/resenalo/top3Reviews",
+      );
 
       if (urls && urls.length >= 3) {
-        const details = await Promise.all(urls.map(url => getData(url)));
+        const details = await Promise.all(urls.map((url) => getData(url)));
 
-        const rawItems = details.map((data, index) => ({
-          data,
-          url: urls[index],
-          rank: index + 1
-        })).filter(item => item.data !== null);
+        // Map data with rank and filter out null responses
+        const rawItems = details
+          .map((data, index) => ({
+            data,
+            url: urls[index],
+            rank: index + 1,
+          }))
+          .filter((item) => item.data !== null);
 
+        // Reorder items to display visually as: [Rank 2, Rank 1, Rank 3]
         const ordered = [rawItems[1], rawItems[0], rawItems[2]];
         setPodiumData(ordered);
       }
     } catch (error) {
-      console.error(error);
+      // Error handled silently
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     obtainData();
   }, []);
 
+  // Refresh podium data when screen comes into focus
   useFocusEffect(
     useCallback(() => {
       obtainData();
-    }, [])
-  )
+    }, []),
+  );
 
   const handlePressPlace = (reviewUrl) => {
     setSearchUrl(reviewUrl);
@@ -62,10 +83,17 @@ const WeekPlace = ({ navigation }) => {
             {podiumData.map((item, index) => {
               if (!item) return null;
 
+              // Visual logic for podium bar heights and colors
               let barHeight = 65;
-              let borderColor = "#d48332";
-              if (item.rank === 1) { barHeight = 115; borderColor = "#ffd549"; }
-              else if (item.rank === 2) { barHeight = 90; borderColor = "#e7e7e7"; }
+              let borderColor = "#d48332"; // Bronze/Default
+
+              if (item.rank === 1) {
+                barHeight = 115;
+                borderColor = "#ffd549"; // Gold
+              } else if (item.rank === 2) {
+                barHeight = 90;
+                borderColor = "#e7e7e7"; // Silver
+              }
 
               return (
                 <Pressable
@@ -74,7 +102,12 @@ const WeekPlace = ({ navigation }) => {
                   onPress={() => handlePressPlace(item.data.review)}
                 >
                   <Text style={styles.rankTop}>{item.rank}</Text>
-                  <View style={[styles.bar, { height: barHeight, borderColor: borderColor }]}>
+                  <View
+                    style={[
+                      styles.bar,
+                      { height: barHeight, borderColor: borderColor },
+                    ]}
+                  >
                     {item.data.image ? (
                       <Image
                         source={{ uri: item.data.image }}
@@ -87,7 +120,9 @@ const WeekPlace = ({ navigation }) => {
                       </View>
                     )}
                   </View>
-                  <Text style={styles.place} numberOfLines={1}>{item.data.title}</Text>
+                  <Text style={styles.place} numberOfLines={1}>
+                    {item.data.title}
+                  </Text>
                 </Pressable>
               );
             })}
@@ -98,7 +133,7 @@ const WeekPlace = ({ navigation }) => {
           style={styles.titleWrapper}
           onPress={() => navigation.navigate("Podium")}
         >
-          <Text style={styles.title}>{t('placeScreen.buttonPodium')}</Text>
+          <Text style={styles.title}>{t("placeScreen.buttonPodium")}</Text>
           <Ionicons name="chevron-forward-outline" size={25} color="#fff" />
         </Pressable>
       </View>
@@ -132,21 +167,21 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 12,
     borderWidth: 3,
-    overflow: 'hidden',
-    backgroundColor: '#1a3a8f',
+    overflow: "hidden",
+    backgroundColor: "#1a3a8f",
   },
-  image: { width: '100%', height: '100%' },
-  centerIcon: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  image: { width: "100%", height: "100%" },
+  centerIcon: { flex: 1, justifyContent: "center", alignItems: "center" },
   place: {
     color: "#fff",
     fontSize: 11,
     fontWeight: "700",
     marginTop: 8,
-    textAlign: 'center',
-    width: '100%',
+    textAlign: "center",
+    width: "100%",
   },
   titleWrapper: { flexDirection: "row", alignItems: "center", paddingTop: 10 },
-  title: { fontSize: 18, fontWeight: "700", color: "#ffffff" }
+  title: { fontSize: 18, fontWeight: "700", color: "#ffffff" },
 });
 
 export default WeekPlace;

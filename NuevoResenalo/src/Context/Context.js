@@ -1,9 +1,10 @@
 import { createContext, useState, useEffect } from "react";
-import { postData } from "../services/Services";  // Asegúrate de importar la función postData
-import { useTranslation } from 'react-i18next';
+import { postData } from "../services/Services";
+import { useTranslation } from "react-i18next";
 
 const Context = createContext();
 
+// Define design tokens for both modes
 const themes = {
   light: {
     background: "#F5F5F5",
@@ -18,87 +19,109 @@ const themes = {
     text: "white",
     primary: "#2654d1",
     border: "#333333",
-  }
+  },
 };
 
+/**
+ * Global Context Provider: Manages user authentication, theme state,
+ * language preferences, and shared publication data.
+ */
 export const Provider = ({ children }) => {
-  const [isLoged, setIsLoged] = useState(false);
-  const [emailLogged, setEmailLogged] = useState({});
-  const [publishInfo, setPublishInfo] = useState({
-    title: "", user: "", valoration: "", description: "", type: "", coords: "",
-  });
-  const [searchUrl, setSearchUrl] = useState('');
-  const [selectedFriend, setSelectedFriend] = useState(null);
-
   const { i18n } = useTranslation();
 
-  // New state for language
-  const [language, setLanguage] = useState(emailLogged?.results?.language || 'en');
+  // User and Auth State
+  const [isLoged, setIsLoged] = useState(false);
+  const [emailLogged, setEmailLogged] = useState({});
+  const [selectedFriend, setSelectedFriend] = useState(null);
 
-  // --- NUEVA LÓGICA DE TEMA ---
-  const [isDark, setIsDark] = useState(
-    emailLogged?.results?.theme === 'dark' ? true : false
-  );
+  // Shared Form State (for creating reviews)
+  const [publishInfo, setPublishInfo] = useState({
+    title: "",
+    user: "",
+    valoration: "",
+    description: "",
+    type: "",
+    coords: "",
+  });
+
+  // Navigation and Search State
+  const [searchUrl, setSearchUrl] = useState("");
+
+  // Theme and Language State
+  const [language, setLanguage] = useState("en");
+  const [isDark, setIsDark] = useState(false);
 
   const theme = isDark ? themes.dark : themes.light;
 
-  const toggleTheme = async () => {
-    const newTheme = isDark ? 'light' : 'dark';
-    setIsDark(!isDark);
-
-    // Realizar el POST para actualizar el tema en la base de datos
-    try {
-      const response = await postData('http://44.213.235.160:8080/resenalo/updateTheme', {
-        email: emailLogged?.results?.email, // Asumiendo que el email está en emailLogged.results.email
-        theme: newTheme,
-      });
-
-      if (response) {
-        console.log('Tema actualizado correctamente en la base de datos');
-      }
-    } catch (error) {
-      console.error('Error al actualizar el tema:', error);
-    }
-  };
-
-  // Function to update the language
-  const updateLanguage = async (selectedLanguage) => {
-    setLanguage(selectedLanguage);
-    i18n.changeLanguage(selectedLanguage);  // Update the i18n language
-
-    // Send a POST request to update the language in the database
-    try {
-      const response = await postData('http://44.213.235.160:8080/resenalo/updateLanguage', {
-        email: emailLogged?.results?.email, // Asumiendo que el email está en emailLogged.results.email
-        language: selectedLanguage,
-      });
-
-      if (response) {
-        console.log('Idioma actualizado correctamente en la base de datos');
-      }
-    } catch (error) {
-      console.error('Error al actualizar el idioma:', error);
-    }
-  };
-
+  /**
+   * Syncs the app state whenever a user logs in or their profile is updated.
+   */
   useEffect(() => {
-    // Update language if the emailLogged state changes
-    if (emailLogged?.results?.language) {
-      setLanguage(emailLogged.results.language);
-      i18n.changeLanguage(emailLogged.results.language); // Change the language in i18n
+    if (emailLogged?.results) {
+      // Sync Theme from user profile
+      setIsDark(emailLogged.results.theme === "dark");
+
+      // Sync Language from user profile
+      if (emailLogged.results.language) {
+        setLanguage(emailLogged.results.language);
+        i18n.changeLanguage(emailLogged.results.language);
+      }
     }
   }, [emailLogged]);
+
+  /**
+   * Toggles between light and dark mode and persists the choice to the database.
+   */
+  const toggleTheme = async () => {
+    const newTheme = isDark ? "light" : "dark";
+    setIsDark(!isDark);
+
+    try {
+      await postData("http://44.213.235.160:8080/resenalo/updateTheme", {
+        email: emailLogged?.results?.email,
+        theme: newTheme,
+      });
+    } catch (error) {
+      // Handled silently to avoid interrupting user flow
+    }
+  };
+
+  /**
+   * Updates the app language via i18next and persists the choice to the database.
+   */
+  const updateLanguage = async (selectedLanguage) => {
+    setLanguage(selectedLanguage);
+    i18n.changeLanguage(selectedLanguage);
+
+    try {
+      await postData("http://44.213.235.160:8080/resenalo/updateLanguage", {
+        email: emailLogged?.results?.email,
+        language: selectedLanguage,
+      });
+    } catch (error) {
+      // Handled silently
+    }
+  };
 
   return (
     <Context.Provider
       value={{
-        isLoged, setIsLoged,
-        publishInfo, setPublishInfo,
-        emailLogged, setEmailLogged,
-        searchUrl, setSearchUrl,
-        selectedFriend, setSelectedFriend,
-        theme, isDark, toggleTheme,
-        language, setLanguage, updateLanguage  // Add language and updateLanguage to the context
+        isLoged,
+        setIsLoged,
+        publishInfo,
+        setPublishInfo,
+        emailLogged,
+        setEmailLogged,
+        searchUrl,
+        setSearchUrl,
+        selectedFriend,
+        setSelectedFriend,
+        theme,
+        isDark,
+        toggleTheme,
+        language,
+        setLanguage,
+        updateLanguage,
       }}
     >
       {children}

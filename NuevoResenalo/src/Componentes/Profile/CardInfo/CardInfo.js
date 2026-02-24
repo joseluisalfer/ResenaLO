@@ -1,21 +1,21 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
+import React, { useContext } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { Card } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
 import Context from "../../../Context/Context";
-import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from "react-i18next";
+
+/**
+ * CardInfo Component: Displays the logged-in user's statistics,
+ * specifically the count of posts (reviews) and followers.
+ */
 const CardInfo = () => {
   const { emailLogged } = useContext(Context);
-  const reviews = emailLogged?.results?.reviews ?? [];
-  const followers = emailLogged?.results?.followers ?? [];
   const { t } = useTranslation();
 
-  useEffect(() => {
-    console.log(reviews);
-  }, [reviews]);
+  // Safely extract arrays from context to determine counts
+  const reviews = emailLogged?.results?.reviews ?? [];
+  const followers = emailLogged?.results?.followers ?? [];
 
-  // Contar la cantidad de reviews
   const reviewsCount = reviews.length;
   const followersCount = followers.length;
 
@@ -23,11 +23,13 @@ const CardInfo = () => {
     <View>
       <Card style={styles.statsCard}>
         <Card.Content style={styles.statsContainer}>
+          {/* Post/Review count display */}
           <View style={styles.statItem}>
             <Text variant="titleMedium">{reviewsCount}</Text>
-            {/* Muestra la cantidad de reviews */}
             <Text variant="bodySmall">{t("profile.post")}</Text>
           </View>
+
+          {/* Followers count display */}
           <View style={styles.statItem}>
             <Text variant="titleMedium">{followersCount}</Text>
             <Text variant="bodySmall">{t("profile.followers")}</Text>

@@ -1,18 +1,22 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { View, StyleSheet, Modal, Pressable, Text } from "react-native";
 import { Button } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../../Context/Context";
 import { useTranslation } from "react-i18next";
-import "../../../../assets/i18n/index"; // Ensure this imports your i18n configurations
-import { postData } from "../../../services/Services"; // Ensure this is available for making POST requests
+import "../../../../assets/i18n/index"; 
+import { postData } from "../../../services/Services";
 
+/**
+ * ModalProfile Component: Displays a settings menu for logout, 
+ * language selection, and theme toggling.
+ */
 const ModalProfile = ({ handleLogOut }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
   const { t, i18n } = useTranslation();
 
-  // 1. Extraemos theme además de isDark y toggleTheme
+  // Extract theme-related data and current user info from Context
   const { isDark, toggleTheme, theme, emailLogged } = useContext(Context);
 
   const handleCancelLanguageChange = () => {
@@ -23,21 +27,19 @@ const ModalProfile = ({ handleLogOut }) => {
     setShowLanguageOptions(true);
   };
 
+  /**
+   * Updates the application language locally and persists it to the backend.
+   */
   const handleChangeLanguage = async (lang) => {
-    i18n.changeLanguage(lang); // Update the language in i18n
+    i18n.changeLanguage(lang);
 
-    // Save the selected language to the backend
     try {
-      const response = await postData('http://44.213.235.160:8080/resenalo/updateLanguage', {
-        email: emailLogged?.results?.email,  // Ensure this data exists
+      await postData('http://44.213.235.160:8080/resenalo/updateLanguage', {
+        email: emailLogged?.results?.email,
         language: lang,
       });
-
-      if (response) {
-        console.log('Idioma actualizado correctamente en la base de datos');
-      }
     } catch (error) {
-      console.error('Error al actualizar el idioma:', error);
+      // API error handled silently to prioritize user experience
     }
   };
 
@@ -47,7 +49,6 @@ const ModalProfile = ({ handleLogOut }) => {
         onPress={() => setModalVisible(true)}
         style={styles.iconContainer}
       >
-        {/* 2. El color del icono ahora depende del tema */}
         <Ionicons name="settings-outline" size={30} color={theme.text} />
       </Pressable>
 
@@ -58,13 +59,16 @@ const ModalProfile = ({ handleLogOut }) => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          {/* 3. Fondo dinámico para el cuadro del modal */}
+          {/* Adaptive modal background color */}
           <View
-            style={[styles.modalContent, { backgroundColor: isDark ? "#1E1E1E" : "white" }]}
+            style={[
+              styles.modalContent, 
+              { backgroundColor: isDark ? "#1E1E1E" : "white" }
+            ]}
           >
             {!showLanguageOptions ? (
               <>
-                {/* 4. Añadimos textColor a los botones para que se vean en fondo oscuro */}
+                {/* Main Settings Menu */}
                 <Button
                   onPress={handleLogOut}
                   mode="outlined"
@@ -73,6 +77,7 @@ const ModalProfile = ({ handleLogOut }) => {
                 >
                   {t("profile.logout")}
                 </Button>
+                
                 <Button
                   onPress={handleChangeToLanguageSelection}
                   mode="outlined"
@@ -102,6 +107,7 @@ const ModalProfile = ({ handleLogOut }) => {
               </>
             ) : (
               <>
+                {/* Language Selection Menu */}
                 <Button
                   onPress={() => handleChangeLanguage("es")}
                   textColor={theme.text}
@@ -158,21 +164,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // Un poco más oscuro el fondo exterior
+    backgroundColor: "rgba(0, 0, 0, 0.6)", 
   },
   modalContent: {
-    borderRadius: 15, // Un poco más redondeado para look moderno
+    borderRadius: 15,
     padding: 20,
     width: "80%",
-    elevation: 5, // Sombra para Android
-    shadowColor: "#000", // Sombra para iOS
+    elevation: 5,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
   modalButton: {
     marginBottom: 10,
-    borderColor: "#555", // Borde grisáceo para que se vea en ambos temas
+    borderColor: "#555",
   },
   cancelButton: {
     backgroundColor: "#DC3545",

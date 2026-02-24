@@ -1,34 +1,45 @@
-import React, { useState, useContext } from "react"; 
+import React, { useState, useContext } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 import ProfileImage from "../Componentes/Profile/ProfileImage/ProfileImage";
 import EditUser from "../Componentes/Profile/EditUser/EditUser";
-import Context from "../Context/Context"; 
+import Context from "../Context/Context";
 
+/**
+ * EditProfile Screen: A container screen that allows users to change their
+ * profile picture and update their account details via the EditUser form.
+ */
 const EditProfile = () => {
   const [image, setImage] = useState(null);
   const navigation = useNavigation();
 
-  // Extraemos el tema del contexto
+  // Extract the global theme from Context
   const { theme } = useContext(Context);
 
   return (
-    /* Envolvemos en una View con el fondo del tema para que, 
-       si el ScrollView rebota, no se vea nada blanco detrás.
-    */
+    /**
+     * Parent View with theme background prevents white flashes
+     * during ScrollView "bouncing" on iOS.
+     */
     <View style={{ flex: 1, backgroundColor: theme.background }}>
-      <ScrollView 
+      <ScrollView
         style={[styles.container, { backgroundColor: theme.background }]}
-        // flexGrow asegura que el fondo cubra TODA la pantalla aunque el contenido sea poco
-        contentContainerStyle={{ flexGrow: 1, backgroundColor: theme.background }}
+        /**
+         * flexGrow ensures the background covers the entire screen
+         * even if the content is shorter than the device height.
+         */
+        contentContainerStyle={{
+          flexGrow: 1,
+          backgroundColor: theme.background,
+        }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Imagen de perfil se queda aquí */}
+        {/* Profile Image Section */}
         <View style={styles.profileImageContainer}>
           <ProfileImage image={image} setImage={setImage} />
         </View>
 
-        {/* Componente de edición (Asegúrate de quitar la foto de dentro de EditUser) */}
+        {/* User Data Form Section */}
         <EditUser />
       </ScrollView>
     </View>
@@ -42,7 +53,7 @@ const styles = StyleSheet.create({
   },
   profileImageContainer: {
     alignItems: "center",
-    marginBottom: 10, // Ajustado para que pegue mejor con el formulario
+    marginBottom: 10,
     marginTop: 20,
   },
 });

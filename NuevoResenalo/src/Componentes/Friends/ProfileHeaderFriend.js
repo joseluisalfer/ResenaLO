@@ -5,65 +5,57 @@ import { Ionicons } from "@expo/vector-icons";
 import Context from "../../Context/Context";
 import { postData, getData } from "../../services/Services";
 import { useTranslation } from "react-i18next";
+
+/**
+ * ProfileHeaderFriend Component: Displays the profile information of a friend
+ * and manages the follow/unfollow logic.
+ */
 const ProfileHeaderFriend = ({ navigation }) => {
-  const { selectedFriend, emailLogged, setEmailLogged, theme, isDark } = useContext(Context);
+  const { selectedFriend, emailLogged, theme, isDark } = useContext(Context);
   const { t } = useTranslation();
-  const myUserName = emailLogged?.results?.user; // Protegido
+
+  const myUserName = emailLogged?.results?.user;
   const [isFollowing, setIsFollowing] = useState(false);
   const [friendDetails, setFriendDetails] = useState(null);
 
+  /**
+   * Fetches the follow status and profile details of the selected friend
+   */
   const updateFollowStatus = useCallback(async () => {
     if (!selectedFriend?.user || !myUserName) return;
 
     try {
-      // Obtener MI usuario (para saber a quién sigo)
       const userRes = await getData(
-        `http://44.213.235.160:8080/resenalo/user?userName=${myUserName}`
+        `http://44.213.235.160:8080/resenalo/user?userName=${myUserName}`,
       );
 
       if (userRes) {
         const followeds = userRes?.results?.followeds ?? [];
-
-        // Aquí estamos considerando que 'followeds' es un array de nombres de usuario
-        // o un array de URLs si el backend usa URLs (ajustar si es necesario)
         const friendUrl = `http://44.213.235.160:8080/resenalo/user?userName=${selectedFriend.user}`;
-
-        // Si followeds es un array de URLs, la comparación será así:
         setIsFollowing(followeds.includes(friendUrl));
-
-        // Si followeds es un array de objetos con usernames, la comparación sería:
-        // setIsFollowing(followeds.some(follow => follow.username === selectedFriend.user));
       }
 
-      // Obtener detalles del amigo
       const friendRes = await getData(
-        `http://44.213.235.160:8080/resenalo/user?userName=${selectedFriend.user}`
+        `http://44.213.235.160:8080/resenalo/user?userName=${selectedFriend.user}`,
       );
       if (friendRes) setFriendDetails(friendRes.results);
     } catch (error) {
-      console.error(error);
+      // Error handled silently to maintain UI stability
     }
   }, [selectedFriend?.user, myUserName]);
 
   useFocusEffect(
     useCallback(() => {
       updateFollowStatus();
-    }, [updateFollowStatus])
+    }, [updateFollowStatus]),
   );
 
-  if (!selectedFriend) {
-    return (
-      <View style={[styles.container, { backgroundColor: theme.background }]}>
-        <Text style={[styles.emptyText, { color: isDark ? "#888" : "#666" }]}>
-          No hay amigo seleccionado
-        </Text>
-      </View>
-    );
-  }
-
+  /**
+   * Handles the logic for adding or removing a follow relationship
+   */
   const handleFollowAction = async () => {
     if (!myUserName) {
-      Alert.alert("Error", "No se ha cargado tu usuario todavía.");
+      Alert.alert("Error", "Your user profile has not loaded yet.");
       return;
     }
 
@@ -78,12 +70,21 @@ const ProfileHeaderFriend = ({ navigation }) => {
 
     try {
       await postData(url, body);
-      await updateFollowStatus(); // ✅ refrescar estado del botón
+      await updateFollowStatus();
     } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "No se pudo actualizar el seguimiento");
+      Alert.alert("Error", "Could not update follow status");
     }
   };
+
+  if (!selectedFriend) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <Text style={[styles.emptyText, { color: isDark ? "#888" : "#666" }]}>
+          No friend selected
+        </Text>
+      </View>
+    );
+  }
 
   const followColor = isFollowing
     ? isDark
@@ -95,24 +96,31 @@ const ProfileHeaderFriend = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Botón Volver */}
-      <Pressable style={styles.backButton} onPress={() => navigation.goBack()} hitSlop={12}>
+      <Pressable
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+        hitSlop={12}
+      >
         <Ionicons name="arrow-back" size={30} color={theme.text} />
       </Pressable>
 
-      {/* Botón de Seguimiento */}
-      <Pressable style={styles.actionButton} onPress={handleFollowAction} hitSlop={12}>
+      <Pressable
+        style={styles.actionButton}
+        onPress={handleFollowAction}
+        hitSlop={12}
+      >
         <Ionicons
           name={isFollowing ? "close-outline" : "checkmark-outline"}
           size={28}
           color={followColor}
         />
         <Text style={[styles.actionText, { color: followColor }]}>
-          {isFollowing ? t('profileFriend.buttonUnfollow') : t('profileFriend.buttonFollow')}
+          {isFollowing
+            ? t("profileFriend.buttonUnfollow")
+            : t("profileFriend.buttonFollow")}
         </Text>
       </Pressable>
 
-      {/* Foto de Perfil */}
       <View style={styles.photoWrap}>
         <View
           style={[
@@ -131,7 +139,6 @@ const ProfileHeaderFriend = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Info de Usuario */}
       <View style={{ alignItems: "center" }}>
         <Text style={[styles.username, { color: isDark ? "#aaa" : "gray" }]}>
           @{selectedFriend.user}
@@ -152,11 +159,37 @@ const ProfileHeaderFriend = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { marginBottom: 16, marginTop: 40 },
-  backButton: { position: "absolute", top: -10, left: 16, zIndex: 999, padding: 6 },
-  actionButton: { position: "absolute", top: -10, right: 12, zIndex: 999, padding: 6, alignItems: "center", width: 85 },
-  actionText: { fontSize: 10, fontWeight: "bold", marginTop: -2, textAlign: "center" },
+  backButton: {
+    position: "absolute",
+    top: -10,
+    left: 16,
+    zIndex: 999,
+    padding: 6,
+  },
+  actionButton: {
+    position: "absolute",
+    top: -10,
+    right: 12,
+    zIndex: 999,
+    padding: 6,
+    alignItems: "center",
+    width: 85,
+  },
+  actionText: {
+    fontSize: 10,
+    fontWeight: "bold",
+    marginTop: -2,
+    textAlign: "center",
+  },
   photoWrap: { marginTop: 35, alignItems: "center" },
-  photoSquare: { width: 120, height: 120, borderRadius: 60, borderWidth: 1, justifyContent: "center", alignItems: "center" },
+  photoSquare: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   photo: { width: "100%", height: "100%", borderRadius: 60 },
   username: { marginTop: 3 },
   name: { marginTop: 5, fontSize: 25, fontWeight: "bold" },

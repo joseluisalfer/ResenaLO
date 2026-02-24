@@ -7,71 +7,91 @@ import {
   Pressable,
   Text,
   StyleSheet,
+  Alert,
 } from "react-native";
-import DatosPublish from "../Componentes/Publish/PublishData/PublishData"; 
-import SelectorImagen from "../Componentes/Publish/ImageSelector/imageSelector"; 
+import PublishData from "../Componentes/Publish/PublishData/PublishData";
+import ImageSelector from "../Componentes/Publish/ImageSelector/imageSelector";
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
-import { postData } from "../services/Services"; 
+import { postData } from "../services/Services";
 import Context from "../Context/Context";
 
+/**
+ * Publish Screen: Handles the creation of new location reviews.
+ * Users can fill in data (title, rating, description, coordinates)
+ * and upload multiple images which are converted to Base64 for the API.
+ */
 const Publish = () => {
-  const [imagenes, setImagenes] = useState([null]); 
+  const [images, setImages] = useState([null]);
   const { t } = useTranslation();
-  
-  // Extraemos theme e isDark para controlar los colores dinámicamente
-  const { publishInfo, setPublishInfo, emailLogged, theme, isDark } = useContext(Context);
 
+  // Extract theme and global state from Context
+  const { publishInfo, setPublishInfo, emailLogged, theme, isDark } =
+    useContext(Context);
+
+  /**
+   * Utility to convert image URIs to Base64 strings for server-side processing.
+   */
   const convertImageToBase64 = async (uri) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    const reader = new FileReader();
-    return new Promise((resolve, reject) => {
-      reader.onloadend = () => {
-        let base64 = reader.result;
-        base64 = base64.split(",")[1]; 
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onloadend = () => {
+          let base64 = reader.result;
+          base64 = base64.split(",")[1]; // Remove the data type prefix
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error("Conversion error:", error);
+      return null;
+    }
   };
 
+  /**
+   * Validates form data and sends the review payload to the backend.
+   */
   const handleAddMap = async () => {
     const { title, coords, type, description, valoration } = publishInfo;
 
+    // Basic validation check
     if (
       !title ||
       !coords ||
       !type ||
       !description ||
       !valoration ||
-      !imagenes.length ||
-      !imagenes[0]
+      !images.length ||
+      !images[0]
     ) {
-      alert(t("alerts.publishScreen"));
+      Alert.alert(t("alerts.error"), t("alerts.publishScreen"));
       return;
     }
 
+    // Ensure coordinates are properly formatted (Latitude, Longitude)
     if (!coords.includes(",")) {
-      alert(t("alerts.latitude"));
+      Alert.alert(t("alerts.error"), t("alerts.latitude"));
       return;
     }
 
     const base64Images = await Promise.all(
-      imagenes
+      images
         .filter((img) => img !== null)
         .map((img) => convertImageToBase64(img.uri)),
     );
 
     const data = {
       title: title,
-      user: emailLogged?.results?.user || t("alerts.anonim"), 
+      user: emailLogged?.results?.user || t("alerts.anonim"),
       valoration: valoration,
       description: description,
       type: type,
-      coords: coords, 
-      files: base64Images, 
+      coords: coords,
+      files: base64Images,
     };
 
     try {
@@ -79,53 +99,60 @@ const Publish = () => {
         "http://44.213.235.160:8080/resenalo/uploadReview",
         data,
       );
+
+      // In this API, a null response indicates a successful 200/204 status
       if (response === null) {
-        alert(t("alerts.excelentPublish"));
+        Alert.alert(t("alerts.success"), t("alerts.excelentPublish"));
       } else {
-        alert(t("alerts.errorPublish"));
+        Alert.alert(t("alerts.error"), t("alerts.errorPublish"));
       }
     } catch (error) {
-      console.error("Error al enviar los datos:", error);
-      alert(t("alerts.errorConnection"));
+      console.error("Upload error:", error);
+      Alert.alert(t("alerts.error"), t("alerts.errorConnection"));
     }
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      {/* Contenedor principal con fondo negro del tema */}
       <View style={{ flex: 1, backgroundColor: theme.background }}>
         <ScrollView
           style={{ backgroundColor: theme.background }}
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 16,
-            paddingBottom: 160, // Espacio extra para que los botones no tapen el contenido
+            paddingBottom: 160, // Prevents bottom buttons from overlapping content
             flexGrow: 1,
           }}
           showsVerticalScrollIndicator={false}
         >
-          {/* Título en blanco */}
           <Text style={[styles.title, { color: theme.text }]}>
             {t("publishScreen.new_place")}
           </Text>
 
-          {/* Formulario de publicación */}
-          <DatosPublish setFormData={setPublishInfo} />
+          {/* Form data inputs */}
+          <PublishData setFormData={setPublishInfo} />
 
-          {/* Selector de imágenes */}
-          <SelectorImagen imagenes={imagenes} setImagenes={setImagenes} />
+          {/* Visual image picker grid */}
+          <ImageSelector images={images} setImages={setImages} />
         </ScrollView>
 
-        {/* Botón para eliminar las fotos (Rojo oscuro en Dark Mode) */}
-        <Pressable 
-          style={[styles.removeButton, { backgroundColor: isDark ? "#DC3545" : "#DC3545" }]} 
-          onPress={() => setImagenes([null])}
+        {/* Action Buttons: Positioned absolutely at the bottom */}
+        <Pressable
+          style={[styles.removeButton, { backgroundColor: "#DC3545" }]}
+          onPress={() => setImages([null])}
         >
-          <Text style={styles.buttonText}>{t("publishScreen.buttonDelete")}</Text>
+          <Text style={styles.buttonText}>
+            {t("publishScreen.buttonDelete")}
+          </Text>
         </Pressable>
 
-        {/* Botón principal */}
-        <Pressable style={styles.button} onPress={handleAddMap}>
+        <Pressable
+          style={[
+            styles.button,
+            { backgroundColor: theme.primary || "#2654d1" },
+          ]}
+          onPress={handleAddMap}
+        >
           <Text style={styles.buttonText}>{t("publishScreen.buttonAdd")}</Text>
         </Pressable>
       </View>
@@ -146,7 +173,6 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 16,
     right: 16,
-    backgroundColor: "#2654d1",
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
@@ -159,7 +185,7 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     position: "absolute",
-    bottom: 85, 
+    bottom: 85,
     left: 16,
     right: 16,
     paddingVertical: 14,

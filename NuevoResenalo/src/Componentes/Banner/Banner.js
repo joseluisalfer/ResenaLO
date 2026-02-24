@@ -1,11 +1,14 @@
-import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import React from "react";
+import { StyleSheet, View, Image } from "react-native";
 
+/**
+ * Banner Component: Renders the main brand image at the top
+ */
 const Banner = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../../assets/images/ResenaLo_Banner.jpeg')}
+        source={require("../../../assets/images/ResenaLo_Banner.jpeg")}
         style={styles.image}
         resizeMode="contain"
       />
@@ -15,13 +18,13 @@ const Banner = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: '15%', // Reduce el espacio superior para que la imagen esté más arriba
+    width: "100%",
+    alignItems: "center",
+    marginTop: "15%",
   },
   image: {
-    width: '100%',
-    height: 200,  // Ajusta la altura si necesitas una imagen más pequeña
+    width: "100%",
+    height: 200,
   },
 });
 

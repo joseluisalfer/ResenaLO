@@ -1,34 +1,47 @@
-import React, { useContext } from "react"; // Importamos useContext
+import React, { useContext } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { Divider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
 import ProfileHeaderFriend from "../Componentes/Friends/ProfileHeaderFriend";
 import ProfileStatsFriend from "../Componentes/Friends/ProfileStatsFriend";
-import Posts from "../Componentes/Friends/PostList";
-import Context from "../Context/Context"; // Importamos tu Contexto
+import PostList from "../Componentes/Friends/PostList";
+import Context from "../Context/Context";
 
+/**
+ * Friend Screen: Displays the public profile of another user.
+ * Structure: Header (Avatar/Info) -> Stats (Followers/Reviews) -> Post Feed.
+ */
 const Friend = () => {
   const navigation = useNavigation();
-  
-  // Extraemos theme e isDark del contexto
+
+  // Extract theme tokens from global context
   const { theme, isDark } = useContext(Context);
 
+  /**
+   * ListHeader: Encapsulates all profile info above the post feed.
+   * Using this inside FlatList ensures the header scrolls away with the content.
+   */
   const ListHeader = () => (
     <View style={{ backgroundColor: theme.background }}>
-      {/* Header/info amigo */}
+      {/* Friend identity header (Photo, Name, Bio) */}
       <View style={styles.section}>
         <ProfileHeaderFriend navigation={navigation} />
       </View>
 
-      {/* Stats */}
+      {/* Numerical statistics (Reviews count, following, etc.) */}
       <View style={styles.section}>
         <ProfileStatsFriend />
       </View>
 
-      {/* Divider dinámico */}
+      {/* Themed Divider for visual separation */}
       <View style={styles.divider}>
-        <Divider style={[styles.dividerLine, { backgroundColor: isDark ? "#333" : "#ddd" }]} />
+        <Divider
+          style={[
+            styles.dividerLine,
+            { backgroundColor: isDark ? "#333" : "#ddd" },
+          ]}
+        />
       </View>
     </View>
   );
@@ -39,12 +52,17 @@ const Friend = () => {
       keyExtractor={(item) => item.key}
       ListHeaderComponent={<ListHeader />}
       renderItem={() => (
-        <View style={[styles.postsSection, { backgroundColor: theme.background }]}>
-          <Posts navigation={navigation} />
+        <View
+          style={[styles.postsSection, { backgroundColor: theme.background }]}
+        >
+          <PostList navigation={navigation} />
         </View>
       )}
-      // Fondo dinámico para el contenedor y la lista
-      contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}
+      // Apply background color to both the scrollable area and the container
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: theme.background },
+      ]}
       style={{ backgroundColor: theme.background }}
       showsVerticalScrollIndicator={false}
     />
@@ -55,7 +73,7 @@ const styles = StyleSheet.create({
   container: {
     paddingBottom: 16,
     paddingTop: 20,
-    flexGrow: 1, // Para que el color de fondo cubra toda la pantalla
+    flexGrow: 1, // Ensures background covers the screen even if list is short
   },
   section: {
     marginBottom: 16,

@@ -14,6 +14,10 @@ import { Searchbar } from "react-native-paper";
 import Context from "../Context/Context";
 import { useTranslation } from "react-i18next";
 
+/**
+ * FindUser Component: Provides a searchable list of users within the platform.
+ * Supports pagination (load more) and dynamic search queries.
+ */
 const FindUser = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -21,7 +25,7 @@ const FindUser = ({ navigation }) => {
   const [shownUsers, setShownUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
   const { t } = useTranslation();
-  // 1. Extraemos theme e isDark
+
   const { emailLogged, setSelectedFriend, theme, isDark } = useContext(Context);
   const myEmail = emailLogged?.results?.email;
 
@@ -33,17 +37,10 @@ const FindUser = ({ navigation }) => {
     setShownUsers(users);
   };
 
-  const getImageUri = (rawPhoto) => {
-    if (rawPhoto) {
-      if (rawPhoto.startsWith("data:image") || rawPhoto.startsWith("http")) {
-        return rawPhoto;
-      } else {
-        return `data:image/jpeg;base64,${rawPhoto}`;
-      }
-    }
-    return null;
-  };
-
+  /**
+   * Fetches the list of users from the server.
+   * @param {number} pageToLoad - The current page index for pagination.
+   */
   const obtainUsers = async (pageToLoad) => {
     try {
       if (pageToLoad === 0) setLoading(true);
@@ -51,6 +48,7 @@ const FindUser = ({ navigation }) => {
 
       const url = `http://44.213.235.160:8080/resenalo/users?page=${pageToLoad}`;
       const response = await getData(url);
+
       if (response?.totalPages !== undefined) {
         setTotalPages(response.totalPages);
       }
@@ -59,8 +57,7 @@ const FindUser = ({ navigation }) => {
         const userDetailsPromises = response.users.map(async (link) => {
           const res = await getData(link);
           const r = res?.results;
-          if (!r) return null;
-          if (r.email === myEmail) return null;
+          if (!r || r.email === myEmail) return null; // Filter out self and invalid results
 
           return {
             id: r.id,
@@ -84,7 +81,7 @@ const FindUser = ({ navigation }) => {
         setPage(pageToLoad);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      // Error handled silently
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -97,6 +94,9 @@ const FindUser = ({ navigation }) => {
     }
   };
 
+  /**
+   * Performs a server-side search based on the username query.
+   */
   const handleSearch = async () => {
     const q = searchText.trim();
     if (!q) {
@@ -131,12 +131,17 @@ const FindUser = ({ navigation }) => {
   }, []);
 
   return (
-    // 2. Fondo dinámico para toda la pantalla
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={[styles.header, { borderBottomColor: isDark ? "#333" : "#ddd" }]}>
-        <Text style={[styles.title, { color: theme.text }]}>{t("listUser.search")}</Text>
+      {/* Header Section */}
+      <View
+        style={[styles.header, { borderBottomColor: isDark ? "#333" : "#ddd" }]}
+      >
+        <Text style={[styles.title, { color: theme.text }]}>
+          {t("listUser.search")}
+        </Text>
       </View>
 
+      {/* Search Section */}
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder={t("listUser.search_placeholder")}
@@ -145,8 +150,10 @@ const FindUser = ({ navigation }) => {
           onIconPress={handleSearch}
           onSubmitEditing={handleSearch}
           autoCapitalize="none"
-          // 3. Adaptamos la Searchbar (Paper a veces necesita estilos específicos)
-          style={[styles.searchBarPaper, { backgroundColor: isDark ? "#222" : "#fff" }]}
+          style={[
+            styles.searchBarPaper,
+            { backgroundColor: isDark ? "#222" : "#fff" },
+          ]}
           inputStyle={[styles.searchInput, { color: theme.text }]}
           placeholderTextColor={isDark ? "#888" : "#999"}
           iconColor={isDark ? "#fff" : "#000"}
@@ -155,11 +162,19 @@ const FindUser = ({ navigation }) => {
         />
       </View>
 
+      {/* Results List */}
       <View style={{ flex: 1, width: "100%" }}>
         {loading ? (
-          <ActivityIndicator size="large" color={theme.primary || "#2654d1"} style={styles.loader} />
+          <ActivityIndicator
+            size="large"
+            color={theme.primary || "#2654d1"}
+            style={styles.loader}
+          />
         ) : (
-          <ScrollView contentContainerStyle={styles.scrollView}>
+          <ScrollView
+            contentContainerStyle={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+          >
             {shownUsers.length > 0 ? (
               shownUsers.map((item, index) => (
                 <Pressable
@@ -176,32 +191,60 @@ const FindUser = ({ navigation }) => {
                     });
                   }}
                 >
-                  {/* 4. Tarjetas con color dinámico */}
-                  <View style={[styles.card, { backgroundColor: isDark ? "#1E1E1E" : "#f0f0f0" }]}>
+                  <View
+                    style={[
+                      styles.card,
+                      { backgroundColor: isDark ? "#1E1E1E" : "#f0f0f0" },
+                    ]}
+                  >
                     <Image source={{ uri: item.photo }} style={styles.image} />
                     <View style={styles.textContainer}>
-                      <Text style={[styles.placeName, { color: theme.text }]}>{item.name}</Text>
-                      <Text style={[styles.followingText, { color: isDark ? "#AAA" : "#777" }]}>@{item.user}</Text>
+                      <Text style={[styles.placeName, { color: theme.text }]}>
+                        {item.name}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.followingText,
+                          { color: isDark ? "#AAA" : "#777" },
+                        ]}
+                      >
+                        @{item.user}
+                      </Text>
                     </View>
                   </View>
                 </Pressable>
               ))
             ) : (
-              <Text style={{ textAlign: "center", color: theme.text, marginTop: 20 }}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: theme.text,
+                  marginTop: 20,
+                }}
+              >
                 {t("listUser.error")}
               </Text>
             )}
 
+            {/* Pagination Footer */}
             {!searchText && page + 1 < totalPages && (
               <View style={styles.footerContainer}>
                 {loadingMore ? (
-                  <ActivityIndicator size="small" color={theme.primary || "#2654d1"} />
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.primary || "#2654d1"}
+                  />
                 ) : (
                   <TouchableOpacity
-                    style={styles.loadMoreBtn}
+                    style={[
+                      styles.loadMoreBtn,
+                      { backgroundColor: theme.primary || "#1748ce" },
+                    ]}
                     onPress={handleLoadMore}
                   >
-                    <Text style={styles.loadMoreText}>{t("listUser.button")}</Text>
+                    <Text style={styles.loadMoreText}>
+                      {t("listUser.button")}
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -214,19 +257,14 @@ const FindUser = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   header: {
     padding: 15,
     alignItems: "center",
     borderBottomWidth: 1,
     marginTop: 30,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-  },
+  title: { fontSize: 28, fontWeight: "bold" },
   searchContainer: {
     width: "90%",
     alignSelf: "center",
@@ -234,13 +272,10 @@ const styles = StyleSheet.create({
   },
   searchBarPaper: {
     borderRadius: 8,
-    height: 45, // Un poco más alta para Android
+    height: 45,
     elevation: 2,
   },
-  searchInput: {
-    fontSize: 16,
-    minHeight: 45,
-  },
+  searchInput: { fontSize: 16, minHeight: 45 },
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -255,33 +290,21 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     marginRight: 15,
-    backgroundColor: '#ccc'
+    backgroundColor: "#ccc",
   },
   textContainer: { flex: 1 },
-  placeName: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  followingText: {
-    fontSize: 16,
-  },
+  placeName: { fontSize: 18, fontWeight: "bold" },
+  followingText: { fontSize: 16 },
   loader: { marginTop: 20 },
   scrollView: { paddingBottom: 20 },
-  footerContainer: {
-    paddingVertical: 20,
-    alignItems: "center",
-  },
+  footerContainer: { paddingVertical: 20, alignItems: "center" },
   loadMoreBtn: {
     padding: 12,
-    backgroundColor: "#1748ce",
     borderRadius: 8,
     width: "50%",
     alignItems: "center",
   },
-  loadMoreText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  loadMoreText: { color: "#fff", fontWeight: "bold" },
 });
 
 export default FindUser;

@@ -1,4 +1,4 @@
-import React, { useContext } from "react"; // Importamos useContext
+import React, { useContext } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -6,28 +6,33 @@ import Home from "./placeScreens/PlaceStacks";
 import Publish from "./mainScreens/Publish";
 import Find from "./mainScreens/stackNotification/StackNotification";
 import Profile from "./editScreen/ProfileScreens";
-import Context from "./Context/Context"; // Ajusta la ruta a tu Context
+import Context from "./Context/Context"; 
 
 const Tab = createBottomTabNavigator();
 
+/**
+ * Main Component: Configures the Bottom Tab Navigation for the app.
+ * Dynamically adjusts styles and icons based on the active route and theme.
+ */
 const Main = () => {
-  // Extraemos theme e isDark del contexto
+  // Extract theme and isDark from global context
   const { theme, isDark } = useContext(Context);
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarShowLabel: false,
-        // Estilos de la barra
+        // Bar styling
         tabBarStyle: {
-          backgroundColor: isDark ? "#121212" : "#fff", // Fondo oscuro o claro
-          borderTopColor: isDark ? "#333" : "#eee",     // Borde superior sutil
-          height: 60,                                    // Altura de la barra
-          // Quitamos la propiedad 'position: 'absolute'' para evitar que la barra flote sobre el contenido
+          backgroundColor: isDark ? "#121212" : "#fff", // Dark or light background
+          borderTopColor: isDark ? "#333" : "#eee",     // Subtle top border
+          height: 60,                                   // Bar height
+          // 'position: absolute' is omitted to prevent the bar from floating over content
         },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
+          // Assign icon based on route name
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Publish") {
@@ -40,9 +45,9 @@ const Main = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        // Color del icono cuando está seleccionado
+        // Icon color when selected
         tabBarActiveTintColor: "#2654d1", 
-        // Color del icono cuando NO está seleccionado
+        // Icon color when NOT selected
         tabBarInactiveTintColor: isDark ? "#666" : "#BDC3C7", 
         headerShown: false,
       })}

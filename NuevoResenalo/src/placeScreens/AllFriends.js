@@ -11,10 +11,14 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../Context/Context";
 import { getData } from "../services/Services";
-import { Searchbar } from 'react-native-paper';
+import { Searchbar } from "react-native-paper";
 import { useTranslation } from "react-i18next";
+
+/**
+ * Friends Component: Displays a searchable list of users followed by the current user.
+ * Features include real-time filtering and dynamic theming for light/dark modes.
+ */
 const Friends = ({ navigation }) => {
-  // 1. Extraemos el theme del Contexto
   const { setSelectedFriend, emailLogged, theme, isDark } = useContext(Context);
   const [friends, setFriends] = useState([]);
   const [filteredFriends, setFilteredFriends] = useState([]);
@@ -22,18 +26,25 @@ const Friends = ({ navigation }) => {
   const [searchFriend, setSearchFriend] = useState("");
   const { t } = useTranslation();
 
+  // Initial data fetch
   useEffect(() => {
     obtainUsers();
   }, []);
 
+  // Client-side filtering logic
   useEffect(() => {
-    const result = friends.filter(friend =>
-      friend.name.toLowerCase().includes(searchFriend.toLowerCase()) ||
-      friend.user.toLowerCase().includes(searchFriend.toLowerCase())
+    const result = friends.filter(
+      (friend) =>
+        friend.name.toLowerCase().includes(searchFriend.toLowerCase()) ||
+        friend.user.toLowerCase().includes(searchFriend.toLowerCase()),
     );
     setFilteredFriends(result);
   }, [searchFriend, friends]);
 
+  /**
+   * Fetches friend details from the provided URLs in the user profile.
+   * Uses Promise.allSettled to ensure the list renders even if one request fails.
+   */
   const obtainUsers = async () => {
     setLoading(true);
     try {
@@ -51,36 +62,48 @@ const Friends = ({ navigation }) => {
             user: r.user,
             reviews: r.reviews,
           };
-        })
+        }),
       );
 
-      const ok = settled
+      // Filter only successful requests and non-null values
+      const successfulFriends = settled
         .filter((x) => x.status === "fulfilled")
         .map((x) => x.value)
         .filter(Boolean);
 
-      setFriends(ok);
-      setFilteredFriends(ok);
+      setFriends(successfulFriends);
+      setFilteredFriends(successfulFriends);
     } catch (err) {
-      console.error("Error crítico en obtainUsers:", err);
+      console.error("Critical error in obtainUsers:", err);
       setFriends([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Loading State
   if (loading) {
     return (
-      <View style={[styles.loaderContainer, { backgroundColor: theme.background }]}>
-        <ActivityIndicator size="large" color="#4F46E5" />
+      <View
+        style={[styles.loaderContainer, { backgroundColor: theme.background }]}
+      >
+        <ActivityIndicator size="large" color={theme.primary || "#4F46E5"} />
       </View>
     );
   }
 
   return (
     <View style={[styles.wrapper, { backgroundColor: theme.background }]}>
-      {/* HEADER DINÁMICO */}
-      <View style={[styles.headerContainer, { backgroundColor: theme.background, borderBottomColor: isDark ? "#333" : "#F3F4F6" }]}>
+      {/* Header with Dynamic Border */}
+      <View
+        style={[
+          styles.headerContainer,
+          {
+            backgroundColor: theme.background,
+            borderBottomColor: isDark ? "#333" : "#F3F4F6",
+          },
+        ]}
+      >
         <Ionicons
           name="arrow-back"
           size={28}
@@ -88,19 +111,23 @@ const Friends = ({ navigation }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         />
-        <Text style={[styles.headerTitle, { color: theme.text }]}>{t('friends.list')}</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>
+          {t("friends.list")}
+        </Text>
       </View>
 
-      {/* SEARCHBAR ADAPTADA */}
-      <View style={[styles.searchContainer, { backgroundColor: theme.background }]}>
+      {/* Themed Searchbar */}
+      <View
+        style={[styles.searchContainer, { backgroundColor: theme.background }]}
+      >
         <Searchbar
-          placeholder={t('friends.searchHolder')}
+          placeholder={t("friends.searchHolder")}
           placeholderTextColor={isDark ? "#AAA" : "#6B7280"}
           onChangeText={setSearchFriend}
           value={searchFriend}
           style={[
             styles.searchBar,
-            { backgroundColor: isDark ? "#1E1E1E" : "#F3F4F6" }
+            { backgroundColor: isDark ? "#1E1E1E" : "#F3F4F6" },
           ]}
           inputStyle={[styles.searchInput, { color: theme.text }]}
           iconColor={theme.text}
@@ -108,10 +135,16 @@ const Friends = ({ navigation }) => {
         />
       </View>
 
+      {/* List Content */}
       {filteredFriends.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={[styles.noFriendsText, { color: isDark ? "#888" : "#9CA3AF" }]}>
-            {searchFriend ? t('friends.notFoundFriend'): t('friends.notFound')}
+          <Text
+            style={[
+              styles.noFriendsText,
+              { color: isDark ? "#888" : "#9CA3AF" },
+            ]}
+          >
+            {searchFriend ? t("friends.notFoundFriend") : t("friends.notFound")}
           </Text>
         </View>
       ) : (
@@ -126,7 +159,7 @@ const Friends = ({ navigation }) => {
                 styles.item,
                 {
                   backgroundColor: isDark ? "#121212" : "#FFF",
-                  borderColor: isDark ? "#333" : "#E5E7EB"
+                  borderColor: isDark ? "#333" : "#E5E7EB",
                 },
                 index !== filteredFriends.length - 1 && styles.itemGap,
               ]}
@@ -145,20 +178,36 @@ const Friends = ({ navigation }) => {
               <View style={styles.itemRow}>
                 <Image
                   source={{ uri: item.photo.trim() }}
-                  style={[styles.avatar, { backgroundColor: isDark ? "#333" : "#E5E7EB" }]}
+                  style={[
+                    styles.avatar,
+                    { backgroundColor: isDark ? "#333" : "#E5E7EB" },
+                  ]}
                   resizeMode="cover"
                 />
 
                 <View style={styles.textContainer}>
-                  <Text style={[styles.info, { color: theme.text }]} numberOfLines={1}>
+                  <Text
+                    style={[styles.info, { color: theme.text }]}
+                    numberOfLines={1}
+                  >
                     {item.name}
                   </Text>
-                  <Text style={[styles.username, { color: isDark ? "#AAA" : "#6B7280" }]} numberOfLines={1}>
+                  <Text
+                    style={[
+                      styles.username,
+                      { color: isDark ? "#AAA" : "#6B7280" },
+                    ]}
+                    numberOfLines={1}
+                  >
                     @{item.user}
                   </Text>
                 </View>
 
-                <Ionicons name="chevron-forward" size={18} color={isDark ? "#555" : "#9CA3AF"} />
+                <Ionicons
+                  name="chevron-forward"
+                  size={18}
+                  color={isDark ? "#555" : "#9CA3AF"}
+                />
               </View>
             </Pressable>
           )}
@@ -198,7 +247,7 @@ const styles = StyleSheet.create({
   textContainer: { flex: 1, marginLeft: 14 },
   info: { fontSize: 16, fontWeight: "bold" },
   username: { fontSize: 13, marginTop: 2, fontWeight: "500" },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   noFriendsText: { textAlign: "center", fontSize: 15, fontWeight: "500" },
 });
 

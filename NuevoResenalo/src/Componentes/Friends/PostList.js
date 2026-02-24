@@ -13,34 +13,46 @@ import Context from "../../Context/Context";
 
 const PLACEHOLDER_IMG = "https://via.placeholder.com/600x400.png?text=No+image";
 
-const Posts = ({ navigation }) => {
+/**
+ * Posts Component: Displays a grid of reviews/places for a selected friend
+ */
+const PostList = ({ navigation }) => {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Extraemos theme e isDark del contexto
   const { selectedFriend, setSearchUrl, theme, isDark } = useContext(Context);
 
+  /**
+   * Converts raw image data (URL or Base64) into a valid URI string
+   */
   const normalizeImageToUri = (imgRaw) => {
     const first = Array.isArray(imgRaw) ? imgRaw[0] : imgRaw;
-    const value = typeof first === "string" ? first : first?.url ? first.url : null;
+    const value =
+      typeof first === "string" ? first : first?.url ? first.url : null;
 
     if (!value || typeof value !== "string") return PLACEHOLDER_IMG;
-    if (value.startsWith("http")) return value;
-    if (value.startsWith("data:image")) return value;
+    if (value.startsWith("http") || value.startsWith("data:image"))
+      return value;
 
     const cleanBase64 = value.replace(/[^A-Za-z0-9+/=]/g, "");
     return `data:image/jpeg;base64,${cleanBase64}`;
   };
 
+  /**
+   * Updates global search URL and navigates to the Place detail screen
+   */
   const changePageAndSendUri = (uri) => {
     setSearchUrl(uri);
     navigation.navigate("Place");
   };
 
+  /**
+   * Fetches detailed review data from a list of URLs
+   */
   const fetchReviews = async () => {
     try {
       setLoading(true);
-      const reviewUrls = selectedFriend?.reviews ?? selectedFriend?.results?.reviews ?? [];
+      const reviewUrls =
+        selectedFriend?.reviews ?? selectedFriend?.results?.reviews ?? [];
 
       if (!Array.isArray(reviewUrls) || reviewUrls.length === 0) {
         setPlaces([]);
@@ -53,7 +65,7 @@ const Posts = ({ navigation }) => {
             const reviewData = await getData(url);
             return {
               id: reviewData?.id ?? `review_${index}_${url}`,
-              name: reviewData?.title ?? reviewData?.type ?? "Sin título",
+              name: reviewData?.title ?? reviewData?.type ?? "Untitled",
               image: { uri: normalizeImageToUri(reviewData?.images) },
               rating: reviewData?.valoration ?? 0,
               uri: url,
@@ -61,13 +73,13 @@ const Posts = ({ navigation }) => {
           } catch (e) {
             return {
               id: `error_${index}_${url}`,
-              name: "Error al cargar",
+              name: "Load Error",
               image: { uri: PLACEHOLDER_IMG },
               rating: 0,
               uri: url,
             };
           }
-        })
+        }),
       );
       setPlaces(reviewDetails.filter(Boolean));
     } catch (error) {
@@ -99,12 +111,16 @@ const Posts = ({ navigation }) => {
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
         renderItem={({ item, index }) => {
-          // Lógica de colores adaptada al tema
+          // Dynamic color logic based on item index and theme
           const isThirdCard = index % 3 === 2;
-          const backgroundColor = 
-            index % 3 === 0 ? "#1748ce" : 
-            index % 3 === 1 ? "#DC3545" : 
-            (isDark ? "#1e1e1e" : "white"); // En Dark Mode, la tarjeta "blanca" es gris oscuro
+          const backgroundColor =
+            index % 3 === 0
+              ? "#1748ce"
+              : index % 3 === 1
+                ? "#DC3545"
+                : isDark
+                  ? "#1e1e1e"
+                  : "white";
 
           const textColor = isThirdCard ? theme.text : "white";
 
@@ -113,10 +129,16 @@ const Posts = ({ navigation }) => {
               style={styles.card}
               onPress={() => changePageAndSendUri(item.uri)}
             >
-              <Card style={[
-                styles.cardContainer, 
-                { backgroundColor, borderColor: isDark ? "#333" : "transparent", borderWidth: isDark ? 1 : 0 }
-              ]}>
+              <Card
+                style={[
+                  styles.cardContainer,
+                  {
+                    backgroundColor,
+                    borderColor: isDark ? "#333" : "transparent",
+                    borderWidth: isDark ? 1 : 0,
+                  },
+                ]}
+              >
                 <Card.Cover
                   source={item.image}
                   style={styles.image}
@@ -139,8 +161,10 @@ const Posts = ({ navigation }) => {
         }}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
-            <Text style={[styles.emptyText, { color: isDark ? "#777" : "#aaa" }]}>
-                No hay reseñas disponibles
+            <Text
+              style={[styles.emptyText, { color: isDark ? "#777" : "#aaa" }]}
+            >
+              No reviews available
             </Text>
           </View>
         }
@@ -153,7 +177,7 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     paddingHorizontal: 8,
-    width: "100%"
+    width: "100%",
   },
   card: {
     flex: 1,
@@ -161,7 +185,7 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 1,
-    borderRadius: 16, // Un poco más redondeadas queda más moderno
+    borderRadius: 16,
     overflow: "hidden",
     height: 210,
     elevation: 4,
@@ -192,7 +216,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
   },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
-export default Posts;
+export default PostList;

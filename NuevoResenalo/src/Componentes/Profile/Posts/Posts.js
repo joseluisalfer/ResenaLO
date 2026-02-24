@@ -10,8 +10,11 @@ import {
 import { Card } from "react-native-paper";
 import { getData } from "../../../services/Services";
 import Context from "../../../Context/Context";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 
+/**
+ * Posts Component: Displays a grid of reviews created by the logged-in user.
+ */
 const Posts = ({ navigation }) => {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +25,9 @@ const Posts = ({ navigation }) => {
     navigation.navigate("Place");
   };
 
+  /**
+   * Fetches full review details from an array of URLs stored in the user profile.
+   */
   const fetchReviews = async () => {
     try {
       setLoading(true);
@@ -37,25 +43,26 @@ const Posts = ({ navigation }) => {
           try {
             const reviewData = await getData(url);
 
-            // Intentamos sacar la URL de 'image' o de la primera posición de 'images'
-            const finalImageUrl = reviewData?.image || (Array.isArray(reviewData?.images) ? reviewData.images[0] : null);
+            // Prioritize the main 'image' field, fallback to the first item in 'images' array
+            const finalImageUrl =
+              reviewData?.image ||
+              (Array.isArray(reviewData?.images) ? reviewData.images[0] : null);
 
             return {
               id: reviewData?.id ?? url,
-              name: reviewData?.title ?? "Sin título",
+              name: reviewData?.title ?? "Untitled",
               image: finalImageUrl ? { uri: finalImageUrl } : null,
               rating: reviewData?.valoration ?? 0,
               uri: url,
             };
           } catch {
-            return null;
+            return null; // Ignore individual fetch failures
           }
         }),
       );
 
       setPlaces(reviewDetails.filter(Boolean));
     } catch (error) {
-      console.error("Error al obtener las reseñas:", error);
       setPlaces([]);
     } finally {
       setLoading(false);
@@ -66,11 +73,12 @@ const Posts = ({ navigation }) => {
     fetchReviews();
   }, [emailLogged]);
 
-    useFocusEffect(
-      useCallback(() => {
-        fetchReviews();
-      }, [])
-    )
+  // Refresh data whenever the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchReviews();
+    }, []),
+  );
 
   if (loading) {
     return (
@@ -87,6 +95,7 @@ const Posts = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
         renderItem={({ item, index }) => {
+          // Dynamic color rotation for the UI grid
           const backgroundColor =
             index % 3 === 0 ? "#1748ce" : index % 3 === 1 ? "#DC3545" : "white";
           const textColor = backgroundColor === "white" ? "black" : "white";
@@ -105,12 +114,15 @@ const Posts = ({ navigation }) => {
                   />
                 ) : (
                   <View style={[styles.image, styles.center]}>
-                    <Text style={{ color: textColor }}>Sin imagen</Text>
+                    <Text style={{ color: textColor }}>No image</Text>
                   </View>
                 )}
 
                 <Card.Content style={styles.cardContent}>
-                  <Text style={[styles.placeName, { color: textColor }]} numberOfLines={1}>
+                  <Text
+                    style={[styles.placeName, { color: textColor }]}
+                    numberOfLines={1}
+                  >
                     {item.name}
                   </Text>
                   <Text style={[styles.rating, { color: textColor }]}>
@@ -157,7 +169,11 @@ const styles = StyleSheet.create({
   rating: {
     fontSize: 12,
   },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 export default Posts;

@@ -1,17 +1,23 @@
-import React, { useContext } from 'react'; // Importamos useContext
+import React, { useContext } from 'react';
 import { View, Pressable, Text, Image, Alert, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import '../../../../assets/i18n/index';
-import Context from '../../../Context/Context'; // Importamos tu contexto
+import Context from '../../../Context/Context';
 
-const SelectorImagen = ({ imagenes, setImagenes }) => {
+/**
+ * ImageSelector Component: Allows users to pick multiple images 
+ * from the gallery or camera. Automatically adds a new slot when an 
+ * image is selected.
+ */
+const ImageSelector = ({ images, setImages }) => {
   const { t } = useTranslation();
-  
-  // Extraemos theme e isDark del contexto
-  const { theme, isDark } = useContext(Context);
+  const { isDark } = useContext(Context);
 
-  const seleccionarImagen = async (index) => {
+  /**
+   * Opens an alert to choose between gallery or camera for a specific index.
+   */
+  const handleSelectImage = async (index) => {
     Alert.alert(t("buttonAdd.add"), t("buttonAdd.option"), [
       {
         text: t("buttonAdd.gallery"),
@@ -28,10 +34,7 @@ const SelectorImagen = ({ imagenes, setImagenes }) => {
           });
 
           if (!result.canceled) {
-            const nuevas = [...imagenes];
-            nuevas[index] = result.assets[0];
-            if (index === imagenes.length - 1) nuevas.push(null);
-            setImagenes(nuevas);
+            updateImagesArray(index, result.assets[0]);
           }
         },
       },
@@ -51,10 +54,7 @@ const SelectorImagen = ({ imagenes, setImagenes }) => {
           });
 
           if (!result.canceled) {
-            const nuevas = [...imagenes];
-            nuevas[index] = result.assets[0];
-            if (index === imagenes.length - 1) nuevas.push(null);
-            setImagenes(nuevas);
+            updateImagesArray(index, result.assets[0]);
           }
         },
       },
@@ -62,18 +62,30 @@ const SelectorImagen = ({ imagenes, setImagenes }) => {
     ]);
   };
 
+  /**
+   * Updates the images list and appends a new null slot if the last slot was filled.
+   */
+  const updateImagesArray = (index, asset) => {
+    const updatedImages = [...images];
+    updatedImages[index] = asset;
+    
+    // Add a new empty slot if we just filled the current last one
+    if (index === images.length - 1) {
+      updatedImages.push(null);
+    }
+    setImages(updatedImages);
+  };
+
   return (
     <View style={styles.container}>
-      {imagenes.map((img, indx) => (
+      {images.map((img, index) => (
         <Pressable 
-          key={indx} 
-          onPress={() => seleccionarImagen(indx)} 
+          key={index} 
+          onPress={() => handleSelectImage(index)} 
           style={[
             styles.photoSquare, 
             { 
-              // Fondo dinámico (negro suave en dark mode, gris claro en light)
               backgroundColor: isDark ? '#1A1A1A' : '#f5f5f5',
-              // Borde dinámico
               borderColor: isDark ? '#444' : '#ccc'
             }
           ]}
@@ -81,7 +93,6 @@ const SelectorImagen = ({ imagenes, setImagenes }) => {
           {img ? (
             <Image source={{ uri: img.uri }} style={styles.photo} />
           ) : (
-            // El símbolo "+" cambia de color según el tema
             <Text style={[styles.plus, { color: isDark ? '#fff' : '#aaa' }]}>+</Text>
           )}
         </Pressable>
@@ -106,8 +117,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  photo: { width: '100%', height: '100%', borderRadius: 12 },
-  plus: { fontSize: 32 },
+  photo: { 
+    width: '100%', 
+    height: '100%', 
+    borderRadius: 12 
+  },
+  plus: { 
+    fontSize: 32 
+  },
 });
 
-export default SelectorImagen;
+export default ImageSelector;

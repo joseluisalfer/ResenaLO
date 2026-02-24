@@ -1,10 +1,16 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+
+// Import translation files
 import ca from './ca/ca.json'
 import es from './es/es.json';
 import en from './en/en.json';
 import zh from './zh/zh.json';  
 
+/**
+ * Resource mapping for supported languages.
+ * Includes Catalan (ca), Spanish (es), English (en), and Chinese (zh).
+ */
 const resources = {
     ca: { translation: ca },
     es: { translation: es },
@@ -13,19 +19,22 @@ const resources = {
 };
 
 i18n
-    .use(initReactI18next)
+    .use(initReactI18next) // Passes i18n down to react-i18next
     .init({
         resources,
-        lng: 'en',  // Default language
-        fallbackLng: 'es',
+        lng: 'en',  // Initial language set to English
+        fallbackLng: 'es', // Use Spanish if a translation is missing in the current language
         interpolation: {
-            escapeValue: false,
+            escapeValue: false, // React already protects against XSS
         },
     });
 
-// Listen for changes in language and update i18n language
+/**
+ * Event listener for language changes.
+ * This can be used for secondary actions like saving preferences to storage.
+ */
 i18n.on('languageChanged', (lng) => {
-    console.log('Language changed to: ', lng);
+    // Logic for language change can be added here
 });
 
 export default i18n;
