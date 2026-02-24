@@ -1,0 +1,153 @@
+{
+    "loginScreen": {
+        "login": "Iniciar sesión",
+        "footer": "Introduce tu dirección de correo electrónico y contraseña para iniciar sesión en esta aplicación",
+        "createAccount": "Crear cuenta",
+        "textAccount": "Crea tu cuenta para registrarte en ReseñaLo y descubrir nuevos lugares.",
+        "register": "Registrarse",
+        "passwordPlaceHolder": "Contraseña"
+    },
+    "registerScreen": {
+        "createAccount": "Crear cuenta",
+        "footer": "Introduce tu correo electrónico y contraseña para crear una cuenta:",
+        "email": "correo electrónico",
+        "password": "contraseña",
+        "confirm": "Confirmar contraseña",
+        "user": "Nombre de usuario",
+        "name": "Nombre",
+        "date": "Fecha de nacimiento (DD/MM/AAAA)",
+        "register": "Registrarse",
+        "buttonPrivaticy": "Términos de privacidad",
+        "buttonAccept": "Aceptar Términos",
+        "buttonClose": "Cerrar"
+    },
+    "home": {
+        "buttonFriend": "Amigos",
+        "buttonExplorer": "Explorar"
+    },
+    "publishScreen": {
+        "new_place": "Nuevo lugar",
+        "header": "Añadir nuevo lugar",
+        "name": "Nombre del lugar",
+        "new_name": "Nuevo lugar",
+        "location": "Ubicación",
+        "new_location": "Ejemplo 40.7128°,-74.0060°",
+        "type": "Tipo",
+        "new_type": "Tipo de lugar",
+        "description": "Descripción",
+        "new_description": "Descripción del lugar",
+        "buttonAdd": "Añadir al mapa",
+        "buttonRestart": "Restablecer",
+        "buttonDelete": "Eliminar Fotos",
+        "buttonAddMap": "Añadir al mapa"
+    },
+    "buttonAdd": {
+        "add": "Añadir imagen ",
+        "option": "Elige una opción",
+        "gallery": "GALERÍA",
+        "camera": "CÁMARA",
+        "cancel": "CANCELAR"
+    },
+    "profile": {
+        "buttonEdit": "Editar Perfil",
+        "post": "Publicaciones",
+        "logout": "Cerrar sesión",
+        "change_lang": "Cambiar idioma",
+        "change_theme": "Cambiar Tema",
+        "cancel": "Cancelar",
+        "save": "Guardar cambios",
+        "title": "Seleccionar idioma",
+        "light_mode": "Tema Claro",
+        "dark_mode": "Tema oscuro",
+        "followers": "Seguidores",
+        "name": "Nombre",
+        "username": "Nombre de usuario",
+        "bio": "Biografía",
+        "exit": "Salir"
+    },
+    "listUser": {
+        "search": "Buscar usuarios",
+        "search_placeholder": "Buscar usuario...",
+        "button": "Cargar más",
+        "error": " No se encontraron usuarios.",
+        "notFound": "No se encontraron usuarios.",
+        "errorSearch": "No hay sitios con ese nombre: "
+    },
+    "language": {
+        "es": "Español 🇪🇸",
+        "en": "Inglés 🇬🇧",
+        "ca": "Valenciano 🏳️",
+        "zh": "Chino 🇨🇳"
+    },
+    "placeScreen": {
+        "buttonPodium": "Top 10 lugares",
+        "headerPodium": "Podio de reseñas",
+        "anotherPlace": "Otros lugares destacados",
+        "noReview": "No hay reseñas todavía.",
+        "errorSearch": "No hay sitios con ese nombre: "
+    },
+    "friends": {
+        "friends": "Amigos",
+        "list": "Lista de Amigos",
+        "searchHolder": "Buscar por nombre",
+        "notFound": "Todavía no tienes amigos",
+        "notFoundFriend": "No tienes ningún amigo con ese nombre",
+        "errorSearch": "No hay amigos con ese nombre: "
+    },
+    "buttonExplorer": {
+        "list": "Lista de sitios",
+        "searchHolder": "Buscar por título",
+        "errorSearch": "No hay sitios con ese título: ",
+        "noReview": "No hay reseñas todavía"
+    },
+    "stackReview": {
+        "comments": "COMENTARIOS ",
+        "addComment": "AÑADIR COMENTARIO"
+    },
+    "modalReview": {
+        "header": "¿Qué te pareció?",
+        "inputHolder": "Escribe aquí tu opinión sobre este lugar...",
+        "buttonAdd": "Publicar reseña",
+        "buttonCancel": "Cancelar"
+    },
+    "profileFriend": {
+        "buttonFollow": "Seguir",
+        "buttonUnfollow": "Dejar de seguir",
+        "followers": "Seguidores",
+        "posts": "Publicaciones"
+    },
+    "response": {
+        "afirmative": "Sí",
+        "negative": "No"
+    },
+
+    "alerts": {
+        "empptyData": "Datos vacíos",
+        "invalidEmail": "Email incorrecto",
+        "loginError": "Inicio de sesión incorrecto",
+        "obligatory": "Todos los campos son obligatorios",
+        "differentsPassword": "Las contraseñas no coinciden",
+        "isValidEmail": "Por favor, ingresa un correo electrónico válido",
+        "privacity": "Debes aceptar los términos de privacidad",
+        "registerProblem": "Hubo un problema con el registro",
+        "connection": "Hubo un problema con la conexión",
+        "code": "Por favor, ingresa el código de verificación.",
+        "publishScreen": "Por favor, completa todos los campos y asegúrate de haber agregado una imagen.",
+        "latitude": "Por favor, ingresa las coordenadas en el formato correcto (latitud,longitud).",
+        "anonim": "Anónimo",
+        "excelentPublish": "Reseña publicada con éxito.",
+        "errorPublish": "Hubo un error al publicar la reseña.",
+        "errorConnection": "Hubo un error al enviar los datos. Por favor, inténtalo de nuevo.",
+        "emailSession": "Error, No se encontró el email de sesión.",
+        "emptyUsername": "Error, Nombre y username no pueden estar vacíos.",
+        "excelentEdit": "Éxito, Perfil actualizado correctamente.",
+        "errorEdit": "Error, No se pudieron guardar los cambios.",
+        "errorSession": "Error, No hay sesión.",
+        "isInvalidImage": "Error, Imagen inválida.",
+        "errorUrl": "Error, El servidor no devolvió una URL válida.",
+        "errorImage": "Error, No se pudo subir la imagen.",
+        "changeImage": "Cambiar imagen de perfil, Elige una opción",
+        "permissionGallery": "Permiso, Se requiere permiso de galería.",
+        "permissionCamera": "Permiso, Se requiere permiso de cámara."
+    }
+}

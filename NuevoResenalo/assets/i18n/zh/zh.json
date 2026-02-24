@@ -1,0 +1,152 @@
+{
+    "loginScreen": {
+        "login": "登录",
+        "footer": "请输入您的电子邮件地址和密码以登录此应用程序",
+        "createAccount": "创建账号",
+        "textAccount": "创建您的账号以注册 ReseñaLo 并发现新地方。",
+        "register": "注册",
+        "passwordPlaceHolder": "密码"
+    },
+    "registerScreen": {
+        "createAccount": "创建账号",
+        "footer": "请输入您的电子邮件和密码以创建账号：",
+        "email": "电子邮件",
+        "password": "密码",
+        "confirm": "确认密码",
+        "user": "用户名",
+        "name": "姓名",
+        "date": "出生日期 (日/月/年)",
+        "register": "注册",
+        "buttonPrivaticy": "隐私条款",
+        "buttonAccept": "接受条款",
+        "buttonClose": "关闭"
+    },
+    "home": {
+        "buttonFriend": "朋友",
+        "buttonExplorer": "探索"
+    },
+    "publishScreen": {
+        "new_place": "新地点",
+        "header": "添加新地点",
+        "name": "地点名称",
+        "new_name": "新地点",
+        "location": "位置",
+        "new_location": "例如 40.7128°,-74.0060°",
+        "type": "类型",
+        "new_type": "地点类型",
+        "description": "描述",
+        "new_description": "地点描述",
+        "buttonAdd": "添加到地图",
+        "buttonRestart": "重置",
+        "buttonDelete": "删除照片",
+        "buttonAddMap": "添加到地图"
+    },
+    "buttonAdd": {
+        "add": "添加图片",
+        "option": "请选择一个选项",
+        "gallery": "相册",
+        "camera": "相机",
+        "cancel": "取消"
+    },
+    "profile": {
+        "buttonEdit": "编辑个人资料",
+        "post": "发布",
+        "logout": "退出登录",
+        "change_lang": "更改语言",
+        "change_theme": "更改主题",
+        "cancel": "取消",
+        "save": "保存更改",
+        "title": "选择语言",
+        "light_mode": "浅色模式",
+        "dark_mode": "深色模式",
+        "followers": "粉丝",
+        "name": "姓名",
+        "username": "用户名",
+        "bio": "个人简介",
+        "exit": "退出"
+    },
+    "listUser": {
+        "search": "搜索用户",
+        "search_placeholder": "搜索用户...",
+        "button": "加载更多",
+        "error": "未找到用户。",
+        "notFound": "未找到用户。",
+        "errorSearch": "未找到该名称的地点："
+    },
+    "language": {
+        "es": "西班牙语 🇪🇸",
+        "en": "英语 🇬🇧",
+        "ca": "瓦伦西亚语 🏳️",
+        "zh": "中文 🇨🇳"
+    },
+    "placeScreen": {
+        "buttonPodium": "前10名地点",
+        "headerPodium": "点评排行榜",
+        "anotherPlace": "其他推荐地点",
+        "noReview": "尚无点评。",
+        "errorSearch": "未找到该名称的地点："
+    },
+    "friends": {
+        "friends": "朋友",
+        "list": "好友列表",
+        "searchHolder": "按名称搜索",
+        "notFound": "您还没有好友",
+        "notFoundFriend": "未找到该名称的好友",
+        "errorSearch": "未找到该名称的好友："
+    },
+    "buttonExplorer": {
+        "list": "地点列表",
+        "searchHolder": "按标题搜索",
+        "errorSearch": "未找到该标题的地点：",
+        "noReview": "尚无点评"
+    },
+    "stackReview": {
+        "comments": "评论",
+        "addComment": "添加评论"
+    },
+    "modalReview": {
+        "header": "你觉得怎么样？",
+        "inputHolder": "在此写下你对这个地方的评价...",
+        "buttonAdd": "发布评价",
+        "buttonCancel": "取消"
+    },
+    "profileFriend": {
+        "buttonFollow": "关注",
+        "buttonUnfollow": "取消关注",
+        "followers": "粉丝",
+        "posts": "发布"
+    },
+    "response": {
+        "afirmative": "是",
+        "negative": "否"
+    },
+    "alerts": {
+        "empptyData": "数据为空",
+        "invalidEmail": "电子邮件错误",
+        "loginError": "登录失败",
+        "obligatory": "所有字段均为必填项",
+        "differentsPassword": "密码不匹配",
+        "isValidEmail": "请输入有效的电子邮件地址",
+        "privacity": "您必须接受隐私条款",
+        "registerProblem": "注册时出现问题",
+        "connection": "连接出现问题",
+        "code": "请输入验证码。",
+        "publishScreen": "请填写所有字段并确保已添加图片。",
+        "latitude": "请输入正确格式的坐标（纬度,经度）。",
+        "anonim": "匿名",
+        "excelentPublish": "评价发布成功。",
+        "errorPublish": "发布评价时出错。",
+        "errorConnection": "发送数据时出错。请重试。",
+        "emailSession": "错误，未找到登录会话电子邮件。",
+        "emptyUsername": "错误，姓名和用户名不能为空。",
+        "excelentEdit": "成功，个人资料已更新。",
+        "errorEdit": "错误，无法保存更改。",
+        "errorSession": "错误，无会话信息。",
+        "isInvalidImage": "错误，图片无效。",
+        "errorUrl": "错误，服务器未返回有效的 URL。",
+        "errorImage": "错误，无法上传图片。",
+        "changeImage": "更换头像，请选择一个选项",
+        "permissionGallery": "权限限制，需要访问相册权限。",
+        "permissionCamera": "权限限制，需要访问相机权限。"
+    }
+}

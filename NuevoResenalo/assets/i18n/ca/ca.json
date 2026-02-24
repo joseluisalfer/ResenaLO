@@ -1,0 +1,152 @@
+{
+    "loginScreen": {
+        "login": "Inicia sessió",
+        "footer": "Introduïu la vostra adreça de correu electrònic i contrasenya per a iniciar sessió en aquesta aplicació",
+        "createAccount": "Crear compte",
+        "textAccount": "Crea el teu compte per a registrar-te en ReseñaLo i descobrir nous llocs.",
+        "register": "Registrar-se",
+        "passwordPlaceHolder": "Contrasenya"
+    },
+    "registerScreen": {
+        "createAccount": "Crear compte",
+        "footer": "Introduïu el vostre correu electrònic i contrasenya per a crear un compte:",
+        "email": "correu electrònic",
+        "password": "contrasenya",
+        "confirm": "Confirmar contrasenya",
+        "user": "Nom d'usuari",
+        "name": "Nom",
+        "date": "Data de naixement (DD/MM/AAAA)",
+        "register": "Registrar-se",
+        "buttonPrivaticy": "Termes de privacitat",
+        "buttonAccept": "Acceptar Termes",
+        "buttonClose": "Tancar"
+    },
+    "home": {
+        "buttonFriend": "Amics",
+        "buttonExplorer": "Explorar"
+    },
+    "publishScreen": {
+        "new_place": "Nou lloc",
+        "header": "Afegir nou lloc",
+        "name": "Nom del lloc",
+        "new_name": "Nou lloc",
+        "location": "Ubicació",
+        "new_location": "Exemple 40.7128°,-74.0060°",
+        "type": "Tipus",
+        "new_type": "Tipus de lloc",
+        "description": "Descripció",
+        "new_description": "Descripció del lloc",
+        "buttonAdd": "Afegir al mapa",
+        "buttonRestart": "Restablir",
+        "buttonDelete": "Eliminar Fotos",
+        "buttonAddMap": "Afegir al mapa"
+    },
+    "buttonAdd": {
+        "add": "Afegir imatge",
+        "option": "Tria una opció",
+        "gallery": "GALERIA",
+        "camera": "CÀMERA",
+        "cancel": "CANCEL·LAR"
+    },
+    "profile": {
+        "buttonEdit": "Editar Perfil",
+        "post": "Publicacions",
+        "logout": "Tancar sessió",
+        "change_lang": "Canviar idioma",
+        "change_theme": "Canviar Tema",
+        "cancel": "Cancel·lar",
+        "save": "Guardar canvis",
+        "title": "Seleccionar idioma",
+        "light_mode": "Tema Clar",
+        "dark_mode": "Tema fosc",
+        "followers": "Seguidors",
+        "name": "Nom",
+        "username": "Nom d'usuari",
+        "bio": "Biografia",
+        "exit": "Eixir"
+    },
+    "listUser": {
+        "search": "Buscar usuaris",
+        "search_placeholder": "Buscar usuari...",
+        "button": "Carregar més",
+        "error": "No s'han trobat usuaris.",
+        "notFound": "No s'han trobat usuaris.",
+        "errorSearch": "No hi ha llocs amb aquest nom: "
+    },
+    "language": {
+        "es": "Castellà 🇪🇸",
+        "en": "Anglés 🇬🇧",
+        "ca": "Valencià 🏳️",
+        "zh": "Xinés 🇨🇳"
+    },
+    "placeScreen": {
+        "buttonPodium": "Top 10 llocs",
+        "headerPodium": "Podi de ressenyes",
+        "anotherPlace": "Altres llocs destacats",
+        "noReview": "No hi ha ressenyes encara.",
+        "errorSearch": "No s'han trobat llocs amb aquest nom: "
+    },
+    "friends": {
+        "friends": "Amics",
+        "list": "Llista d'Amics",
+        "searchHolder": "Buscar per nom",
+        "notFound": "Encara no tens amics",
+        "notFoundFriend": "No tens cap amic amb aquest nom",
+        "errorSearch": "No s'han trobat amics amb aquest nom: "
+    },
+    "buttonExplorer": {
+        "list": "Llista de llocs",
+        "searchHolder": "Buscar per títol",
+        "errorSearch": "No hi ha llocs amb aquest títol: ",
+        "noReview": "No hi ha ressenyes encara"
+    },
+    "stackReview": {
+        "comments": "COMENTARIS",
+        "addComment": "AFEGIR COMENTARI"
+    },
+    "modalReview": {
+        "header": "Què t'ha semblat?",
+        "inputHolder": "Escriu ací la teua opinió sobre este lloc...",
+        "buttonAdd": "Publicar ressenya",
+        "buttonCancel": "Cancel·lar"
+    },
+    "profileFriend": {
+        "buttonFollow": "Seguir",
+        "buttonUnfollow": "Deixar de seguir",
+        "followers": "Seguidors",
+        "posts": "Publicacions"
+    },
+    "response": {
+        "afirmative": "Sí",
+        "negative": "No"
+    },
+    "alerts": {
+        "empptyData": "Dades buides",
+        "invalidEmail": "Email incorrecte",
+        "loginError": "Inici de sessió incorrecte",
+        "obligatory": "Tots els camps són obligatoris",
+        "differentsPassword": "Les contrasenyes no coincideixen",
+        "isValidEmail": "Per favor, introduïu un correu electrònic vàlid",
+        "privacity": "Heu d'acceptar els termes de privacitat",
+        "registerProblem": "Hi ha hagut un problema amb el registre",
+        "connection": "Hi ha hagut un problema amb la connexió",
+        "code": "Per favor, introduïu el codi de verificació.",
+        "publishScreen": "Per favor, completa tots els camps i assegura't d'haver afegit una imatge.",
+        "latitude": "Per favor, introduïu les coordenades en el format correcte (latitud, longitud).",
+        "anonim": "Anònim",
+        "excelentPublish": "Ressenya publicada amb èxit.",
+        "errorPublish": "Hi ha hagut un error en publicar la ressenya.",
+        "errorConnection": "Hi ha hagut un error en enviar les dades. Per favor, torna-ho a intentar.",
+        "emailSession": "Error, No s'ha trobat l'email de sessió.",
+        "emptyUsername": "Error, El nom i el nom d'usuari no poden estar buits.",
+        "excelentEdit": "Èxit, Perfil actualitzat correctament.",
+        "errorEdit": "Error, No s'han pogut guardar els canvis.",
+        "errorSession": "Error, No hi ha sessió.",
+        "isInvalidImage": "Error, Imatge invàlida.",
+        "errorUrl": "Error, El servidor no ha retornat una URL vàlida.",
+        "errorImage": "Error, No s'ha pogut pujar la imatge.",
+        "changeImage": "Canviar imatge de perfil, tria una opció",
+        "permissionGallery": "Permís, es requereix permís de galeria.",
+        "permissionCamera": "Permís, es requereix permís de càmera."
+    }
+}

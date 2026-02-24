@@ -1,0 +1,152 @@
+{
+    "loginScreen": {
+        "login": "Log In",
+        "footer": "Enter your email address and password to log in to this application",
+        "createAccount": "Create account",
+        "textAccount": "Create your account to register in ReseñaLo and discover new places.",
+        "register": "Register",
+        "passwordPlaceHolder": "Password"
+    },
+    "registerScreen": {
+        "createAccount": "Create account",
+        "footer": "Enter your email and password to create an account:",
+        "email": "Email",
+        "password": "Password",
+        "confirm": "Confirm password",
+        "user": "Username",
+        "name": "Name",
+        "date": "Date of birth (DD/MM/YYYY)",
+        "register": "Register",
+        "buttonPrivaticy": "Privacy Terms",
+        "buttonAccept": "Accept Terms",
+        "buttonClose": "Close"
+    },
+    "home": {
+        "buttonFriend": "Friends",
+        "buttonExplorer": "Explore"
+    },
+    "publishScreen": {
+        "new_place": "New place",
+        "header": "Add new place",
+        "name": "Place name",
+        "new_name": "New place",
+        "location": "Location",
+        "new_location": "Example 40.7128°,-74.0060°",
+        "type": "Type",
+        "new_type": "Place type",
+        "description": "Description",
+        "new_description": "Place description",
+        "buttonAdd": "Add to map",
+        "buttonRestart": "Reset",
+        "buttonDelete": "Delete Photos",
+        "buttonAddMap": "Add to map"
+    },
+    "buttonAdd": {
+        "add": "Add image",
+        "option": "Choose an option",
+        "gallery": "GALLERY",
+        "camera": "CAMERA",
+        "cancel": "CANCEL"
+    },
+    "profile": {
+        "buttonEdit": "Edit Profile",
+        "post": "Posts",
+        "logout": "Log out",
+        "change_lang": "Change language",
+        "change_theme": "Change Theme",
+        "cancel": "Cancel",
+        "save": "Save changes",
+        "title": "Select language",
+        "light_mode": "Light Mode",
+        "dark_mode": "Dark mode",
+        "followers": "Followers",
+        "name": "Name",
+        "username": "Username",
+        "bio": "Bio",
+        "exit": "Exit"
+    },
+    "listUser": {
+        "search": "Search users",
+        "search_placeholder": "Search user...",
+        "button": "Load more",
+        "error": "No users found.",
+        "notFound": "No users found.",
+        "errorSearch": "No sites found with that name: "
+    },
+    "language": {
+        "es": "Spanish 🇪🇸",
+        "en": "English 🇬🇧",
+        "ca": "Valencian 🏳️",
+        "zh": "Chinese 🇨🇳"
+    },
+    "placeScreen": {
+        "buttonPodium": "Top 10 places",
+        "headerPodium": "Review Podium",
+        "anotherPlace": "Other featured places",
+        "noReview": "No reviews yet.",
+        "errorSearch": "No places found with that name: "
+    },
+    "friends": {
+        "friends": "Friends",
+        "list": "Friends List",
+        "searchHolder": "Search by name",
+        "notFound": "You don't have any friends yet",
+        "notFoundFriend": "You don't have any friend with that name",
+        "errorSearch": "No friends found with that name: "
+    },
+    "buttonExplorer": {
+        "list": "Site list",
+        "searchHolder": "Search by title",
+        "errorSearch": "No places found with that title: ",
+        "noReview": "No reviews yet"
+    },
+    "stackReview": {
+        "comments": "COMMENTS",
+        "addComment": "ADD COMMENT"
+    },
+    "modalReview": {
+        "header": "What did you think?",
+        "inputHolder": "Write your opinion about this place here...",
+        "buttonAdd": "Post review",
+        "buttonCancel": "Cancel"
+    },
+    "profileFriend": {
+        "buttonFollow": "Follow",
+        "buttonUnfollow": "Unfollow",
+        "followers": "Followers",
+        "posts": "Posts"
+    },
+    "response": {
+        "afirmative": "Yes",
+        "negative": "No"
+    },
+    "alerts": {
+        "empptyData": "Empty data",
+        "invalidEmail": "Incorrect email",
+        "loginError": "Incorrect login",
+        "obligatory": "All fields are required",
+        "differentsPassword": "Passwords do not match",
+        "isValidEmail": "Please enter a valid email address",
+        "privacity": "You must accept the privacy terms",
+        "registerProblem": "There was a problem with the registration",
+        "connection": "There was a connection problem",
+        "code": "Please enter the verification code.",
+        "publishScreen": "Please complete all fields and make sure you have added an image.",
+        "latitude": "Please enter the coordinates in the correct format (latitude, longitude).",
+        "anonim": "Anonymous",
+        "excelentPublish": "Review published successfully.",
+        "errorPublish": "There was an error publishing the review.",
+        "errorConnection": "There was an error sending the data. Please try again.",
+        "emailSession": "Error, session email not found.",
+        "emptyUsername": "Error, Name and username cannot be empty.",
+        "excelentEdit": "Success, Profile updated correctly.",
+        "errorEdit": "Error, Changes could not be saved.",
+        "errorSession": "Error, No active session.",
+        "isInvalidImage": "Error, Invalid image.",
+        "errorUrl": "Error, The server did not return a valid URL.",
+        "errorImage": "Error, Could not upload image.",
+        "changeImage": "Change profile picture, Choose an option",
+        "permissionGallery": "Permission, Gallery permission is required.",
+        "permissionCamera": "Permission, Camera permission is required."
+    }
+}

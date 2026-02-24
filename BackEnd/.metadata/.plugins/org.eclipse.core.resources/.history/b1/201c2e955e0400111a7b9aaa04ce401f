@@ -1,0 +1,84 @@
+package principal.controller;
+
+import java.io.IOException;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import static com.mongodb.client.model.Filters.*;
+
+@RestController
+@RequestMapping("first")
+public class PrincipalController {
+
+	MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+	MongoDatabase database = mongoClient.getDatabase("ResenaLo");
+	MongoCollection<Document> accounts = database.getCollection("acounts");
+
+	@PostMapping("register")
+	public ResponseEntity<Object> register(@RequestBody String body) throws IOException {
+
+		JSONObject json = new JSONObject(body);
+		String user = json.getString("user");
+		String email = json.getString("email");
+		String password = json.getString("password");
+		String password2 = json.getString("password2");
+
+		boolean errorPassword = false;
+
+		MongoCursor<Document> existAcountEmail = accounts.find(eq("email", email)).iterator();
+		if (!existAcountEmail.hasNext()) {
+			if (password.equals(password2)) {
+				Document doc = new Document().append("user", user).append("email", email).append("password", password)
+						.append("logged", "false");
+				accounts.insertOne(doc);
+			} else {
+				errorPassword = true;
+			}
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Este correo ya esta registrado"); // 401
+		}
+
+		if (errorPassword) {
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Las contraseñas no son iguales"); // 406
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body("Cuenta creada con EXITO"); // 200
+		}
+	}
+
+	@PostMapping("login")
+	public ResponseEntity<Object> login(@RequestBody String body) throws IOException {
+
+		JSONObject json = new JSONObject(body);
+		String user = json.getString("user");
+		String email = json.getString("email");
+		String password = json.getString("password");
+
+		boolean errorPassword = false;
+
+		Bson queryLogin = and(eq("email", email), eq("user", user), eq("password", password)); 
+		MongoCursor<Document> existAcountEmail = accounts
+				.find(queryLogin).iterator();
+		if (existAcountEmail.hasNext()) {
+				accounts.updateOne(queryLogin,
+						new Document("$set", new Document("logged", true)));
+			
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("O las credenciales son incorrectas o no te has registrado anteriormente"); // 401
+		}
+
+		
+	}
+}
