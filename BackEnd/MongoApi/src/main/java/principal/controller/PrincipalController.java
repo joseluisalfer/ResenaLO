@@ -479,53 +479,42 @@ public class PrincipalController {
 		userRepository.save(user);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
-
-	@PostMapping("/commentReview")
+	
+	@PostMapping("commentReview")
 	public ResponseEntity<Object> commentReview(@RequestBody String body) throws IOException {
 
-		JSONObject json = new JSONObject(body);
-		String reviewId = json.getString("reviewId");
-		String user = json.getString("user");
-		String text = json.getString("text");
-		Date date = new Date();
-		Double valoration = json.getDouble("valoration");
+	    JSONObject json = new JSONObject(body);
+	    String reviewId = json.getString("reviewId");
+	    String user = json.getString("user");
+	    String text = json.getString("text");
+	    Double valoration = json.getDouble("valoration");
+	    Date date = new Date();
 
-		// Verificar si la reseña con el id proporcionado existe
-		Optional<Review> Oreview = reviewRepository.findById(reviewId);
+	    Optional<Review> Oreview = reviewRepository.findById(reviewId);
 
-		if (Oreview.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reseña no encontrada.");
-		}
+	    if (Oreview.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reseña no encontrada.");
+	    }
 
-		// Crear el nuevo comentario
-		Comments comment = new Comments(reviewId, user, text, date, valoration);
+	    Comments comment = new Comments(reviewId, user, text, date, valoration);
+	    commentsRepository.save(comment);
 
-		// Guardar el comentario en la colección de comentarios
-		commentsRepository.save(comment);
+	    Review review = Oreview.get();
+	    
+	    List<Comments> commentsList = commentsRepository.findByReviewId(reviewId);
+	    
+	    double totalValoration = review.getValorationInitial();
+	    int totalCount = 1;
 
-		// Obtener la reseña de la base de datos
-		Review review = Oreview.get();
+	    for (Comments c : commentsList) {
+	        totalValoration += c.getValoration();
+	        totalCount++;
+	    }
+	    
+	    review.setValoration(totalValoration / totalCount);
+	    reviewRepository.save(review);
 
-		// Sumar la valoración del comentario a la reseña
-		List<Comments> commentsList = commentsRepository.findByReviewId(reviewId);
-		double totalValoration = review.getValorationInitial(); // Valoracion de la reseña
-		int totalCount = 1;
-
-		// Sumamos las valoraciones de todos los comentarios
-		for (Comments c : commentsList) {
-			totalValoration += c.getValoration();
-			totalCount++;
-		}
-		
-		
-		double newValoration = totalValoration / totalCount;
-		review.setValoration(newValoration);
-
-		// Guardar la reseña con la nueva valoración
-		reviewRepository.save(review);
-
-		// Responder con éxito
-		return ResponseEntity.status(HttpStatus.OK).build();
+	    return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PutMapping("updatePhoto")
@@ -603,46 +592,46 @@ public class PrincipalController {
 	@DeleteMapping("deleteComment")
 	public ResponseEntity<Object> deleteComment(@RequestBody String body) throws IOException {
 
-		JSONObject json = new JSONObject(body);
-		String idComment = json.getString("idComment");
+	    // 1. Extraer el ID del comentario del body
+	    JSONObject json = new JSONObject(body);
+	    String idComment = json.getString("idComment");
 
-		Optional<Comments> Ocomment = commentsRepository.findById(idComment);
-		if (Ocomment.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+	    // 2. Buscar si el comentario existe
+	    Optional<Comments> Ocomment = commentsRepository.findById(idComment);
+	    if (Ocomment.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
 
-		Comments comment = Ocomment.get();
-		String reviewId = comment.getReviewId();
+	    Comments comment = Ocomment.get();
+	    String reviewId = comment.getReviewId();
 
-		// borrar comentario
-		commentsRepository.deleteById(idComment);
+	    // 3. Borrar el comentario
+	    commentsRepository.deleteById(idComment);
 
-		// buscar review
-		Optional<Review> Oreview = reviewRepository.findById(reviewId);
-		if (Oreview.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-		}
+	    // 4. Buscar la review para recalcular su valoración
+	    Optional<Review> Oreview = reviewRepository.findById(reviewId);
+	    if (Oreview.isEmpty()) {
+	        // Si no hay review (porque se borró antes), devolvemos éxito pero sin contenido
+	        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	    }
 
-		Review review = Oreview.get();
+	    Review review = Oreview.get();
 
-		List<Comments> remaining = commentsRepository.findByReviewId(reviewId);
+	    // 5. Obtener los comentarios que quedan y calcular el nuevo promedio
+	    List<Comments> remaining = commentsRepository.findByReviewId(reviewId);
 
-		double sum = review.getValorationInitial();
-		int count = 1;
-		for (Comments c : remaining) {
-			sum += c.getValoration();
-			count++;
-		}
+	    double sum = review.getValorationInitial();
+	    int count = 1 + remaining.size(); // Review inicial + comentarios restantes
 
-		if (count == 1) {
-			review.setValoration(review.getValorationInitial());
-			reviewRepository.save(review);
-		} else {
-			review.setValoration(sum / count);
-			reviewRepository.save(review);
-		}
+	    for (Comments c : remaining) {
+	        sum += c.getValoration();
+	    }
 
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	    // Actualizar y guardar
+	    review.setValoration(sum / count);
+	    reviewRepository.save(review);
+
+	    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@GetMapping("/userEmail")
