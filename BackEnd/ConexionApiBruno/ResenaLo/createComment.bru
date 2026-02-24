@@ -1,0 +1,25 @@
+meta {
+  name: createComment
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/resenalo/commentReview
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "reviewId": "699c2f2d4341b33cddfba375",
+    "user": "unai",
+    "text": "comprobacion3",
+    "valoration": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

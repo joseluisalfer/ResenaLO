@@ -1,0 +1,19 @@
+meta {
+  name: userEmail
+  type: http
+  seq: 10
+}
+
+get {
+  url: http://44.213.235.160:8080/resenalo/userEmail?email=cjenb@gmail.com
+  body: none
+  auth: inherit
+}
+
+params:query {
+  email: cjenb@gmail.com
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/first/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "user": "oscar",
+    "email": "oscarmartorellg@gmail.com",
+    "password": "1233",
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,15 @@
+meta {
+  name: infoUser
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:8080/first/user
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
