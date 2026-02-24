@@ -154,6 +154,8 @@ public class PrincipalController {
 	 *   "name": "John Doe"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if registered, 409 if email or username exists
 	 */
 	@PostMapping("/register")
 	public ResponseEntity<Object> register(@RequestBody String body) throws IOException, MessagingException {
@@ -213,6 +215,8 @@ public class PrincipalController {
 	 *   "password": "password123"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if authenticated, 401 if credentials are invalid
 	 */
 	@PostMapping("/login")
 	public ResponseEntity<Object> login(@RequestBody String body) {
@@ -254,6 +258,43 @@ public class PrincipalController {
 	}
 
 	/**
+	 * Logout endpoint: expects an email in the request body and performs
+	 * logout-related persistence updates if necessary.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com"
+	 * }
+	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if logout successful, 400/404 if error
+	 */
+	@PostMapping("/logout")
+	public ResponseEntity<Object> logout(@RequestBody String body) {
+		try {
+			JSONObject json = new JSONObject(body);
+			String email = json.getString("email");
+
+			// Buscar usuario por email
+			User dbUser = userRepository.findByEmail(email);
+
+			if (dbUser == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+						.body("Credenciales incorrectas o usuario no registrado");
+			}
+
+			userRepository.save(dbUser);
+
+			return ResponseEntity.status(HttpStatus.OK).build();
+
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error en el servidor: " + e.getMessage());
+		}
+	}
+
+	/**
 	 * Verify an email using a numeric token.
 	 * Expects JSON with token and email. If token matches, marks user as verified.
 	 * <br>
@@ -264,6 +305,8 @@ public class PrincipalController {
 	 *   "token": 123456
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if verified, 401 if token/email invalid
 	 */
 	@PostMapping("verifyEmail")
 	public ResponseEntity<Object> verifyEMail(@RequestBody String body) {
@@ -304,6 +347,8 @@ public class PrincipalController {
 	 *   "files": ["base64string1", "base64string2"]
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if review uploaded, 400/404 if error
 	 */
 	@PostMapping("/uploadReview")
 	public ResponseEntity<Object> uploadReview(@RequestBody String body) throws IOException {
@@ -345,7 +390,7 @@ public class PrincipalController {
 				byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
 				String relative = "reviews/" + resena.getId() + "/" + UUID.randomUUID() + ".jpg";
-				String key = s3PublicImageService.buildKey(relative); 
+				String key = s3PublicImageService.buildKey(relative); // -> public/....
 
 				String publicUrl = s3PublicImageService.uploadAndGetPublicUrl(key, imageBytes, "image/jpeg");
 				resena.getImageUrls().add(publicUrl);
@@ -369,6 +414,8 @@ public class PrincipalController {
 	 *   "userFollow": "bob"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if follow successful, 400/404 if error
 	 */
 	@PostMapping("addFollow")
 	public ResponseEntity<String> addFollow(@RequestBody Map<String, String> body) {
@@ -421,6 +468,8 @@ public class PrincipalController {
 	 *   "userFollow": "bob"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if unfollowed, 404 if user not found
 	 */
 	@PostMapping("deleteFollow")
 	public ResponseEntity<Object> deleteFollow(@RequestBody String body) throws IOException {
@@ -476,6 +525,8 @@ public class PrincipalController {
 	 *   "newTitle": "Updated Title"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if updated, 404 if review not found
 	 */
 	@PutMapping("updateTitle")
 	public ResponseEntity<Object> updateTitle(@RequestBody String body) throws IOException {
@@ -510,6 +561,8 @@ public class PrincipalController {
 	 *   "newText": "Updated comment text."
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if updated, 404 if comment not found
 	 */
 	@PutMapping("updateComment")
 	public ResponseEntity<Object> updateComment(@RequestBody String body) throws IOException {
@@ -546,6 +599,8 @@ public class PrincipalController {
 	 *   "newDescription": "New description."
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if updated, 404/406 if error
 	 */
 	@PutMapping("updateUser")
 	public ResponseEntity<Object> updateUser(@RequestBody String body) throws IOException {
@@ -615,6 +670,8 @@ public class PrincipalController {
 	 *   "valoration": 4.0
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if comment added, 404 if review not found
 	 */
 	@PostMapping("commentReview")
 	public ResponseEntity<Object> commentReview(@RequestBody String body) throws IOException {
@@ -665,6 +722,8 @@ public class PrincipalController {
 	 *   "file": "base64string..."
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK with new imageUrl, 400/404 if error
 	 */
 	@PutMapping("updatePhoto")
 	public ResponseEntity<Object> updatePhoto(@RequestBody String body) throws IOException {
@@ -721,6 +780,8 @@ public class PrincipalController {
 	 *   "idReview": "reviewId123"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 204 No Content if deleted, 400/404 if error
 	 */
 	@DeleteMapping("deleteReview")
 	public ResponseEntity<Object> deleteReview(@RequestBody(required = false) String body) {
@@ -758,6 +819,8 @@ public class PrincipalController {
 	 *   "idComment": "commentId123"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 204 No Content if deleted, 404 if comment not found
 	 */
 	@DeleteMapping("deleteComment")
 	public ResponseEntity<Object> deleteComment(@RequestBody String body) throws IOException {
@@ -830,6 +893,8 @@ public class PrincipalController {
 	 *   }
 	 * }
 	 * </pre>
+	 * @param em email address
+	 * @return 200 OK with user info JSON, 404 if not found
 	 */
 	@GetMapping("/userEmail")
 	public ResponseEntity<String> userEmail(@RequestParam(value = "email") String em) {
@@ -926,6 +991,8 @@ public class PrincipalController {
 	 * Similar to /userEmail but intended for other use cases (keeps same structure).
 	 * <br>
 	 * Example request: <code>/userEmailOther?email=user@example.com</code>
+	 * @param em email address
+	 * @return 200 OK with user info JSON, 404 if not found
 	 */
 	@GetMapping("/userEmailOther")
 	public ResponseEntity<String> userEmailOther(@RequestParam(value = "email") String em) {
@@ -1018,6 +1085,8 @@ public class PrincipalController {
 	 * Includes created date, reviews and social links.
 	 * <br>
 	 * Example request: <code>/user?userName=username</code>
+	 * @param userName username
+	 * @return 200 OK with user info JSON, 404 if not found
 	 */
 	@GetMapping("/user")
 	public ResponseEntity<String> user(@RequestParam(value = "userName") String userName) {
@@ -1130,6 +1199,8 @@ public class PrincipalController {
 	 *   "images": ["url1", "url2"]
 	 * }
 	 * </pre>
+	 * @param id review id
+	 * @return 200 OK with review JSON, 404 if not found
 	 */
 	@GetMapping("/review")
 	public ResponseEntity<String> review(@RequestParam(value = "id") String id) {
@@ -1182,6 +1253,8 @@ public class PrincipalController {
 	 *   "image": "url"
 	 * }
 	 * </pre>
+	 * @param id review id
+	 * @return 200 OK with review preview JSON, 404 if not found
 	 */
 	@GetMapping("/reviewP")
 	public ResponseEntity<String> reviewP(@RequestParam(value = "id") String id) {
@@ -1215,6 +1288,8 @@ public class PrincipalController {
 	 * Search reviews by place/title and return an array of review objects with images.
 	 * <br>
 	 * Example request: <code>/reviewPlace?title=Great+Place!</code>
+	 * @param title review title
+	 * @return 200 OK with array of reviews
 	 */
 	@GetMapping("/reviewPlace")
 	public ResponseEntity<String> reviewPlace(@RequestParam(value = "title") String title) {
@@ -1236,7 +1311,7 @@ public class PrincipalController {
 			jsonReview.put("longitud", review.getLongitud());
 			jsonReview.put("type", review.getType());
 
-			JSONArray jsonImagesArray = new JSONArray();
+				JSONArray jsonImagesArray = new JSONArray();
 			List<String> urls = review.getImageUrls();
 			if (urls != null) {
 				for (String u : urls) {
@@ -1259,6 +1334,9 @@ public class PrincipalController {
 	 * Paginate and return all users as an array of user links and pagination metadata.
 	 * <br>
 	 * Example request: <code>/users?page=0&size=5</code>
+	 * @param page page number
+	 * @param size page size
+	 * @return 200 OK with users and pagination info
 	 */
 	@GetMapping("/users")
 	public ResponseEntity<String> getAllUsers(@RequestParam(defaultValue = "0") int page,
@@ -1300,6 +1378,9 @@ public class PrincipalController {
 	 * Paginate and return reviews as preview links with pagination metadata.
 	 * <br>
 	 * Example request: <code>/reviews?page=0&size=10</code>
+	 * @param page page number
+	 * @param size page size
+	 * @return 200 OK with reviews and pagination info
 	 */
 	@GetMapping("/reviews")
 	public ResponseEntity<String> reviews(@RequestParam(defaultValue = "0") int page, // Página actual, predeterminado
@@ -1337,6 +1418,9 @@ public class PrincipalController {
 	 * Paginate and return comments with metadata. Each comment includes a link to its review.
 	 * <br>
 	 * Example request: <code>/comments?page=0&size=10</code>
+	 * @param page page number
+	 * @param size page size
+	 * @return 200 OK with comments and pagination info
 	 */
 	@GetMapping("comments")
 	public ResponseEntity<String> comments(@RequestParam(defaultValue = "0") int page,
@@ -1392,6 +1476,8 @@ public class PrincipalController {
 	 * Return all comments for a specific review id.
 	 * <br>
 	 * Example request: <code>/comment?idReview=reviewId123</code>
+	 * @param idReview review id
+	 * @return 200 OK with array of comments, 404 if review not found
 	 */
 	@GetMapping("/comment")
 	public ResponseEntity<String> comment(@RequestParam(value = "idReview") String idReview) {
@@ -1424,6 +1510,7 @@ public class PrincipalController {
 	 * Return a small list of random review preview links (max 4) shuffled randomly.
 	 * <br>
 	 * Example request: <code>/randomReviews</code>
+	 * @return 200 OK with up to 4 random review preview links
 	 */
 	@GetMapping("/randomReviews")
 	public ResponseEntity<List<String>> randomReviews() {
@@ -1447,6 +1534,7 @@ public class PrincipalController {
 	 * Return a small list of random user profile links (max 10) shuffled randomly.
 	 * <br>
 	 * Example request: <code>/randomUsers</code>
+	 * @return 200 OK with up to 10 random user profile links
 	 */
 	@GetMapping("/randomUsers")
 	public ResponseEntity<List<String>> randomUsers() {
@@ -1465,6 +1553,7 @@ public class PrincipalController {
 	 * Return top 10 reviews by valoration as preview links.
 	 * <br>
 	 * Example request: <code>/top10Reviews</code>
+	 * @return 200 OK with top 10 review preview links
 	 */
 	@GetMapping("/top10Reviews")
 	public ResponseEntity<List<String>> top10Reviews() {
@@ -1481,6 +1570,7 @@ public class PrincipalController {
 	 * Return top 3 reviews by valoration as preview links.
 	 * <br>
 	 * Example request: <code>/top3Reviews</code>
+	 * @return 200 OK with top 3 review preview links
 	 */
 	@GetMapping("/top3Reviews")
 	public ResponseEntity<List<String>> top3Reviews() {
@@ -1496,6 +1586,8 @@ public class PrincipalController {
 	 * Search users by partial username (case-insensitive) and return an array of user objects.
 	 * <br>
 	 * Example request: <code>/searchUsers?user=alice</code>
+	 * @param userQuery partial username
+	 * @return 200 OK with array of user objects
 	 */
 	@GetMapping("/searchUsers")
 	public ResponseEntity<String> searchUsers(@RequestParam(value = "user") String userQuery) {
@@ -1588,6 +1680,8 @@ public class PrincipalController {
 	 *   "theme": "dark"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if updated, 400/404 if error
 	 */
 	@PostMapping("/updateTheme")
 	public ResponseEntity<Object> updateTheme(@RequestBody String body) throws IOException {
@@ -1624,6 +1718,8 @@ public class PrincipalController {
 	 *   "language": "es"
 	 * }
 	 * </pre>
+	 * @param body JSON request body
+	 * @return 200 OK if updated, 404 if user not found
 	 */
 	@PostMapping("/updateLanguage")
 	public ResponseEntity<Object> updateLanguage(@RequestBody String body) throws IOException {

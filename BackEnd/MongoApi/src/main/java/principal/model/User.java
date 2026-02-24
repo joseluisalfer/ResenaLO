@@ -125,29 +125,52 @@ public class User {
 		this.name = name;
 	}
 
+	/**
+	 * Gets the description of the user.
+	 * @return user description
+	 */
 	public String getDescription() {
 		return description;
 	}
 
+	/**
+	 * Sets the description of the user.
+	 * @param description user description
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * Gets the theme preference of the user (e.g., "light" or "dark").
+	 * @return theme preference
+	 */
 	public String getTheme() {
 		return theme;
 	}
 
+	/**
+	 * Sets the theme preference of the user.
+	 * @param theme theme preference
+	 */
 	public void setTheme(String theme) {
 		this.theme = theme;
 	}
 
+	/**
+	 * Gets the language preference of the user (e.g., "en", "es").
+	 * @return language preference
+	 */
 	public String getLanguage() {
 		return language;
 	}
 
+	/**
+	 * Sets the language preference of the user.
+	 * @param language language preference
+	 */
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-
 
 }
