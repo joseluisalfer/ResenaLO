@@ -1,56 +1,66 @@
 {
     "loginScreen": {
-        "login": "login",
+        "login": "Log In",
         "footer": "Enter your email address and password to log in to this application",
-        "createAccount": "Create account",
-        "textAccount": "Create your account to register on ReseñaLo and discover new places.",
+        "createAccount": "Create Account",
+        "textAccount": "Create your account to sign up for ReseñaLo and discover new places.",
         "register": "Register"
     },
     "registerScreen": {
-        "createAccount": "Create account",
+        "createAccount": "Create Account",
         "footer": "Enter your email and password to create an account:",
         "email": "Email",
         "password": "Password",
-        "confirm": "Confirm password",
+        "confirm": "Confirm Password",
         "user": "Username",
-        "date": "Date of birth (DD/MM/YYYY)",
+        "name": "Name",
+        "date": "Date of Birth (DD/MM/YYYY)",
         "register": "Register"
     },
     "home": {
-        "places_week": "Places of the week",
+        "places_week": "Places of the Week",
         "buttonFriend": "Friends",
         "buttonExplorer": "Explore"
     },
     "publishScreen": {
-        "new_place": "Add new place",
-        "name": "NAME",
-        "new_name": "Add new place",
-        "location": "LOCATION",
-        "new_location": "Add coordinates",
-        "type": "DESTINATION TYPE",
-        "new_type": "Choose the type",
-        "description": "DESCRIPTION",
-        "new_description": "Describe the place",
-        "buttonAdd": "Add to map"
+        "header": "Add New Place",
+        "name": "Place Name",
+        "new_name": "New Place",
+        "location": "Location",
+        "new_location": "Example: 40.7128°,-74.0060°",
+        "type": "Type",
+        "new_type": "Place Type",
+        "description": "Description",
+        "new_description": "Place Description",
+        "buttonAdd": "Add to Map",
+        "buttonRestart": "Reset",
+        "buttonDelete": "Delete Photo",
+        "buttonAddMap": "Add to Map"
     },
     "buttonAdd": {
-        "add": "Add image",
+        "add": "Add Image",
         "option": "Choose an option",
         "gallery": "GALLERY",
         "camera": "CAMERA",
         "cancel": "CANCEL"
     },
     "profile": {
-        "buttonEdit": "Edit profile",
+        "buttonEdit": "Edit Profile",
         "post": "Posts",
-        "logout": "Log out",
-        "change_lang": "Change language",
+        "logout": "Log Out",
+        "change_lang": "Change Language",
         "change_theme": "Change Theme",
         "cancel": "Cancel",
-        "comments": "Comments",
-        "friends": "Friends",
-        "save": "Save changes",
-        "title": "Select language"
+        "save": "Save Changes",
+        "title": "Select Language",
+        "light_mode": "Light Mode",
+        "dark_mode": "Dark Mode",
+        "followers": "Followers"
+    },
+    "listUser": {
+        "search": "Search Users",
+        "search_placeholder": "Search user...",
+        "button": "Load More"
     },
     "language": {
         "sp": "Spanish",
@@ -58,19 +68,33 @@
         "ca": "Valencian"
     },
     "placeScreen": {
-        "podium": "Top 10 Most Valued Places",
-        "anotherText": "Other Places"
+        "buttonPodium": "Top 10 Places",
+        "headerPodium": "Review Podium",
+        "anotherPlace": "Other Featured Places"
     },
     "friends": {
+        "friends": "Friends",
         "list": "Friends List",
-        "friends": "Friends"
+        "searchHolder": "Search by name"
     },
     "buttonExplorer": {
-        "list": "List of Sites"
+        "list": "Site List",
+        "searchHolder": "Search by title"
+    },
+    "stackReview": {
+        "comments": "Comments",
+        "addComment": "Add Comment"
     },
     "modalReview": {
-        "location": "Location:",
-        "calification": "Rating",
-        "images": "Images"
+        "header": "What did you think?",
+        "inputHolder": "Write your review about this place here...",
+        "buttonAdd": "Post Review",
+        "buttonCancel": "Cancel"
+    },
+    "profileFriend": {
+        "buttonFollow": "Follow",
+        "buttonUnfollow": "Unfollow",
+        "followers": "Followers",
+        "posts": "Posts"
     }
 }

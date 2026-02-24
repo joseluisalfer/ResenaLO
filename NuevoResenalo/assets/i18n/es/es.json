@@ -23,16 +23,19 @@
         "buttonExplorer": "Explorar"
     },
     "publishScreen": {
-        "new_place": "Añadir nuevo lugar.",
-        "name": "NOMBRE",
-        "new_name": "Añadir nuevo lugar",
-        "location": "UBICACIÓN",
-        "new_location": "Añadir coordenadas",
-        "type": "TIPO DE DESTINO",
-        "new_type": "Elige de que tipo es",
-        "description": "DESCRIPCIÓN",
-        "new_description": "Describe el lugar",
-        "buttonAdd": "Añadir al mapa"
+        "header": "Añadir nuevo lugar",
+        "name": "Nombre del lugar",
+        "new_name": "Nuevo lugar",
+        "location": "Ubicación",
+        "new_location": "Ejemplo 40.7128°,-74.0060°",
+        "type": "Tipo",
+        "new_type": "Tipo de lugar",
+        "description": "Descripción",
+        "new_description": "Descripción del lugar",
+        "buttonAdd": "Añadir al mapa",
+        "buttonRestart": "Restablecer",
+        "buttonDelete": "Eliminar Foto",
+        "buttonAddMap": "Añadir al mapa"
     },
     "buttonAdd": {
         "add": "Añadir imagen ",
@@ -48,11 +51,19 @@
         "change_lang": "Cambiar idioma",
         "change_theme": "Cambiar Tema",
         "cancel": "cancelar",
-        "comments": "Comentarios",
-        "friends": "Amigos",
         "save": "Guardar cambios",
-        "title": "Seleccionar idioma"
+        "title": "Seleccionar idioma",
+        "light_mode": "Tema Claro",
+        "dark_mode": "Tema oscuro",
+        "followers": "Seguidores"
     },
+
+     "listUser": {
+        "search": "Buscar usuarios",
+        "search_placeholder": "Buscar usuario...",
+        "button": "Cargar más"
+    },
+
     "language": {
         "sp": "Español",
         "en": "Ingles",
@@ -60,24 +71,43 @@
     },
 
     "placeScreen": {
-        "podium": "Top  10 lugares mas valorados",
-        "anotherText": "Otros lugares"
+        "buttonPodium": "Top 10 lugares",
+        "headerPodium": "Podio de reseñas",
+        "anotherPlace": "Otros lugares destacados"
     },
 
     "friends": {
-        "list": "Lista de Amigos",
-        "friends": "Amigos"
+        "friends": "Amigos",
+         "list": "Lista de Amigos",
+         "searchHolder": "Buscar por nombre"
     },
 
     "buttonExplorer":{
-        "list": "Lista de sitios"
+        "list": "Lista de sitios",
+        "searchHolder": "Buscar por título"
+    },
+
+
+    "stackReview":{
+       "comments": "Comentarios",
+         "addComment": "Añadir comentario"
     },
 
     "modalReview":{
-        "location": "Ubicación:",
-        "calification": "Calicación",
-        "images": "Imagenes"
+     "header": "¿Qué te pareció?",
+        "inputHolder": "Escribe aquí tu opinión sobre este lugar...",
+        "buttonAdd": "Publicar reseña",
+        "buttonCancel": "Cancelar"
+    }, 
+
+    "profileFriend":{
+       "buttonFollow": "Seguir",
+        "buttonUnfollow": "Dejar de seguir",
+        "followers": "Seguidores" , 
+        "posts": "Publicaciones"
     }
 
+
+    
     
 }
