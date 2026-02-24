@@ -1,0 +1,11 @@
+Manel:
+email: mviel@florida-uni.es
+pass: 1234
+
+Paco:
+email: fsegura@florida-uni.es
+pass: 1234
+
+Roberto:
+email: rsanz@florida-uni.es
+pass: 1234
