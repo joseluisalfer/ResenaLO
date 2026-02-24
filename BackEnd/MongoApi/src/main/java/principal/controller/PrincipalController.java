@@ -254,41 +254,6 @@ public class PrincipalController {
 	}
 
 	/**
-	 * Logout endpoint: expects an email in the request body and performs
-	 * logout-related persistence updates if necessary.
-	 * <br>
-	 * Example:
-	 * <pre>
-	 * {
-	 *   "email": "user@example.com"
-	 * }
-	 * </pre>
-	 */
-	@PostMapping("/logout")
-	public ResponseEntity<Object> logout(@RequestBody String body) {
-		try {
-			JSONObject json = new JSONObject(body);
-			String email = json.getString("email");
-
-			// Buscar usuario por email
-			User dbUser = userRepository.findByEmail(email);
-
-			if (dbUser == null) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-						.body("Credenciales incorrectas o usuario no registrado");
-			}
-
-			userRepository.save(dbUser);
-
-			return ResponseEntity.status(HttpStatus.OK).build();
-
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Error en el servidor: " + e.getMessage());
-		}
-	}
-
-	/**
 	 * Verify an email using a numeric token.
 	 * Expects JSON with token and email. If token matches, marks user as verified.
 	 * <br>
