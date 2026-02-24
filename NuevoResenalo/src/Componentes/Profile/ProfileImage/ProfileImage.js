@@ -10,14 +10,14 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-
+import { useTranslation } from "react-i18next";
 const ProfileImage = () => {
   // 1. Extraemos theme e isDark del Context
   const { emailLogged, setEmailLogged, theme, isDark } = useContext(Context);
 
   const userEmail = emailLogged?.results?.email || null;
   const currentImage = emailLogged?.results?.photo || emailLogged?.results?.image || null;
-
+  const { t } = useTranslation()
   const [imageUri, setImageUri] = useState(currentImage);
   const [updating, setUpdating] = useState(false);
 
@@ -102,12 +102,15 @@ const ProfileImage = () => {
     }
   };
 
-  const seleccionarImagen = async () => {
-    if (!userEmail) return Alert.alert(t("alerts.errorSession"));
+ const seleccionarImagen = async () => {
+  if (!userEmail) return Alert.alert(t("alerts.errorSession") || "Error");
 
-    Alert.alert(t("alerts.changeImage"), [
+  Alert.alert(
+    t("alerts.changeImage") || "Opciones",
+    "", // Añadimos un string vacío como mensaje para evitar errores de casteo
+    [
       {
-        text: t("buttonAdd.gallery"),
+        text: t("buttonAdd.gallery") || "Galería",
         onPress: async () => {
           const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
           if (!perm.granted) return Alert.alert(t("alerts.permissionGallery"));
@@ -121,7 +124,7 @@ const ProfileImage = () => {
         },
       },
       {
-        text: t("buttonAdd.camera"),
+        text: t("buttonAdd.camera") || "Cámara",
         onPress: async () => {
           const perm = await ImagePicker.requestCameraPermissionsAsync();
           if (!perm.granted) return Alert.alert(t("alerts.permissionCamera"));
@@ -133,9 +136,13 @@ const ProfileImage = () => {
           if (!result.canceled) handleUpdatePhoto(result.assets[0].uri);
         },
       },
-      { text: t("bubuttonAdd.cancel"), style: "cancel" },
-    ]);
-  };
+      { 
+        text: t("buttonAdd.cancel") || "Cancelar", 
+        style: "cancel" 
+      },
+    ]
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -144,9 +151,9 @@ const ProfileImage = () => {
         onPress={seleccionarImagen}
         style={[
           styles.photoSquare,
-          { 
-            borderColor: isDark ? "#444" : "#ccc", 
-            backgroundColor: isDark ? "#222" : "#f5f5f5" 
+          {
+            borderColor: isDark ? "#444" : "#ccc",
+            backgroundColor: isDark ? "#222" : "#f5f5f5"
           }
         ]}
         disabled={updating}
@@ -163,7 +170,7 @@ const ProfileImage = () => {
         {updating && (
           /* 4. Overlay de carga adaptado al modo oscuro */
           <View style={[
-            styles.loadingOverlay, 
+            styles.loadingOverlay,
             { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.6)" }
           ]}>
             <ActivityIndicator color={theme.primary || "#1748ce"} size="small" />
