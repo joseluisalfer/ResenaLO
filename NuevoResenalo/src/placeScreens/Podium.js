@@ -4,12 +4,13 @@ import { Card } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../services/Services";
 import Context from "../Context/Context";
-
+import { useTranslation } from "react-i18next";
 const Podium = ({ navigation }) => {
   const [top10, setTop10] = useState([]);
   const [loading, setLoading] = useState(true);
   const { setSearchUrl, theme, isDark } = useContext(Context);
-
+  const { t } = useTranslation();
+  
   useEffect(() => {
     const fetchTop10 = async () => {
       try {
@@ -112,7 +113,7 @@ const Podium = ({ navigation }) => {
         onPress={() => navigation.goBack()}
       />
 
-      <Text style={[styles.title, { color: theme.text }]}>Podio de Reseñas</Text>
+      <Text style={[styles.title, { color: theme.text }]}>{t('placeScreen.headerPodium')}</Text>
 
       {top10.length >= 3 && (
         <View style={styles.podium}>
@@ -130,7 +131,7 @@ const Podium = ({ navigation }) => {
         </View>
       )}
 
-      <Text style={[styles.subTitle, { color: theme.text }]}>Otros lugares destacados</Text>
+      <Text style={[styles.subTitle, { color: theme.text }]}>{t('placeScreen.anotherPlace')}</Text>
 
       <FlatList
         data={top10.slice(3)}

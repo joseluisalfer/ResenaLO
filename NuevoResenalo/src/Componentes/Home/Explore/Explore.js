@@ -4,11 +4,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../../services/Services";
 import Context from "../../../Context/Context";
-
+import { useTranslation } from "react-i18next";
 const Explore = ({ navigation }) => {
   const [reviewsUrls, setReviewsUrls] = useState([]);
   const [reviewsData, setReviewsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   // Extraemos el theme del contexto
   const { setSearchUrl, theme, isDark } = useContext(Context);
@@ -74,7 +75,7 @@ const Explore = ({ navigation }) => {
         onPress={() => navigation?.navigate("ListPlace")}
       >
         {/* Texto dinámico según el tema */}
-        <Text style={[styles.title, { color: theme.text }]}>Explorar</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('home.buttonExplorer')}</Text>
         <Ionicons
           name="chevron-forward-outline"
           size={25}

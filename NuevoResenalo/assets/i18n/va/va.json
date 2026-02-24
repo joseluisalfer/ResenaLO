@@ -18,11 +18,11 @@
         "register": "Registrar-se"
     },
     "home": {
-        "places_week": "Llocs de la setmana",
         "buttonFriend": "Amics",
         "buttonExplorer": "Explorar"
     },
     "publishScreen": {
+        "new_place": "Nou lloc",
         "header": "Afegir nou lloc",
         "name": "Nom del lloc",
         "new_name": "Nou lloc",
@@ -34,7 +34,7 @@
         "new_description": "Descripció del lloc",
         "buttonAdd": "Afegir al mapa",
         "buttonRestart": "Restablir",
-        "buttonDelete": "Eliminar Foto",
+        "buttonDelete": "Eliminar Fotos",
         "buttonAddMap": "Afegir al mapa"
     },
     "buttonAdd": {
@@ -45,22 +45,27 @@
         "cancel": "CANCEL·LAR"
     },
     "profile": {
-        "buttonEdit": "Editar perfil",
+        "buttonEdit": "Editar Perfil",
         "post": "Publicacions",
         "logout": "Tancar sessió",
         "change_lang": "Canviar idioma",
-        "change_theme": "Canviar tema",
-        "cancel": "cancel·lar",
+        "change_theme": "Canviar Tema",
+        "cancel": "Cancelar",
         "save": "Guardar canvis",
         "title": "Seleccionar idioma",
-        "light_mode": "Tema clar",
+        "light_mode": "Tema Clar",
         "dark_mode": "Tema fosc",
-        "followers": "Seguidors"
+        "followers": "Seguidors",
+        "name": "Nom",
+        "username": "Nom d'usuari",
+        "bio": "Biografia",
+        "exit": "Eixir"
     },
     "listUser": {
         "search": "Buscar usuaris",
         "search_placeholder": "Buscar usuari...",
-        "button": "Carregar més"
+        "button": "Carregar més",
+        "error": "No s'han trobat usuaris."
     },
     "language": {
         "sp": "Castellà",
@@ -75,15 +80,16 @@
     "friends": {
         "friends": "Amics",
         "list": "Llista d'Amics",
-        "searchHolder": "Buscar per nom"
+        "searchHolder": "Buscar per nom",
+        "notFound": "Encara no tens amics"
     },
     "buttonExplorer": {
         "list": "Llista de llocs",
         "searchHolder": "Buscar per títol"
     },
     "stackReview": {
-        "comments": "Comentaris",
-        "addComment": "Afegir comentari"
+        "comments": "COMENTARIS",
+        "addComment": "AFEGIR COMENTARI"
     },
     "modalReview": {
         "header": "Què t'ha semblat?",
@@ -96,5 +102,9 @@
         "buttonUnfollow": "Deixar de seguir",
         "followers": "Seguidors",
         "posts": "Publicacions"
+    },
+    "response": {
+        "afirmative": "Sí",
+        "negative": "No"
     }
 }

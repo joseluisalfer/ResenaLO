@@ -12,6 +12,7 @@ import {
 import { getData } from "../services/Services";
 import { Searchbar } from "react-native-paper";
 import Context from "../Context/Context";
+import { useTranslation } from "react-i18next";
 
 const FindUser = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ const FindUser = ({ navigation }) => {
   const [users, setUsers] = useState([]);
   const [shownUsers, setShownUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
-
+  const { t } = useTranslation();
   // 1. Extraemos theme e isDark
   const { emailLogged, setSelectedFriend, theme, isDark } = useContext(Context);
   const myEmail = emailLogged?.results?.email;
@@ -133,12 +134,12 @@ const FindUser = ({ navigation }) => {
     // 2. Fondo dinámico para toda la pantalla
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={[styles.header, { borderBottomColor: isDark ? "#333" : "#ddd" }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Buscar Usuarios</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t("listUser.search")}</Text>
       </View>
 
       <View style={styles.searchContainer}>
         <Searchbar
-          placeholder="Buscar usuario..."
+          placeholder={t("listUser.search_placeholder")}
           value={searchText}
           onChangeText={setSearchText}
           onIconPress={handleSearch}
@@ -187,7 +188,7 @@ const FindUser = ({ navigation }) => {
               ))
             ) : (
               <Text style={{ textAlign: "center", color: theme.text, marginTop: 20 }}>
-                No se encontraron usuarios.
+                {t("listUser.error")}
               </Text>
             )}
 
@@ -200,7 +201,7 @@ const FindUser = ({ navigation }) => {
                     style={styles.loadMoreBtn}
                     onPress={handleLoadMore}
                   >
-                    <Text style={styles.loadMoreText}>Cargar más</Text>
+                    <Text style={styles.loadMoreText}>{t("listUser.button")}</Text>
                   </TouchableOpacity>
                 )}
               </View>

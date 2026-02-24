@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Context from "../Context/Context";
 import { getData } from "../services/Services";
 import { Searchbar } from 'react-native-paper';
-
+import { useTranslation } from "react-i18next";
 const Friends = ({ navigation }) => {
   // 1. Extraemos el theme del Contexto
   const { setSelectedFriend, emailLogged, theme, isDark } = useContext(Context);
@@ -20,6 +20,7 @@ const Friends = ({ navigation }) => {
   const [filteredFriends, setFilteredFriends] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchFriend, setSearchFriend] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     obtainUsers();
@@ -87,13 +88,13 @@ const Friends = ({ navigation }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         />
-        <Text style={[styles.headerTitle, { color: theme.text }]}>Lista de amigos</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>{t('friends.list')}</Text>
       </View>
 
       {/* SEARCHBAR ADAPTADA */}
       <View style={[styles.searchContainer, { backgroundColor: theme.background }]}>
         <Searchbar
-          placeholder="Buscar por nombre..."
+          placeholder={t('friends.searchHolder')}
           placeholderTextColor={isDark ? "#AAA" : "#6B7280"}
           onChangeText={setSearchFriend}
           value={searchFriend}
@@ -110,7 +111,7 @@ const Friends = ({ navigation }) => {
       {filteredFriends.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={[styles.noFriendsText, { color: isDark ? "#888" : "#9CA3AF" }]}>
-            {searchFriend ? "No se encontraron resultados" : "Todavía no tienes amigos"}
+            {searchFriend ? "No se encontraron resultados" : "t('friends.notFound')"}
           </Text>
         </View>
       ) : (

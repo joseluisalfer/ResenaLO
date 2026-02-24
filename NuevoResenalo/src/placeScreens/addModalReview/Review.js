@@ -13,7 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { postData } from "../../services/Services";
 import Context from "../../Context/Context";
-
+import { useTranslation } from "react-i18next";
 function Review({ route, navigation }) {
     const { reviewId } = route.params || {};
     
@@ -23,6 +23,7 @@ function Review({ route, navigation }) {
     
     // Extraemos el theme del Contexto
     const { emailLogged, theme, isDark } = useContext(Context);
+    const { t } = useTranslation();
 
     const handleSubmitReview = async () => {
         if (rating === 0) {
@@ -88,7 +89,7 @@ function Review({ route, navigation }) {
                     styles.card, 
                     { backgroundColor: isDark ? "#1e1e1e" : "#fff" }
                 ]}>
-                    <Text style={[styles.title, { color: theme.text }]}>¿Qué te pareció?</Text>
+                    <Text style={[styles.title, { color: theme.text }]}>{t("modalReview.header")}</Text>
                     
                     <View style={styles.starContainer}>
                         {renderStars()}
@@ -105,7 +106,7 @@ function Review({ route, navigation }) {
                         ]}
                         multiline
                         numberOfLines={5}
-                        placeholder="Escribe aquí tu opinión sobre este lugar..."
+                        placeholder={t("modalReview.inputHolder")}
                         placeholderTextColor={isDark ? "#666" : "#999"}
                         value={reviewText}
                         onChangeText={setReviewText}
@@ -122,7 +123,7 @@ function Review({ route, navigation }) {
                         {loading ? (
                             <ActivityIndicator color="white" />
                         ) : (
-                            <Text style={styles.buttonText}>Publicar Reseña</Text>
+                            <Text style={styles.buttonText}>{t("modalReview.buttonAdd")}</Text>
                         )}
                     </Pressable>
                     
@@ -132,7 +133,7 @@ function Review({ route, navigation }) {
                         disabled={loading}
                     >
                         <Text style={[styles.cancelText, { color: isDark ? "#ff5c5c" : "#DC3545" }]}>
-                            Cancelar
+                            {t("modalReview.buttonCancel")}
                         </Text>
                     </Pressable>
                 </View>

@@ -98,17 +98,17 @@ const DatosPublish = () => {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* 3. Pasamos el theme a cada input para que el texto sea negro o blanco según toque */}
-      <FormInput label="Nombre del lugar" placeholder="Nuevo lugar" value={title} onChangeText={handleTitleChange} theme={theme} />
-      <FormInput label="Ubicación" placeholder="Ejemplo: 40.7128,-74.0060" value={ubication} onChangeText={handleUbicationChange} theme={theme} />
-      <FormInput label="Tipo" placeholder="Tipo de lugar" value={type} onChangeText={handleTypeChange} theme={theme} />
-      <FormInput label="Descripción" placeholder="Descripción del lugar" value={description} onChangeText={handleDescriptionChange} theme={theme} />
+      <FormInput label={t('publishScreen.name')} placeholder={t('publishScreen.new_name')} value={title} onChangeText={handleTitleChange} theme={theme} />
+      <FormInput label={t('publishScreen.location')} placeholder={t('publishScreen.new_location')} value={ubication} onChangeText={handleUbicationChange} theme={theme} />
+      <FormInput label={t('publishScreen.type')} placeholder={t('publishScreen.new_type')} value={type} onChangeText={handleTypeChange} theme={theme} />
+      <FormInput label={t('publishScreen.description')} placeholder={t('publishScreen.new_description')} value={description} onChangeText={handleDescriptionChange} theme={theme} />
 
       <View style={styles.starContainer}>
         {renderStars()}
       </View>
 
       <Pressable style={styles.resetButton} onPress={resetForm}>
-        <Text style={styles.buttonText}>Restablecer</Text>
+        <Text style={styles.buttonText}>{t("publishScreen.buttonRestart")}</Text>
       </Pressable>
     </View>
   );

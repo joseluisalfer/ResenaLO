@@ -4,11 +4,12 @@ import { Card } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import Context from "../../../Context/Context";
 import { useFocusEffect } from '@react-navigation/native';
-
+import { useTranslation } from "react-i18next";
 const CardInfo = () => {
   const { emailLogged } = useContext(Context);
   const reviews = emailLogged?.results?.reviews ?? [];
   const followers = emailLogged?.results?.followers ?? [];
+  const { t } = useTranslation();
 
   useEffect(() => {
     console.log(reviews);
@@ -25,11 +26,11 @@ const CardInfo = () => {
           <View style={styles.statItem}>
             <Text variant="titleMedium">{reviewsCount}</Text>
             {/* Muestra la cantidad de reviews */}
-            <Text variant="bodySmall">Posts</Text>
+            <Text variant="bodySmall">{t("profile.post")}</Text>
           </View>
           <View style={styles.statItem}>
             <Text variant="titleMedium">{followersCount}</Text>
-            <Text variant="bodySmall">Followers</Text>
+            <Text variant="bodySmall">{t("profile.followers")}</Text>
           </View>
         </Card.Content>
       </Card>

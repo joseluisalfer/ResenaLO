@@ -12,7 +12,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
 import Context from "../../../Context/Context";
 import { getData } from "../../../services/Services";
-
+import { useTranslation } from "react-i18next";
 const pickRandomUpToN = (arr, n = 5) => {
   const copy = [...arr];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -27,6 +27,7 @@ const Friends = ({ navigation }) => {
   const { setSelectedFriend, emailLogged, theme, isDark } = useContext(Context);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   const obtainUsers = useCallback(async () => {
     setLoading(true);
@@ -84,7 +85,7 @@ const Friends = ({ navigation }) => {
       <View style={styles.wrapper}>
         {/* Color de texto dinámico para "Todavía no tienes amigos" */}
         <Text style={[styles.noFriendsText, { color: isDark ? '#aaa' : '#666' }]}>
-          Todavia no tienes amigos
+          {t('friends.notFound')}
         </Text>
       </View>
     );
@@ -97,7 +98,7 @@ const Friends = ({ navigation }) => {
         onPress={() => navigation.navigate("AllFriends")}
       >
         {/* 2. Aplicamos color dinámico al título y al icono */}
-        <Text style={[styles.title, { color: theme.text }]}>Amigos</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('friends.friends')}</Text>
         <Ionicons 
           name="chevron-forward-outline" 
           size={25} 

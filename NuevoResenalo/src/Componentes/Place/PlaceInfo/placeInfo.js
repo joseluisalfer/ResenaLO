@@ -2,7 +2,7 @@ import React, { useContext } from 'react'; // Importamos useContext
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Context from "../../../Context/Context"; // Ajusta la ruta según tu estructura
-
+import { useTranslation } from "react-i18next";
 const PlaceInfo = ({ name, description, type, averageRating }) => {
   // Extraemos theme e isDark del contexto
   const { theme, isDark } = useContext(Context);

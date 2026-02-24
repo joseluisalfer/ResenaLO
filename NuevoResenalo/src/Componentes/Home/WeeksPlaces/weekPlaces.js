@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useContext, useCallback  } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getData } from "../../../services/Services";
 import Context from "../../../Context/Context";
 import { useFocusEffect } from '@react-navigation/native';
-
+import { useTranslation } from "react-i18next";
 const WeekPlace = ({ navigation }) => {
   const [podiumData, setPodiumData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { setSearchUrl } = useContext(Context);
+  const { t } = useTranslation();
 
   const obtainData = async () => {
     try {
@@ -38,11 +39,11 @@ const WeekPlace = ({ navigation }) => {
     obtainData();
   }, []);
 
-    useFocusEffect(
-      useCallback(() => {
-        obtainData();
-      }, [])
-    )
+  useFocusEffect(
+    useCallback(() => {
+      obtainData();
+    }, [])
+  )
 
   const handlePressPlace = (reviewUrl) => {
     setSearchUrl(reviewUrl);
@@ -97,7 +98,7 @@ const WeekPlace = ({ navigation }) => {
           style={styles.titleWrapper}
           onPress={() => navigation.navigate("Podium")}
         >
-          <Text style={styles.title}>Top 10 lugares</Text>
+          <Text style={styles.title}>{t('placeScreen.buttonPodium')}</Text>
           <Ionicons name="chevron-forward-outline" size={25} color="#fff" />
         </Pressable>
       </View>

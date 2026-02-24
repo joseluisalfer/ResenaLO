@@ -3,12 +3,13 @@ import { View, StyleSheet, Modal, Pressable, Text } from "react-native";
 import { Button } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons';
 import Context from "../../../Context/Context";
-
-const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
+import { useTranslation } from "react-i18next";
+import '../../../../assets/i18n/index';
+const ModalProfile = ({ handleLogOut}) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [showLanguageOptions, setShowLanguageOptions] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState("Español");
-
+    const { t, i18n} = useTranslation();
     // 1. Extraemos theme además de isDark y toggleTheme
     const { isDark, toggleTheme, theme } = useContext(Context);
 
@@ -19,6 +20,10 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
     const handleChangeToLanguageSelection = () => {
         setShowLanguageOptions(true);
     };
+
+const handleChangeLanguage = (lang) => {
+    i18n.changeLanguage(lang);
+}
 
     return (
         <View style={styles.container}>
@@ -45,7 +50,7 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
                                     style={styles.modalButton}
                                     textColor={theme.text}
                                 >
-                                    Log Out
+                                    {t("profile.logout")}
                                 </Button>
                                 <Button 
                                     onPress={handleChangeToLanguageSelection} 
@@ -53,7 +58,7 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
                                     style={styles.modalButton}
                                     textColor={theme.text}
                                 >
-                                    Cambiar Idioma
+                                    {t("profile.change_lang")}
                                 </Button>
 
                                 <Button 
@@ -63,7 +68,7 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
                                     textColor={theme.text}
                                    
                                 >
-                                    {isDark ? "Modo Claro" : "Modo Oscuro"}
+                                    {isDark ? t("profile.light_mode") : t("profile.dark_mode")}
                                 </Button>
 
                                 <Button
@@ -72,20 +77,20 @@ const ModalProfile = ({ handleLogOut, handleChangeLanguage }) => {
                                   style={styles.cancelButton}
                                   labelStyle={styles.cancelButtonText}
                                 >
-                                  Cancelar
+                                  {t("profile.cancel")}
                                 </Button>
                             </>
                         ) : (
                             <>
-                                <Button onPress={() => handleChangeLanguage("es")} textColor={theme.text}>Español</Button>
-                                <Button onPress={() => handleChangeLanguage("ca")} textColor={theme.text}>Valenciano</Button>
-                                <Button onPress={() => handleChangeLanguage("en")} textColor={theme.text}>English</Button>
+                                <Button onPress={() => handleChangeLanguage("es")} textColor={theme.text}>{t("language.sp")}</Button>
+                                <Button onPress={() => handleChangeLanguage("ca")} textColor={theme.text}>{t("language.ca")}</Button>
+                                <Button onPress={() => handleChangeLanguage("en")} textColor={theme.text}>{t("language.en")}</Button>
                                 <Button
                                   style={styles.exitButton}
                                   onPress={handleCancelLanguageChange}
                                   labelStyle={styles.exitButtonText}
                                 >
-                                  Salir
+                                    {t("profile.exit")}
                                 </Button>
                             </>
                         )}

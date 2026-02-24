@@ -121,7 +121,7 @@ const Publish = () => {
           style={[styles.removeButton, { backgroundColor: isDark ? "#DC3545" : "#DC3545" }]} 
           onPress={() => setImagenes([null])}
         >
-          <Text style={styles.buttonText}>Eliminar fotos</Text>
+          <Text style={styles.buttonText}>{t("publishScreen.buttonDelete")}</Text>
         </Pressable>
 
         {/* Botón principal */}

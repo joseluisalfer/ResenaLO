@@ -4,10 +4,11 @@ import { Card } from "react-native-paper";
 import Context from "../../Context/Context";
 import { useFocusEffect } from '@react-navigation/native';
 import { getData } from "../../services/Services";
-
+import { useTranslation } from "react-i18next";
 const ProfileStatsFriend = () => {
   const { selectedFriend } = useContext(Context);
   const [stats, setStats] = useState({ reviews: [], followers: [] });
+  const { t } = useTranslation();
 
   const fetchStats = useCallback(async () => {
     if (selectedFriend?.user) {
@@ -45,11 +46,11 @@ const ProfileStatsFriend = () => {
         <Card.Content style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text variant="titleMedium">{stats.reviews.length}</Text>
-            <Text variant="bodySmall">Posts</Text>
+            <Text variant="bodySmall">{t('profile.post')}</Text>
           </View>
           <View style={styles.statItem}>
             <Text variant="titleMedium">{stats.followers.length}</Text>
-            <Text variant="bodySmall">Followers</Text>
+            <Text variant="bodySmall">{t('profile.followers')}</Text>
           </View>
         </Card.Content>
       </Card>
