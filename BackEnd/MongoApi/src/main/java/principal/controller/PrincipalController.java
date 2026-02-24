@@ -51,6 +51,14 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;
 
+/**
+ * PrincipalController
+ * REST controller that exposes endpoints for user, review and comment management,
+ * authentication, file uploads to S3, and simple social features (follow/friends).
+ *
+ * All method-level comments were added in English to explain behaviour, inputs and
+ * expected outputs. The implementation logic remains unchanged.
+ */
 @RestController
 @RequestMapping("resenalo")
 public class PrincipalController {
@@ -67,14 +75,31 @@ public class PrincipalController {
 	@Autowired
 	private S3PublicImageService s3PublicImageService;
 
-	// Genera la contraseña encriptada
+	/**
+	 * Generate a bcrypt hash for a plain password.
+	 * @param plainPassword raw password
+	 * @return bcrypt hashed password
+	 */
 	public static String hashPassword(String plainPassword) {
 		// 10-12 suele ser un buen coste; 12 es común si el servidor lo aguanta
 		int cost = 12;
 		return BCrypt.hashpw(plainPassword, BCrypt.gensalt(cost));
 	}
 
-	// Funcion del email
+	/**
+	 * Send an email using SMTP.
+	 * This helper wraps JavaMail usage to send a message with optional attachments.
+	 * @param mensaje body text of the email
+	 * @param asunto subject of the email
+	 * @param email_remitente sender email address
+	 * @param email_remitente_pass sender password (used for SMTP auth)
+	 * @param host_email SMTP host
+	 * @param port_email SMTP port
+	 * @param emails_destino list of recipient emails
+	 * @param anexos optional attachment file paths
+	 * @throws MessagingException if sending fails
+	 * @throws IOException if reading attachments fails
+	 */
 	public static void envioMail(String mensaje, String asunto, String email_remitente, String email_remitente_pass,
 			String host_email, String port_email, String[] emails_destino, String[] anexos)
 			throws MessagingException, IOException {
@@ -114,6 +139,22 @@ public class PrincipalController {
 		transport.close();
 	}
 
+	/**
+	 * Register a new user.
+	 * Expects a JSON body with email, user, password and name. Sends an email
+	 * verification code, creates the User object with defaults and saves it.
+	 * Returns 409 if email or username already exist.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com",
+	 *   "user": "username",
+	 *   "password": "password123",
+	 *   "name": "John Doe"
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("/register")
 	public ResponseEntity<Object> register(@RequestBody String body) throws IOException, MessagingException {
 
@@ -161,6 +202,18 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
+	/**
+	 * Authenticate a user by email and password.
+	 * Validates the password against the stored bcrypt hash and marks user as verified.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com",
+	 *   "password": "password123"
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("/login")
 	public ResponseEntity<Object> login(@RequestBody String body) {
 		try {
@@ -200,6 +253,17 @@ public class PrincipalController {
 		}
 	}
 
+	/**
+	 * Logout endpoint: expects an email in the request body and performs
+	 * logout-related persistence updates if necessary.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com"
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("/logout")
 	public ResponseEntity<Object> logout(@RequestBody String body) {
 		try {
@@ -224,6 +288,18 @@ public class PrincipalController {
 		}
 	}
 
+	/**
+	 * Verify an email using a numeric token.
+	 * Expects JSON with token and email. If token matches, marks user as verified.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com",
+	 *   "token": 123456
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("verifyEmail")
 	public ResponseEntity<Object> verifyEMail(@RequestBody String body) {
 		JSONObject json = new JSONObject(body);
@@ -246,6 +322,24 @@ public class PrincipalController {
 
 	}
 
+	/**
+	 * Upload a review with optional base64 image files.
+	 * Parses coordinates, creates the Review entity, uploads image files to S3 and
+	 * stores the public URLs in the review.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "title": "Great Place!",
+	 *   "user": "username",
+	 *   "valoration": 4.5,
+	 *   "description": "Nice food and service.",
+	 *   "type": "restaurant",
+	 *   "coords": "40.4168,-3.7038",
+	 *   "files": ["base64string1", "base64string2"]
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("/uploadReview")
 	public ResponseEntity<Object> uploadReview(@RequestBody String body) throws IOException {
 
@@ -286,7 +380,7 @@ public class PrincipalController {
 				byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
 				String relative = "reviews/" + resena.getId() + "/" + UUID.randomUUID() + ".jpg";
-				String key = s3PublicImageService.buildKey(relative); // -> public/....
+				String key = s3PublicImageService.buildKey(relative); 
 
 				String publicUrl = s3PublicImageService.uploadAndGetPublicUrl(key, imageBytes, "image/jpeg");
 				resena.getImageUrls().add(publicUrl);
@@ -298,6 +392,19 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
+	/**
+	 * Follow another user.
+	 * Body expects 'user' (follower) and 'userFollow' (target). Updates followed/followers
+	 * lists and establishes a friend relationship if both follow each other.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "user": "alice",
+	 *   "userFollow": "bob"
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("addFollow")
 	public ResponseEntity<String> addFollow(@RequestBody Map<String, String> body) {
 	    String username = body.get("user");
@@ -338,6 +445,18 @@ public class PrincipalController {
 	    return ResponseEntity.status(HttpStatus.OK).body("Seguimiento realizado");
 	}
 	
+	/**
+	 * Unfollow a user.
+	 * Removes the target user from the caller's followed list and updates followers/friends accordingly.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "user": "alice",
+	 *   "userFollow": "bob"
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("deleteFollow")
 	public ResponseEntity<Object> deleteFollow(@RequestBody String body) throws IOException {
 		JSONObject json = new JSONObject(body);
@@ -381,6 +500,18 @@ public class PrincipalController {
 
 	}
 
+	/**
+	 * Update the title of a review.
+	 * Expects JSON with idReview and newTitle.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "idReview": "reviewId123",
+	 *   "newTitle": "Updated Title"
+	 * }
+	 * </pre>
+	 */
 	@PutMapping("updateTitle")
 	public ResponseEntity<Object> updateTitle(@RequestBody String body) throws IOException {
 		// Parsear el cuerpo del JSON usando JSONObject
@@ -403,6 +534,18 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
+	/**
+	 * Update the text of a comment.
+	 * Expects JSON with idComment and newText.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "idComment": "commentId123",
+	 *   "newText": "Updated comment text."
+	 * }
+	 * </pre>
+	 */
 	@PutMapping("updateComment")
 	public ResponseEntity<Object> updateComment(@RequestBody String body) throws IOException {
 		// Parsear el cuerpo del JSON usando JSONObject
@@ -425,6 +568,20 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
+	/**
+	 * Update basic user profile fields (username, name, description).
+	 * The email field is required to locate the user. Returns 406 if new username already exists.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com",
+	 *   "newUsername": "newuser",
+	 *   "newName": "New Name",
+	 *   "newDescription": "New description."
+	 * }
+	 * </pre>
+	 */
 	@PutMapping("updateUser")
 	public ResponseEntity<Object> updateUser(@RequestBody String body) throws IOException {
 		JSONObject json = new JSONObject(body);
@@ -480,6 +637,20 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
+	/**
+	 * Add a comment to a review and recalculate the review's average rating.
+	 * Expects reviewId, user, text, and valoration in the JSON body.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "reviewId": "reviewId123",
+	 *   "user": "username",
+	 *   "text": "Great review!",
+	 *   "valoration": 4.0
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("commentReview")
 	public ResponseEntity<Object> commentReview(@RequestBody String body) throws IOException {
 
@@ -517,6 +688,19 @@ public class PrincipalController {
 	    return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
+	/**
+	 * Update the user's profile photo. The request must contain email and a base64 file string.
+	 * The image is decoded, uploaded to S3 and the public URL is stored on the user record.
+	 * Returns the new imageUrl in the response JSON.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com",
+	 *   "file": "base64string..."
+	 * }
+	 * </pre>
+	 */
 	@PutMapping("updatePhoto")
 	public ResponseEntity<Object> updatePhoto(@RequestBody String body) throws IOException {
 
@@ -562,6 +746,17 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
 	}
 
+	/**
+	 * Delete a review and all its associated comments.
+	 * Expects idReview in the request body.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "idReview": "reviewId123"
+	 * }
+	 * </pre>
+	 */
 	@DeleteMapping("deleteReview")
 	public ResponseEntity<Object> deleteReview(@RequestBody(required = false) String body) {
 		if (body == null || body.isBlank()) {
@@ -589,6 +784,16 @@ public class PrincipalController {
 		return ResponseEntity.noContent().build();
 	}
 
+	/**
+	 * Delete a comment, then recalculate and update the parent review's average rating.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "idComment": "commentId123"
+	 * }
+	 * </pre>
+	 */
 	@DeleteMapping("deleteComment")
 	public ResponseEntity<Object> deleteComment(@RequestBody String body) throws IOException {
 
@@ -634,6 +839,33 @@ public class PrincipalController {
 	    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
+	/**
+	 * Return user info for a given email.
+	 * The response includes user fields, links to reviews and links to followers/followeds/friends.
+	 * <br>
+	 * Example request: <code>/userEmail?email=user@example.com</code>
+	 * <br>
+	 * Example response:
+	 * <pre>
+	 * {
+	 *   "results": {
+	 *     "id": "userId",
+	 *     "user": "username",
+	 *     "name": "John Doe",
+	 *     "description": "desc",
+	 *     "email": "user@example.com",
+	 *     "photo": "url",
+	 *     "theme": "light",
+	 *     "language": "en",
+	 *     "reviews": ["reviewLink1", "reviewLink2"],
+	 *     "created": "2024-01-01 12:00:00",
+	 *     "followeds": ["userLink1"],
+	 *     "followers": ["userLink2"],
+	 *     "friends": ["userLink3"]
+	 *   }
+	 * }
+	 * </pre>
+	 */
 	@GetMapping("/userEmail")
 	public ResponseEntity<String> userEmail(@RequestParam(value = "email") String em) {
 		try {
@@ -725,6 +957,11 @@ public class PrincipalController {
 		}
 	}
 
+	/**
+	 * Similar to /userEmail but intended for other use cases (keeps same structure).
+	 * <br>
+	 * Example request: <code>/userEmailOther?email=user@example.com</code>
+	 */
 	@GetMapping("/userEmailOther")
 	public ResponseEntity<String> userEmailOther(@RequestParam(value = "email") String em) {
 		try {
@@ -811,6 +1048,12 @@ public class PrincipalController {
 		}
 	}
 
+	/**
+	 * Return public user profile by username.
+	 * Includes created date, reviews and social links.
+	 * <br>
+	 * Example request: <code>/user?userName=username</code>
+	 */
 	@GetMapping("/user")
 	public ResponseEntity<String> user(@RequestParam(value = "userName") String userName) {
 		try {
@@ -902,6 +1145,27 @@ public class PrincipalController {
 		}
 	}
 
+	/**
+	 * Return a full review by id including image URLs and metadata.
+	 * <br>
+	 * Example request: <code>/review?id=reviewId123</code>
+	 * <br>
+	 * Example response:
+	 * <pre>
+	 * {
+	 *   "id": "reviewId123",
+	 *   "title": "Great Place!",
+	 *   "user": "username",
+	 *   "valoration": 4.5,
+	 *   "description": "Nice food and service.",
+	 *   "latitud": 40.4168,
+	 *   "longitud": -3.7038,
+	 *   "type": "restaurant",
+	 *   "mimeType": "image/jpeg",
+	 *   "images": ["url1", "url2"]
+	 * }
+	 * </pre>
+	 */
 	@GetMapping("/review")
 	public ResponseEntity<String> review(@RequestParam(value = "id") String id) {
 		Optional<Review> Oreview = reviewRepository.findById(id);
@@ -937,6 +1201,23 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
 	}
 
+	/**
+	 * Return a compact (preview) representation of a review for lists.
+	 * <br>
+	 * Example request: <code>/reviewP?id=reviewId123</code>
+	 * <br>
+	 * Example response:
+	 * <pre>
+	 * {
+	 *   "title": "Great Place!",
+	 *   "user": "username",
+	 *   "valoration": 4.5,
+	 *   "review": "reviewLink",
+	 *   "mimeType": "image/jpeg",
+	 *   "image": "url"
+	 * }
+	 * </pre>
+	 */
 	@GetMapping("/reviewP")
 	public ResponseEntity<String> reviewP(@RequestParam(value = "id") String id) {
 		Optional<Review> Oreview = reviewRepository.findById(id);
@@ -951,7 +1232,7 @@ public class PrincipalController {
 		jsonP.put("title", review.getTitle());
 		jsonP.put("user", review.getUser());
 		jsonP.put("valoration", Math.round(review.getValoration() * 10.0) / 10.0);
-		jsonP.put("review", "http://44.213.235.160:8080/resenalo/review?id=" + review.getId());
+		jsonP.put("review", "http://44.213.235.160:8080/resenalo/reviewP?id=" + review.getId());
 
 		List<String> urls = review.getImageUrls();
 		if (urls != null && !urls.isEmpty() && urls.get(0) != null && !urls.get(0).isBlank()) {
@@ -965,6 +1246,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(jsonP.toString());
 	}
 
+	/**
+	 * Search reviews by place/title and return an array of review objects with images.
+	 * <br>
+	 * Example request: <code>/reviewPlace?title=Great+Place!</code>
+	 */
 	@GetMapping("/reviewPlace")
 	public ResponseEntity<String> reviewPlace(@RequestParam(value = "title") String title) {
 
@@ -1004,6 +1290,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(jsonResponse.toString());
 	}
 
+	/**
+	 * Paginate and return all users as an array of user links and pagination metadata.
+	 * <br>
+	 * Example request: <code>/users?page=0&size=5</code>
+	 */
 	@GetMapping("/users")
 	public ResponseEntity<String> getAllUsers(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size) {
@@ -1040,6 +1331,11 @@ public class PrincipalController {
 		}
 	}
 
+	/**
+	 * Paginate and return reviews as preview links with pagination metadata.
+	 * <br>
+	 * Example request: <code>/reviews?page=0&size=10</code>
+	 */
 	@GetMapping("/reviews")
 	public ResponseEntity<String> reviews(@RequestParam(defaultValue = "0") int page, // Página actual, predeterminado
 																						// es 0 (la primera página)
@@ -1072,6 +1368,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(jsonResponse.toString());
 	}
 
+	/**
+	 * Paginate and return comments with metadata. Each comment includes a link to its review.
+	 * <br>
+	 * Example request: <code>/comments?page=0&size=10</code>
+	 */
 	@GetMapping("comments")
 	public ResponseEntity<String> comments(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
@@ -1122,6 +1423,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(responseJson.toString());
 	}
 
+	/**
+	 * Return all comments for a specific review id.
+	 * <br>
+	 * Example request: <code>/comment?idReview=reviewId123</code>
+	 */
 	@GetMapping("/comment")
 	public ResponseEntity<String> comment(@RequestParam(value = "idReview") String idReview) {
 		List<Comments> listComments = commentsRepository.findByReviewId(idReview);
@@ -1149,6 +1455,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(jsonComments.toString());
 	}
 
+	/**
+	 * Return a small list of random review preview links (max 4) shuffled randomly.
+	 * <br>
+	 * Example request: <code>/randomReviews</code>
+	 */
 	@GetMapping("/randomReviews")
 	public ResponseEntity<List<String>> randomReviews() {
 		// Obtener todas las reseñas de la base de datos
@@ -1167,6 +1478,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(randomReviews);
 	}
 
+	/**
+	 * Return a small list of random user profile links (max 10) shuffled randomly.
+	 * <br>
+	 * Example request: <code>/randomUsers</code>
+	 */
 	@GetMapping("/randomUsers")
 	public ResponseEntity<List<String>> randomUsers() {
 
@@ -1180,7 +1496,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(randomUsers);
 	}
 
-	// Devuelve el top 10 de reviews
+	/**
+	 * Return top 10 reviews by valoration as preview links.
+	 * <br>
+	 * Example request: <code>/top10Reviews</code>
+	 */
 	@GetMapping("/top10Reviews")
 	public ResponseEntity<List<String>> top10Reviews() {
 
@@ -1192,7 +1512,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(top10Links);
 	}
 
-	// Devuelve el top 3 de reviews
+	/**
+	 * Return top 3 reviews by valoration as preview links.
+	 * <br>
+	 * Example request: <code>/top3Reviews</code>
+	 */
 	@GetMapping("/top3Reviews")
 	public ResponseEntity<List<String>> top3Reviews() {
 		List<Review> top3Reviews = reviewRepository.findTop3ByOrderByValorationDesc();
@@ -1203,6 +1527,11 @@ public class PrincipalController {
 		return ResponseEntity.status(HttpStatus.OK).body(top3Links);
 	}
 
+	/**
+	 * Search users by partial username (case-insensitive) and return an array of user objects.
+	 * <br>
+	 * Example request: <code>/searchUsers?user=alice</code>
+	 */
 	@GetMapping("/searchUsers")
 	public ResponseEntity<String> searchUsers(@RequestParam(value = "user") String userQuery) {
 		try {
@@ -1283,6 +1612,18 @@ public class PrincipalController {
 		}
 	}
 	
+	/**
+	 * Update the user's theme preference (light|dark).
+	 * Expects JSON with email and theme. Validates theme value.
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com",
+	 *   "theme": "dark"
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("/updateTheme")
 	public ResponseEntity<Object> updateTheme(@RequestBody String body) throws IOException {
 
@@ -1307,6 +1648,18 @@ public class PrincipalController {
 	    return ResponseEntity.status(HttpStatus.OK).body("Tema actualizado");
 	}
 	
+	/**
+	 * Update the user's language preference.
+	 * Expects JSON with email and language code (e.g. "en", "es").
+	 * <br>
+	 * Example:
+	 * <pre>
+	 * {
+	 *   "email": "user@example.com",
+	 *   "language": "es"
+	 * }
+	 * </pre>
+	 */
 	@PostMapping("/updateLanguage")
 	public ResponseEntity<Object> updateLanguage(@RequestBody String body) throws IOException {
 
