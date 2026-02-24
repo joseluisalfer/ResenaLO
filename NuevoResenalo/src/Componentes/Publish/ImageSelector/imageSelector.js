@@ -18,7 +18,7 @@ const SelectorImagen = ({ imagenes, setImagenes }) => {
         onPress: async () => {
           const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
           if (!permissionResult.granted) {
-            Alert.alert('Necesitamos permisos para acceder a la galería');
+            Alert.alert(t("alerts.permissionGallery"));
             return;
           }
 
@@ -40,7 +40,7 @@ const SelectorImagen = ({ imagenes, setImagenes }) => {
         onPress: async () => {
           const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
           if (!permissionResult.granted) {
-            Alert.alert('Necesitamos permisos para usar la cámara');
+            Alert.alert(t("alerts.permissionCamera"));
             return;
           }
 

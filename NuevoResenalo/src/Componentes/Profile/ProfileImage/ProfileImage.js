@@ -65,13 +65,13 @@ const ProfileImage = () => {
   const handleUpdatePhoto = async (uri) => {
     try {
       if (!userEmail) {
-        Alert.alert("Error", "No hay sesión.");
+        Alert.alert(t("alerts.errorSession"));
         return;
       }
       setUpdating(true);
       const base64Clean = await toBase64(uri);
       if (!base64Clean || base64Clean.length < 50) {
-        Alert.alert("Error", "Imagen inválida.");
+        Alert.alert(t("alerts.isInvalidImage"));
         return;
       }
 
@@ -82,7 +82,7 @@ const ProfileImage = () => {
 
       const publicUrl = serverResponse?.imageUrl;
       if (!publicUrl || !String(publicUrl).startsWith("http")) {
-        Alert.alert("Error", "El servidor no devolvió una URL válida.");
+        Alert.alert(t("alerts.errorUrl"));
         return;
       }
 
@@ -96,21 +96,21 @@ const ProfileImage = () => {
         },
       }));
     } catch (e) {
-      Alert.alert("Error", "No se pudo subir la imagen.");
+      Alert.alert(t("alerts.errorImage"));
     } finally {
       setUpdating(false);
     }
   };
 
   const seleccionarImagen = async () => {
-    if (!userEmail) return Alert.alert("Error", "No hay sesión.");
+    if (!userEmail) return Alert.alert(t("alerts.errorSession"));
 
-    Alert.alert("Cambiar imagen de perfil", "Elige una opción", [
+    Alert.alert(t("alerts.changeImage"), [
       {
-        text: "Galería",
+        text: t("buttonAdd.gallery"),
         onPress: async () => {
           const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-          if (!perm.granted) return Alert.alert("Permiso", "Se requiere permiso de galería.");
+          if (!perm.granted) return Alert.alert(t("alerts.permissionGallery"));
           const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -121,10 +121,10 @@ const ProfileImage = () => {
         },
       },
       {
-        text: "Cámara",
+        text: t("buttonAdd.camera"),
         onPress: async () => {
           const perm = await ImagePicker.requestCameraPermissionsAsync();
-          if (!perm.granted) return Alert.alert("Permiso", "Se requiere permiso de cámara.");
+          if (!perm.granted) return Alert.alert(t("alerts.permissionCamera"));
           const result = await ImagePicker.launchCameraAsync({
             allowsEditing: true,
             aspect: [1, 1],
@@ -133,7 +133,7 @@ const ProfileImage = () => {
           if (!result.canceled) handleUpdatePhoto(result.assets[0].uri);
         },
       },
-      { text: "Cancelar", style: "cancel" },
+      { text: t("bubuttonAdd.cancel"), style: "cancel" },
     ]);
   };
 

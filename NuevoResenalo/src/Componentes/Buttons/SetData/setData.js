@@ -21,13 +21,13 @@ const PedirDatos = ({ navigation }) => {
   const handleOnPress = async () => {
     // Validar que los campos no estén vacíos
     if (email === "" || password === "") {
-      alert(t("loginScreen.emptyFields"));
+      alert(t("alerts.empptyData"));
       return;
     }
 
     // Validar que el correo electrónico sea correcto
     if (!validateEmail(email)) {
-      alert(t("loginScreen.invalidEmail"));
+      alert(t("alerts.invalidEmail"));
       return;
     }
 
@@ -60,7 +60,7 @@ const PedirDatos = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error al enviar los datos:", error);
-      alert(t("loginScreen.loginError"));
+      alert(t("alerts.loginError"));
     }
   };
 
@@ -77,7 +77,7 @@ const PedirDatos = ({ navigation }) => {
       <View style={styles.space}>
         <TextInput
           style={styles.inputs}
-          placeholder={t("loginScreen.passwordPlaceholder")}
+          placeholder={t("loginScreen.passwordPlaceHolder")}
           onChangeText={(newText) => setPassword(newText)}
           secureTextEntry={true}
           value={password}

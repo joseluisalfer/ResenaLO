@@ -58,7 +58,7 @@ const EditUser = () => {
         try {
             if (saving) return;
             if (!userEmail) {
-                Alert.alert("Error", "No se encontró el email de sesión.");
+                Alert.alert(t("alerts.emailSession"));
                 return;
             }
 
@@ -67,7 +67,7 @@ const EditUser = () => {
             const cleanBio = bio.trim();
 
             if (cleanName === "" || cleanUsername === "") {
-                Alert.alert("Error", "Nombre y username no pueden estar vacíos.");
+                Alert.alert(t("alerts.emptyUsername"));
                 return;
             }
 
@@ -100,12 +100,12 @@ const EditUser = () => {
                     description: cleanBio
                 }
             })
-            Alert.alert("Éxito", "Perfil actualizado correctamente.");
+            Alert.alert(t("alerts.excelentEdit"));
             navigation.goBack();
 
         } catch (e) {
             console.error("Error real al actualizar:", e);
-            Alert.alert("Error", "No se pudieron guardar los cambios.");
+            Alert.alert(t("alerts.errorEdit"));
         } finally {
             setSaving(false);
         }

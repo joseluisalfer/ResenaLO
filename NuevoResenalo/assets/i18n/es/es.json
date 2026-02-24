@@ -4,7 +4,8 @@
         "footer": "Introduce tu dirección de correo electrónico y contraseña para iniciar sesión en esta aplicación",
         "createAccount": "Crear cuenta",
         "textAccount": "Crea tu cuenta para registrarte en ReseñaLo y descubrir nuevos lugares.",
-        "register": "Registrarse"
+        "register": "Registrarse",
+        "passwordPlaceHolder": "Contraseña"
     },
     "registerScreen": {
         "createAccount": "Crear cuenta",
@@ -15,7 +16,10 @@
         "user": "Nombre de usuario",
         "name": "Nombre",
         "date": "Fecha de nacimiento (DD/MM/AAAA)",
-        "register": "Registrarse"
+        "register": "Registrarse",
+        "buttonPrivaticy": "Términos de privacidad",
+        "buttonAccept": "Aceptar Términos",
+        "buttonClose": "Cerrar"
     },
     "home": {
         "buttonFriend": "Amigos",
@@ -107,5 +111,35 @@
     "response": {
         "afirmative": "Sí",
         "negative": "No"
+    },
+
+    "alerts": {
+        "empptyData": "Datos vacios",
+        "invalidEmail": "Email incorrecto",
+        "loginError": "Inicio de session incorrecto",
+        "obligatory": "Todos los campos son obligatorios",
+        "differentsPassword": "Las contraseñas no coinciden",
+        "isValidEmail": "Por favor, ingresa un correo electrónico válido",
+        "privacity": "Debes aceptar los términos de privacidad",
+        "registerProblem": "Hubo un problema con el registro",
+        "connection": "Hubo un problema con la conexión",
+        "code": "Por favor, ingresa el código de verificación.",
+        "publishScreen": "Por favor, completa todos los campos y asegúrate de haber agregado una imagen.",
+        "latitude": "Por favor, ingresa las coordenadas en el formato correcto (latitud,longitud).",
+        "anonim": "Anónimo",
+        "excelentPublish": "Reseña publicada con éxito.",
+        "errorPublish": "Hubo un error al publicar la reseña.",
+        "errorConnection": "Hubo un error al enviar los datos. Por favor, inténtalo de nuevo.",
+        "emailSession": "Error, No se encontró el email de sesión.",
+        "emptyUsername": "Error, Nombre y username no pueden estar vacíos.",
+        "excelentEdit": "Éxito, Perfil actualizado correctamente.",
+        "errorEdit": "Error, No se pudieron guardar los cambios.",
+        "errorSession": "Error, No hay sesión.",
+        "isInvalidImage": "Error, Imagen inválida.",
+        "errorUrl": "Error, El servidor no devolvió una URL válida.",
+        "errorImage": "Error, No se pudo subir la imagen.",
+        "changeImage": "Cambiar imagen de perfil, Elige una opción",
+        "permissionGallery": "Permiso, Se requiere permiso de galería.",
+        "permissionCamera": "Permiso, Se requiere permiso de cámara."
     }
 }

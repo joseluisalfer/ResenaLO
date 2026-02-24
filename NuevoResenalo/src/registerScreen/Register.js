@@ -32,19 +32,19 @@ const Register = ({ navigation }) => {
   // Validación de campos vacíos
   const validateForm = () => {
     if (!email || !password || !confirmPassword || !username || !name) {
-      alert("Todos los campos son obligatorios");
+      alert(t("alerts.obligatory"));
       return false;
     }
     if (password !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      alert(t("alerts.differentsPassword"));
       return false;
     }
     if (!validateEmail(email)) {
-      alert("Por favor, ingresa un correo electrónico válido");
+      alert(t("alerts.isValidEmail"));
       return false;
     }
     if (!verificationTerms) {
-      alert("Debes aceptar los términos de privacidad");
+      alert(t("alerts.privacity"));
       return false;
     }
     return true;
@@ -79,17 +79,17 @@ const Register = ({ navigation }) => {
         setModalVisible(true); // Muestra el modal de verificación después de registrar
       } else {
         console.error("Respuesta no exitosa:", response);
-        alert("Hubo un problema con el registro");
+        alert(t("alerts.registerProblem"));
       }
     } catch (error) {
       console.error("Error en la conexión", error);
-      alert("Hubo un problema con la conexión");
+      alert(t("alerts.connection"));
     }
   };
 
   const handleModalConfirm = async () => {
     if (!verificationCode.trim()) {
-      alert("Por favor, ingresa el código de verificación.");
+      alert(t("alerts.code"));
       return;
     }
 
@@ -206,7 +206,7 @@ const Register = ({ navigation }) => {
       </Pressable>
 
       <Pressable style={styles.buttonTerms} onPress={handleTermsVisible}>
-        <Text style={styles.buttonText}>Términos de privacidad</Text>
+        <Text style={styles.buttonText}>{t("registerScreen.buttonPrivaticy")}</Text>
       </Pressable>
 
       {/* Modal Para aceptar terminos de privacidad*/}
@@ -220,41 +220,40 @@ const Register = ({ navigation }) => {
           <View style={styles.modalTermsContent}>
             <ScrollView tyle={styles.scrollContainer}>
               <Text style={styles.legalText}>
-                POLÍTICA DE PRIVACIDAD
+                PRIVACY POLICY
+                Last updated: February 23, 2026
 
-                Última actualización: 23 de febrero de 2026
+                In compliance with the provisions of Regulation (EU) 2016/679 of the European Parliament and of the Council of April 27, 2016 (General Data Protection Regulation – GDPR), as well as applicable national data protection regulations, users of the application owned by Reseñalo SL are hereby informed of the personal data protection policy that will apply to its use.
 
-                En cumplimiento de lo dispuesto en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo, de 27 de abril de 2016 (Reglamento General de Protección de Datos – RGPD), así como en la normativa nacional aplicable en materia de protección de datos, se informa a los usuarios de la aplicación titularidad de Reseñalo SL sobre la política de protección de datos personales que será de aplicación en el uso de la misma.
+                The Data Controller is Reseñalo SL, located at Florida Universitaria. Reseñalo SL is the entity responsible for determining the purposes and means of processing the data that may be collected through the application.
 
-                El responsable del tratamiento de los datos es Reseñalo SL, con domicilio en Florida Universitaria. Reseñalo SL es la entidad responsable de determinar los fines y medios del tratamiento de los datos que se puedan recoger a través de la aplicación.
+                The application may collect and process information necessary for the correct operation of the service, including technical data, usage data, and any other information required to provide the offered functionalities. Under no circumstances will personal data be requested or processed that is not adequate, relevant, and limited to what is necessary in relation to the purposes for which it is processed.
 
-                La aplicación podrá recopilar y tratar información necesaria para el correcto funcionamiento del servicio, incluyendo datos técnicos, datos de uso y cualquier otra información necesaria para prestar las funcionalidades ofrecidas. En ningún caso se solicitarán ni tratarán datos personales que no resulten adecuados, pertinentes y limitados a lo necesario en relación con los fines para los que sean tratados.
+                The data collected will be used for the purpose of allowing access to and use of the application, managing the relationship with users, improving the user experience, ensuring the security of the service, addressing inquiries or requests, and complying with applicable legal obligations. Likewise, it may be used to improve the service by analyzing the performance of the application.
 
-                Los datos recogidos serán utilizados con la finalidad de permitir el acceso y uso de la aplicación, gestionar la relación con los usuarios, mejorar la experiencia de uso, garantizar la seguridad del servicio, atender consultas o solicitudes y cumplir con las obligaciones legales que resulten de aplicación. Asimismo, podrán utilizarse con fines de mejora del servicio mediante el análisis del funcionamiento de la aplicación.
+                The legal basis for processing is the performance of the service requested by the user, compliance with legal obligations, and the legitimate interest of Reseñalo SL in ensuring the correct operation and security of the application.
 
-                La base jurídica que legitima el tratamiento será la ejecución del servicio solicitado por el usuario, el cumplimiento de obligaciones legales, así como el interés legítimo de Reseñalo SL en garantizar el correcto funcionamiento y seguridad de la aplicación.
+                Data will be retained only for the time necessary to fulfill the purpose for which it was collected and to determine possible liabilities arising from the service provided, as well as during the periods required by current legislation. Once this period has ended, the data will be deleted or anonymized.
 
-                Los datos serán conservados únicamente durante el tiempo necesario para cumplir con la finalidad para la que fueron recabados y para determinar posibles responsabilidades derivadas del servicio prestado, así como durante los plazos exigidos por la legislación vigente. Finalizado dicho periodo, los datos serán suprimidos o anonimizados.
+                Reseñalo SL may use service providers acting as data processors, such as hosting services, technical maintenance, or technological tools necessary for the application's operation. In all cases, these providers will be contractually obligated to guarantee the confidentiality and security of the processed information. Data will not be sold or transferred to third parties, except under legal obligation.
 
-                Reseñalo SL podrá contar con proveedores de servicios que actúen como encargados del tratamiento, tales como servicios de alojamiento, mantenimiento técnico o herramientas tecnológicas necesarias para el funcionamiento de la aplicación. En todo caso, dichos proveedores estarán obligados contractualmente a garantizar la confidencialidad y seguridad de la información tratada. Los datos no serán vendidos ni cedidos a terceros, salvo obligación legal.
+                Should the provision of the service require the use of services located outside the European Economic Area, appropriate safeguards will be adopted in accordance with current data protection regulations.
 
-                En caso de que para la prestación del servicio fuera necesaria la utilización de servicios ubicados fuera del Espacio Económico Europeo, se adoptarán las garantías adecuadas conforme a la normativa vigente en materia de protección de datos.
+                Reseñalo SL adopts the technical and organizational measures necessary to guarantee the security, integrity, and confidentiality of the data, preventing its alteration, loss, unauthorized processing, or access.
 
-                Reseñalo SL adopta las medidas técnicas y organizativas necesarias para garantizar la seguridad, integridad y confidencialidad de los datos, evitando su alteración, pérdida, tratamiento o acceso no autorizado.
+                The application is not directed at children under 14 years of age. Reseñalo SL does not deliberately collect information from minors without the corresponding consent. If it becomes known that data from a minor has been collected without proper authorization, it will be deleted.
 
-                La aplicación no está dirigida a menores de 14 años. Reseñalo SL no recoge deliberadamente información de menores sin el consentimiento correspondiente. En caso de tener conocimiento de que se han recopilado datos de un menor sin la debida autorización, se procederá a su eliminación.
+                This Privacy Policy may be modified to adapt to possible legislative changes or improvements to the application. In the event of significant changes, users will be informed through the means available within the application itself.
 
-                La presente Política de Privacidad podrá ser modificada para adaptarla a posibles cambios legislativos o mejoras en la aplicación. En caso de producirse modificaciones relevantes, se informará a los usuarios a través de los medios disponibles en la propia aplicación.
-
-                El uso de la aplicación implica la aceptación de esta Política de Privacidad.
+                The use of the application implies the acceptance of this Privacy Policy.
               </Text>
             </ScrollView>
             <View style={{ marginTop: 20 }}>
               <Button onPress={handleTermsConfirm} mode="contained" buttonColor="black">
-                Aceptar Términos
+                {t("registerScreen.buttonAccept")}
               </Button>
               <Text onPress={() => setModalTermsVisible(false)} style={styles.cancelButton}>
-                Cerrar
+                {t("registerScreen.buttonClose")}
               </Text>
             </View>
           </View>
@@ -356,7 +355,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     width: "100%",           // Ocupa todo el ancho
     height: "60%",           // Casi toda la pantalla de alto
-    position: "absolute", 
+    position: "absolute",
     bottom: 0,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -5 },

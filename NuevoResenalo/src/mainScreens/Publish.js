@@ -49,12 +49,12 @@ const Publish = () => {
       !imagenes.length ||
       !imagenes[0]
     ) {
-      alert("Por favor, completa todos los campos y asegúrate de haber agregado una imagen.");
+      alert(t("alerts.publishScreen"));
       return;
     }
 
     if (!coords.includes(",")) {
-      alert("Por favor, ingresa las coordenadas en el formato correcto (latitud,longitud).");
+      alert(t("alerts.latitude"));
       return;
     }
 
@@ -66,7 +66,7 @@ const Publish = () => {
 
     const data = {
       title: title,
-      user: emailLogged?.results?.user || "Anónimo", 
+      user: emailLogged?.results?.user || t("alerts.anonim"), 
       valoration: valoration,
       description: description,
       type: type,
@@ -80,13 +80,13 @@ const Publish = () => {
         data,
       );
       if (response === null) {
-        alert("Reseña publicada con éxito.");
+        alert(t("alerts.excelentPublish"));
       } else {
-        alert("Hubo un error al publicar la reseña.");
+        alert(t("alerts.errorPublish"));
       }
     } catch (error) {
       console.error("Error al enviar los datos:", error);
-      alert("Hubo un error al enviar los datos. Por favor, inténtalo de nuevo.");
+      alert(t("alerts.errorConnection"));
     }
   };
 
