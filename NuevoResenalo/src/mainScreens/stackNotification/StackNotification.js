@@ -5,7 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import FindUser from "../FindUser";
 import Friend from "../../placeScreens/Friend"
 import Place from "../../placeScreens/Place"
-
+import Review from "../../placeScreens/addModalReview/Review";
 const Stack = createStackNavigator();
 
 const StackNotification = () => {
@@ -24,6 +24,11 @@ const StackNotification = () => {
             <Stack.Screen
                 name="Place"
                 component={Place}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Review"
+                component={Review}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>
