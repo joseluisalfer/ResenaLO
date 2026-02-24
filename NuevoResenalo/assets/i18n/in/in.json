@@ -68,9 +68,10 @@
         "error": "No users found."
     },
     "language": {
-        "sp": "Spanish",
-        "en": "English",
-        "ca": "Valencian"
+        "sp": "Spanish 🇪🇸",
+        "en": "English 🇬🇧",
+        "ca": "Valencian 🏳️",
+        "zh": "Chinese 🇨🇳"
     },
     "placeScreen": {
         "buttonPodium": "Top 10 Places",

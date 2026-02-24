@@ -68,9 +68,10 @@
         "error": "No s'han trobat usuaris."
     },
     "language": {
-        "sp": "Castellà",
-        "en": "Anglés",
-        "ca": "Valencià"
+        "sp": "Castellà 🇪🇸",
+        "en": "Anglés 🇬🇧",
+        "ca": "Valencià 🏳️",
+        "zh": "Xinés 🇨🇳"
     },
     "placeScreen": {
         "buttonPodium": "Top 10 llocs",

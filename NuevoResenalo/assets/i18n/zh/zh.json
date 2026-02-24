@@ -1,0 +1,111 @@
+{
+    "loginScreen": {
+        "login": "登录",
+        "footer": "请输入您的电子邮件地址和密码以登录此应用程序",
+        "createAccount": "创建账户",
+        "textAccount": "创建账户以注册ReseñaLo并发现新地点。",
+        "register": "注册"
+    },
+    "registerScreen": {
+        "createAccount": "创建账户",
+        "footer": "请输入您的电子邮件和密码以创建账户：",
+        "email": "电子邮件",
+        "password": "密码",
+        "confirm": "确认密码",
+        "user": "用户名",
+        "name": "姓名",
+        "date": "出生日期（DD/MM/YYYY）",
+        "register": "注册"
+    },
+    "home": {
+        "buttonFriend": "朋友",
+        "buttonExplorer": "探索"
+    },
+    "publishScreen": {
+        "new_place": "新地点",
+        "header": "添加新地点",
+        "name": "地点名称",
+        "new_name": "新地点",
+        "location": "位置",
+        "new_location": "示例 40.7128°,-74.0060°",
+        "type": "类型",
+        "new_type": "地点类型",
+        "description": "描述",
+        "new_description": "地点描述",
+        "buttonAdd": "添加到地图",
+        "buttonRestart": "重置",
+        "buttonDelete": "删除照片",
+        "buttonAddMap": "添加到地图"
+    },
+    "buttonAdd": {
+        "add": "添加图片",
+        "option": "选择一个选项",
+        "gallery": "图库",
+        "camera": "相机",
+        "cancel": "取消"
+    },
+    "profile": {
+        "buttonEdit": "编辑个人资料",
+        "post": "发布",
+        "logout": "退出登录",
+        "change_lang": "更改语言",
+        "change_theme": "更改主题",
+        "cancel": "取消",
+        "save": "保存更改",
+        "title": "选择语言",
+        "light_mode": "浅色主题",
+        "dark_mode": "深色主题",
+        "followers": "粉丝",
+        "name": "姓名",
+        "username": "用户名",
+        "bio": "个人简介",
+        "exit": "退出"
+    },
+    "listUser": {
+        "search": "搜索用户",
+        "search_placeholder": "搜索用户...",
+        "button": "加载更多",
+        "error": "未找到用户。"
+    },
+    "language": {
+        "sp": "西班牙语 🇪🇸",
+        "en": "英语 🇬🇧",
+        "ca": "加泰罗尼亚语 🏳️",
+        "zh": "中文 🇨🇳"
+    },
+    "placeScreen": {
+        "buttonPodium": "前十名地点",
+        "headerPodium": "评论排行榜",
+        "anotherPlace": "其他推荐地点"
+    },
+    "friends": {
+        "friends": "朋友",
+        "list": "朋友列表",
+        "searchHolder": "按姓名搜索",
+        "notFound": "你还没有朋友"
+    },
+    "buttonExplorer": {
+        "list": "地点列表",
+        "searchHolder": "按标题搜索"
+    },
+    "stackReview": {
+        "comments": "评论",
+        "addComment": "添加评论"
+    },
+    "modalReview": {
+        "header": "你觉得怎么样？",
+        "inputHolder": "在这里写下你对这个地方的看法...",
+        "buttonAdd": "发布评论",
+        "buttonCancel": "取消"
+    },
+    "profileFriend": {
+        "buttonFollow": "关注",
+        "buttonUnfollow": "取消关注",
+        "followers": "粉丝",
+        "posts": "发布"
+    },
+    "response": {
+        "afirmative": "是",
+        "negative": "否"
+    }
+}

@@ -68,9 +68,10 @@
         "error": " No se encontraron usuarios."
     },
     "language": {
-        "sp": "Español",
-        "en": "Ingles",
-        "ca": "Valenciano"
+        "sp": "Español 🇪🇸",
+        "en": "Ingles 🇬🇧",
+        "ca": "Valenciano 🏳️",
+        "zh": "Chino 🇨🇳"
     },
     "placeScreen": {
         "buttonPodium": "Top 10 lugares",
