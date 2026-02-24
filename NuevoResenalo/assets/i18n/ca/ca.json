@@ -69,7 +69,9 @@
         "search": "Buscar usuaris",
         "search_placeholder": "Buscar usuari...",
         "button": "Carregar més",
-        "error": "No s'han trobat usuaris."
+        "error": "No s'han trobat usuaris.",
+        "notFound": "No s'han trobat usuaris.",
+        "errorSearch": "No hi ha llocs amb aquest nom: "
     },
     "language": {
         "es": "Castellà 🇪🇸",
@@ -80,17 +82,23 @@
     "placeScreen": {
         "buttonPodium": "Top 10 llocs",
         "headerPodium": "Podi de ressenyes",
-        "anotherPlace": "Altres llocs destacats"
+        "anotherPlace": "Altres llocs destacats",
+        "noReview": "No hi ha ressenyes encara.",
+        "errorSearch": "No s'han trobat llocs amb aquest nom: "
     },
     "friends": {
         "friends": "Amics",
         "list": "Llista d'Amics",
         "searchHolder": "Buscar per nom",
-        "notFound": "Encara no tens amics"
+        "notFound": "Encara no tens amics",
+        "notFoundFriend": "No tens cap amic amb aquest nom",
+        "errorSearch": "No s'han trobat amics amb aquest nom: "
     },
     "buttonExplorer": {
         "list": "Llista de llocs",
-        "searchHolder": "Buscar per títol"
+        "searchHolder": "Buscar per títol",
+        "errorSearch": "No hi ha llocs amb aquest títol: ",
+        "noReview": "No hi ha ressenyes encara"
     },
     "stackReview": {
         "comments": "COMENTARIS",

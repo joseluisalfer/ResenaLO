@@ -69,7 +69,9 @@
         "search": "Search users",
         "search_placeholder": "Search user...",
         "button": "Load more",
-        "error": "No users found."
+        "error": "No users found.",
+        "notFound": "No users found.",
+        "errorSearch": "No sites found with that name: "
     },
     "language": {
         "es": "Spanish 🇪🇸",
@@ -80,17 +82,23 @@
     "placeScreen": {
         "buttonPodium": "Top 10 places",
         "headerPodium": "Review Podium",
-        "anotherPlace": "Other featured places"
+        "anotherPlace": "Other featured places",
+        "noReview": "No reviews yet.",
+        "errorSearch": "No places found with that name: "
     },
     "friends": {
         "friends": "Friends",
         "list": "Friends List",
         "searchHolder": "Search by name",
-        "notFound": "You don't have any friends yet"
+        "notFound": "You don't have any friends yet",
+        "notFoundFriend": "You don't have any friend with that name",
+        "errorSearch": "No friends found with that name: "
     },
     "buttonExplorer": {
         "list": "Site list",
-        "searchHolder": "Search by title"
+        "searchHolder": "Search by title",
+        "errorSearch": "No places found with that title: ",
+        "noReview": "No reviews yet"
     },
     "stackReview": {
         "comments": "COMMENTS",

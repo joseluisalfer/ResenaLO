@@ -111,7 +111,7 @@ const Friends = ({ navigation }) => {
       {filteredFriends.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={[styles.noFriendsText, { color: isDark ? "#888" : "#9CA3AF" }]}>
-            {searchFriend ? "No se encontraron resultados" : "t('friends.notFound')"}
+            {searchFriend ? t('friends.notFoundFriend'): t('friends.notFound')}
           </Text>
         </View>
       ) : (

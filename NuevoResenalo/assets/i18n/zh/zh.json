@@ -69,7 +69,9 @@
         "search": "搜索用户",
         "search_placeholder": "搜索用户...",
         "button": "加载更多",
-        "error": "未找到用户。"
+        "error": "未找到用户。",
+        "notFound": "未找到用户。",
+        "errorSearch": "未找到该名称的地点："
     },
     "language": {
         "es": "西班牙语 🇪🇸",
@@ -80,17 +82,23 @@
     "placeScreen": {
         "buttonPodium": "前10名地点",
         "headerPodium": "点评排行榜",
-        "anotherPlace": "其他推荐地点"
+        "anotherPlace": "其他推荐地点",
+        "noReview": "尚无点评。",
+        "errorSearch": "未找到该名称的地点："
     },
     "friends": {
         "friends": "朋友",
         "list": "好友列表",
         "searchHolder": "按名称搜索",
-        "notFound": "您还没有好友"
+        "notFound": "您还没有好友",
+        "notFoundFriend": "未找到该名称的好友",
+        "errorSearch": "未找到该名称的好友："
     },
     "buttonExplorer": {
         "list": "地点列表",
-        "searchHolder": "按标题搜索"
+        "searchHolder": "按标题搜索",
+        "errorSearch": "未找到该标题的地点：",
+        "noReview": "尚无点评"
     },
     "stackReview": {
         "comments": "评论",

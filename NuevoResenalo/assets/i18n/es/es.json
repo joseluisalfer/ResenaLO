@@ -9,7 +9,7 @@
     },
     "registerScreen": {
         "createAccount": "Crear cuenta",
-        "footer": " Introduce tu correo electrónico y contraseña para crear una cuenta:",
+        "footer": "Introduce tu correo electrónico y contraseña para crear una cuenta:",
         "email": "correo electrónico",
         "password": "contraseña",
         "confirm": "Confirmar contraseña",
@@ -43,7 +43,7 @@
     },
     "buttonAdd": {
         "add": "Añadir imagen ",
-        "option": "Elige una opcion",
+        "option": "Elige una opción",
         "gallery": "GALERÍA",
         "camera": "CÁMARA",
         "cancel": "CANCELAR"
@@ -60,8 +60,8 @@
         "light_mode": "Tema Claro",
         "dark_mode": "Tema oscuro",
         "followers": "Seguidores",
-        "name":"Nombre",
-        "username":"Nombre de usuario",
+        "name": "Nombre",
+        "username": "Nombre de usuario",
         "bio": "Biografía",
         "exit": "Salir"
     },
@@ -69,28 +69,36 @@
         "search": "Buscar usuarios",
         "search_placeholder": "Buscar usuario...",
         "button": "Cargar más",
-        "error": " No se encontraron usuarios."
+        "error": " No se encontraron usuarios.",
+        "notFound": "No se encontraron usuarios.",
+        "errorSearch": "No hay sitios con ese nombre: "
     },
     "language": {
         "es": "Español 🇪🇸",
-        "en": "Ingles 🇬🇧",
+        "en": "Inglés 🇬🇧",
         "ca": "Valenciano 🏳️",
         "zh": "Chino 🇨🇳"
     },
     "placeScreen": {
         "buttonPodium": "Top 10 lugares",
         "headerPodium": "Podio de reseñas",
-        "anotherPlace": "Otros lugares destacados"
+        "anotherPlace": "Otros lugares destacados",
+        "noReview": "No hay reseñas todavía.",
+        "errorSearch": "No hay sitios con ese nombre: "
     },
     "friends": {
         "friends": "Amigos",
         "list": "Lista de Amigos",
         "searchHolder": "Buscar por nombre",
-        "notFound": "Todavia no tienes amigos"
+        "notFound": "Todavía no tienes amigos",
+        "notFoundFriend": "No tienes ningún amigo con ese nombre",
+        "errorSearch": "No hay amigos con ese nombre: "
     },
     "buttonExplorer": {
         "list": "Lista de sitios",
-        "searchHolder": "Buscar por título"
+        "searchHolder": "Buscar por título",
+        "errorSearch": "No hay sitios con ese título: ",
+        "noReview": "No hay reseñas todavía"
     },
     "stackReview": {
         "comments": "COMENTARIOS ",
@@ -114,9 +122,9 @@
     },
 
     "alerts": {
-        "empptyData": "Datos vacios",
+        "empptyData": "Datos vacíos",
         "invalidEmail": "Email incorrecto",
-        "loginError": "Inicio de session incorrecto",
+        "loginError": "Inicio de sesión incorrecto",
         "obligatory": "Todos los campos son obligatorios",
         "differentsPassword": "Las contraseñas no coinciden",
         "isValidEmail": "Por favor, ingresa un correo electrónico válido",

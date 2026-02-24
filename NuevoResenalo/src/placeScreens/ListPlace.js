@@ -168,8 +168,8 @@ const ListPlace = ({ navigation }) => {
             <Ionicons name="search-outline" size={50} color={isDark ? "#444" : "#ccc"} />
             <Text style={[styles.emptyText, { color: isDark ? "#888" : "#666" }]}>
               {searchText.trim()
-                ? "No se encontraron reseñas con ese título"
-                : "No hay reseñas para mostrar"}
+                ? t("buttonExplorer.errorSearch") + searchText
+                : t("buttonExplorer.noReview")}
             </Text>
           </View>
         }
@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     width: "100%",
-    paddingTop: "12%",
     paddingHorizontal: 15,
   },
   backButton: { width: 30 },
