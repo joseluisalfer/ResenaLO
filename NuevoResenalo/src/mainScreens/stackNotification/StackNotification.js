@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import FindUser from "../FindUser";
 import Friend from "../../placeScreens/Friend"
+import Place from "../../placeScreens/Place"
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,11 @@ const StackNotification = () => {
             <Stack.Screen
                 name="Friend"
                 component={Friend}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Place"
+                component={Place}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>

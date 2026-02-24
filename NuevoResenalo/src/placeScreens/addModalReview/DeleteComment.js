@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
+import Context from "../../Context/Context"; // Ajusta la ruta
 
- 
 const DeleteComment = ({ isVisible, onClose, onConfirm, title }) => {
+  const { theme, isDark } = useContext(Context);
+
   return (
     <Modal
       animationType="fade"
@@ -11,8 +13,13 @@ const DeleteComment = ({ isVisible, onClose, onConfirm, title }) => {
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{title || "¿Estás seguro?"}</Text>
+        <View style={[
+          styles.modalContent, 
+          { backgroundColor: isDark ? "#1e1e1e" : "white" }
+        ]}>
+          <Text style={[styles.modalTitle, { color: theme.text }]}>
+            {title || "¿Estás seguro?"}
+          </Text>
           
           <View style={styles.modalButtonsRow}>
             <Pressable style={[styles.modalBtn, styles.btnNo]} onPress={onClose}>
@@ -28,7 +35,6 @@ const DeleteComment = ({ isVisible, onClose, onConfirm, title }) => {
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,

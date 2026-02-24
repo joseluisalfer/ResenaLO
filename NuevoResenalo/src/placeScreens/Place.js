@@ -21,7 +21,9 @@ const Place = ({ navigation }) => {
   const [isModalCommentVisible, setIsModalCommentVisible] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
 
-  const { searchUrl, emailLogged } = useContext(Context);
+  // Extraemos theme e isDark del contexto
+  const { searchUrl, emailLogged, theme, isDark } = useContext(Context);
+
   const [region, setRegion] = useState({
     latitude: 0, longitude: 0, latitudeDelta: 0.01, longitudeDelta: 0.01,
   });
@@ -88,19 +90,29 @@ const Place = ({ navigation }) => {
 
   if (loading && !placeData) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
         <ActivityIndicator size="large" color="#2654d1" />
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <ScrollView style={[styles.container, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Ionicons name="arrow-back" size={28} onPress={() => navigation.goBack()} />
+          <Ionicons 
+            name="arrow-back" 
+            size={28} 
+            color={theme.text} // Color dinámico para volver atrás
+            onPress={() => navigation.goBack()} 
+          />
           {emailLogged?.results?.user === placeData?.user && (
-            <Ionicons name="trash-outline" size={28} onPress={() => setIsModalVisible(true)} />
+            <Ionicons 
+              name="trash-outline" 
+              size={28} 
+              color={isDark ? "#ff5c5c" : "#DC3545"} // Un rojo más brillante en modo oscuro
+              onPress={() => setIsModalVisible(true)} 
+            />
           )}
         </View>
 
@@ -111,12 +123,17 @@ const Place = ({ navigation }) => {
           prevImage={() => setImagePos((prev) => (placeData.images.length ? (prev - 1 + placeData.images.length) % placeData.images.length : 0))}
         />
 
-        <PlaceInfo name={placeData?.title} type={placeData?.type} description={placeData?.description} averageRating={placeData?.valoration} />
+        <PlaceInfo 
+          name={placeData?.title} 
+          type={placeData?.type} 
+          description={placeData?.description} 
+          averageRating={placeData?.valoration} 
+        />
         
         <Map latitud={placeData?.latitud} longitud={placeData?.longitud} region={region} />
 
         <View style={styles.reviewSection}>
-          <Text style={styles.sectionTitle}>COMENTARIOS</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>COMENTARIOS</Text>
           
           <Pressable
             style={styles.btnPressable}
@@ -126,7 +143,10 @@ const Place = ({ navigation }) => {
           </Pressable>
 
           {comments.map((item) => (
-            <View key={item._id || item.id} style={styles.commentRow}>
+            <View 
+              key={item._id || item.id} 
+              style={[styles.commentRow, { borderBottomColor: isDark ? "#333" : "#f0f0f0" }]}
+            >
               <View style={{ flex: 1 }}>
                 <Review name={item.user} comment={item.text} stars={item.valoration} />
               </View>
@@ -146,6 +166,7 @@ const Place = ({ navigation }) => {
         </View>
       </ScrollView>
 
+      {/* Los modales suelen tener sus propios estilos internos, pero aquí se llaman */}
       <DeleteModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} onConfirm={handleConfirmDeletePlace} />
       <DeleteModalComment isVisible={isModalCommentVisible} onClose={() => setIsModalCommentVisible(false)} onConfirm={handleConfirmDeleteComment} />
     </View>
@@ -153,14 +174,14 @@ const Place = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 20 },
+  container: { flex: 1, paddingHorizontal: 20 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   header: { flexDirection: "row", justifyContent: "space-between", marginTop: 50, marginBottom: 20 },
   reviewSection: { marginTop: 30, marginBottom: 50 },
   sectionTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 15 },
   btnPressable: { backgroundColor: "#2654d1", paddingVertical: 14, borderRadius: 12, alignItems: "center", marginBottom: 20 },
   btnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  commentRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#f0f0f0', paddingVertical: 10 }
+  commentRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, paddingVertical: 10 }
 });
 
 export default Place;

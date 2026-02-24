@@ -23,7 +23,8 @@ const pickRandomUpToN = (arr, n = 5) => {
 };
 
 const Friends = ({ navigation }) => {
-  const { setSelectedFriend, emailLogged } = useContext(Context);
+  // 1. Extraemos theme e isDark del Contexto
+  const { setSelectedFriend, emailLogged, theme, isDark } = useContext(Context);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +33,7 @@ const Friends = ({ navigation }) => {
     try {
       const rawFriends = emailLogged?.results?.friends ?? [];
       const friendUrls = pickRandomUpToN(rawFriends, 5);
-      console.log(emailLogged.results.friends)
+      
       const settled = await Promise.allSettled(
         friendUrls.map(async (url) => {
           const userData = await getData(url);
@@ -41,7 +42,7 @@ const Friends = ({ navigation }) => {
           return {
             id: r.id,
             name: r.name,
-            photo: r.photo,        // 👈 URL tal cual
+            photo: r.photo,
             description: r.description,
             user: r.user,
             reviews: r.reviews,
@@ -81,7 +82,10 @@ const Friends = ({ navigation }) => {
   if (friends.length === 0) {
     return (
       <View style={styles.wrapper}>
-        <Text style={styles.noFriendsText}>Todavia no tienes amigos</Text>
+        {/* Color de texto dinámico para "Todavía no tienes amigos" */}
+        <Text style={[styles.noFriendsText, { color: isDark ? '#aaa' : '#666' }]}>
+          Todavia no tienes amigos
+        </Text>
       </View>
     );
   }
@@ -92,8 +96,13 @@ const Friends = ({ navigation }) => {
         style={styles.header}
         onPress={() => navigation.navigate("AllFriends")}
       >
-        <Text style={styles.title}>Amigos</Text>
-        <Ionicons name="chevron-forward-outline" size={25} color="#000" />
+        {/* 2. Aplicamos color dinámico al título y al icono */}
+        <Text style={[styles.title, { color: theme.text }]}>Amigos</Text>
+        <Ionicons 
+          name="chevron-forward-outline" 
+          size={25} 
+          color={theme.text} // El chevron ahora cambia según el tema
+        />
       </Pressable>
 
       <FlatList
@@ -116,17 +125,16 @@ const Friends = ({ navigation }) => {
             <Image
 
               source={{ uri: item.photo.trim(), cache: "reload" }}
-              style={styles.avatar}
+              style={[
+                styles.avatar, 
+                { backgroundColor: isDark ? "#333" : "#f0f0f0" } // Fondo de imagen dinámico
+              ]}
               resizeMode="cover"
-              onError={(e) => {
-                console.log("IMAGE ERROR:", item.photo, e.nativeEvent);
-              }}
-              onLoad={() => {
-                console.log("IMAGE LOADED:", item.photo);
-              }}
             />
 
-            <Text style={styles.name} numberOfLines={1}>
+            {/* 3. Nombre del amigo en color dinámico */}
+            <Text style={[styles.name, { color: theme.text }]} numberOfLines={1}>
+
               {item.name}
             </Text>
           </Pressable>
@@ -145,7 +153,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 4,
   },
-  title: { fontSize: 18, fontWeight: "700", color: "#000" },
+  title: { fontSize: 18, fontWeight: "700" },
   row: { paddingVertical: 4 },
   item: { width: 74, alignItems: "center" },
   itemGap: { marginRight: 12 },
@@ -154,11 +162,9 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 27,
     marginBottom: 4,
-    backgroundColor: "#f0f0f0",
   },
   name: {
     fontSize: 11,
-    color: "#000",
     textAlign: "center",
     maxWidth: 74,
     fontWeight: "500",
@@ -166,7 +172,6 @@ const styles = StyleSheet.create({
   noFriendsText: {
     marginTop: 20,
     textAlign: "center",
-    color: "#666",
     fontSize: 14,
     fontStyle: "italic",
   },

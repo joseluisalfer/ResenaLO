@@ -1,23 +1,22 @@
-import { createContext, useState } from "react";
-// Importamos Appearance para detectar el tema del sistema (opcional pero recomendado)
+import { createContext, useState, useEffect } from "react";
 import { Appearance } from "react-native";
+import { postData } from "../services/Services";  // Asegúrate de importar la función postData
 
 const Context = createContext();
 
-// Definimos los colores fuera para que el código sea limpio
 const themes = {
   light: {
     background: "#F5F5F5",
     card: "#FFFFFF",
     text: "black",
-    primary: "#007AFF",
+    primary: "#2654d1",
     border: "#D1D1D1",
   },
   dark: {
     background: "#121212",
     card: "#1E1E1E",
     text: "white",
-    primary: "#0A84FF",
+    primary: "#2654d1",
     border: "#333333",
   }
 };
@@ -32,11 +31,38 @@ export const Provider = ({ children }) => {
   const [selectedFriend, setSelectedFriend] = useState(null);
 
   // --- NUEVA LÓGICA DE TEMA ---
-  const [isDark, setIsDark] = useState(Appearance.getColorScheme() === 'dark');
+  const [isDark, setIsDark] = useState(
+    emailLogged?.results?.theme === 'dark' ? true : false
+  );
+
   const theme = isDark ? themes.dark : themes.light;
 
-  const toggleTheme = () => setIsDark(!isDark);
+  const toggleTheme = async () => {
+    const newTheme = isDark ? 'light' : 'dark';
+    setIsDark(!isDark);
+
+    // Realizar el POST para actualizar el tema en la base de datos
+    try {
+      const response = await postData('http://44.213.235.160:8080/resenalo/updateTheme', {
+        email: emailLogged?.results?.email, // Asumiendo que el email está en emailLogged.results.email
+        theme: newTheme,
+      });
+
+      if (response) {
+        console.log('Tema actualizado correctamente en la base de datos');
+      }
+    } catch (error) {
+      console.error('Error al actualizar el tema:', error);
+    }
+  };
   // ----------------------------
+
+  useEffect(() => {
+    // Verificar y actualizar el estado de isDark cuando emailLogged cambia
+    if (emailLogged?.results?.theme) {
+      setIsDark(emailLogged.results.theme === 'dark');
+    }
+  }, [emailLogged]);
 
   return (
     <Context.Provider

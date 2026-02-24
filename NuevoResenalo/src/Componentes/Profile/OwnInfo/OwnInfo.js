@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react"; // 1. Añadimos useContext
 import { View, Text, StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import ProfileImage from "../ProfileImage/ProfileImage";
+import Context from "../../../Context/Context"; // 2. Importamos tu Context
 
-const OwnInfo = ({ user, description, name}) => {  // Recibe 'image' directamente
+const OwnInfo = ({ user, description, name}) => {
     const navigation = useNavigation();
 
+    // 3. Extraemos theme e isDark del contexto
+    const { theme, isDark } = useContext(Context);
+
     return (
-        <View>
+        <View style={styles.container}>
             {/* Imagen de perfil */}
             <ProfileImage/>
 
             <View style={{ alignItems: "center" }}>
-                <Text variant="bodyMedium" style={styles.username}>
+                {/* El nombre de usuario suele quedar bien en gris, pero puedes usar theme.text si prefieres */}
+                <Text style={[styles.username, { color: isDark ? "#AAA" : "gray" }]}>
                     @{user}
                 </Text>
             </View>
 
             <View style={{ alignItems: "center" }}>
-                <Text variant="headlineSmall" style={styles.name}>
+                {/* 4. Aplicamos color dinámico al Nombre */}
+                <Text style={[styles.name, { color: theme.text }]}>
                     {name}
                 </Text>
                 
-                <Text variant="bodyMedium" style={styles.bio}>
+                {/* 5. Aplicamos color dinámico a la Bio */}
+                <Text style={[styles.bio, { color: theme.text }]}>
                     {description}
                 </Text>
             </View>
@@ -43,7 +50,6 @@ const OwnInfo = ({ user, description, name}) => {  // Recibe 'image' directament
 const styles = StyleSheet.create({
     container: {
         marginBottom: 16,
-        marginTop: 40,
     },
     editButton: {
         alignItems: "center",
@@ -54,7 +60,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#1748ce'
     },
     username: {
-        color: "gray",
         marginTop: 3,
     },
     name: {

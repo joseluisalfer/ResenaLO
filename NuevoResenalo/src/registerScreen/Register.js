@@ -11,7 +11,6 @@ import { Button } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import "../../assets/i18n/index";
 import { postData, getData } from "../services/Services";
-import Context from "../Context/Context";
 
 const Register = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -20,7 +19,6 @@ const Register = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const { t } = useTranslation();
-  const { setIsLoged, setEmailLogged } = useContext(Context);
 
   // Verificación del código
   const [verificationCode, setVerificationCode] = useState("");

@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
+import Context from "../../Context/Context"; // Ajusta la ruta
 
 const DeleteModal = ({ isVisible, onClose, onConfirm, title }) => {
+  const { theme, isDark } = useContext(Context);
+
   return (
     <Modal
       animationType="fade"
@@ -10,8 +13,11 @@ const DeleteModal = ({ isVisible, onClose, onConfirm, title }) => {
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
+        <View style={[
+          styles.modalContent, 
+          { backgroundColor: isDark ? "#1e1e1e" : "white" }
+        ]}>
+          <Text style={[styles.modalTitle, { color: theme.text }]}>
             {title || "¿Estás seguro que quieres borrar esta ubicación?"}
           </Text>
           
@@ -39,13 +45,12 @@ const DeleteModal = ({ isVisible, onClose, onConfirm, title }) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Un poco más oscuro para que resalte el modal
     justifyContent: 'center', 
     alignItems: 'center',
   },
   modalContent: {
     width: '80%', 
-    backgroundColor: 'white',
     borderRadius: 20, 
     padding: 25,
     alignItems: 'center',
@@ -60,7 +65,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 25,
-    color: '#333',
   },
   modalButtonsRow: {
     flexDirection: 'row',

@@ -45,7 +45,7 @@ const PedirDatos = ({ navigation }) => {
 
       const dataEmail = await getData(`http://44.213.235.160:8080/resenalo/userEmail?email=${email}`);
       
-      console.log(dataEmail.results);
+      console.log(dataEmail);
       setEmailLogged(dataEmail);
       // Verificar si la respuesta es exitosa (status 200 OK)oscarmartorellg@gmail.com
       //
