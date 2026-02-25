@@ -1,17 +1,17 @@
 {
     "loginScreen": {
-        "login": "Inicia sessió",
-        "footer": "Introduïu la vostra adreça de correu electrònic i contrasenya per a iniciar sessió en aquesta aplicació",
+        "login": "Iniciar sessió",
+        "footer": "Introdueix la teua adreça de correu electrònic i contrasenya per iniciar sessió en aquesta aplicació",
         "createAccount": "Crear compte",
-        "textAccount": "Crea el teu compte per a registrar-te en ReseñaLo i descobrir nous llocs.",
+        "textAccount": "Crea el teu compte per registrar-te en ReseñaLo i descobrir nous llocs.",
         "register": "Registrar-se",
         "passwordPlaceHolder": "Contrasenya"
     },
     "registerScreen": {
         "createAccount": "Crear compte",
-        "footer": "Introduïu el vostre correu electrònic i contrasenya per a crear un compte:",
-        "email": "correu electrònic",
-        "password": "contrasenya",
+        "footer": "Introdueix el teu correu electrònic i contrasenya per crear un compte:",
+        "email": "Correu electrònic",
+        "password": "Contrasenya",
         "confirm": "Confirmar contrasenya",
         "user": "Nom d'usuari",
         "name": "Nom",
@@ -39,7 +39,8 @@
         "buttonAdd": "Afegir al mapa",
         "buttonRestart": "Restablir",
         "buttonDelete": "Eliminar Fotos",
-        "buttonAddMap": "Afegir al mapa"
+        "buttonAddMap": "Afegir al mapa",
+        "quetionUser": "Estàs segur que vols eliminar aquest lloc?"
     },
     "buttonAdd": {
         "add": "Afegir imatge",
@@ -49,64 +50,64 @@
         "cancel": "CANCEL·LAR"
     },
     "profile": {
-        "buttonEdit": "Editar Perfil",
+        "buttonEdit": "Editar perfil",
         "post": "Publicacions",
         "logout": "Tancar sessió",
         "change_lang": "Canviar idioma",
-        "change_theme": "Canviar Tema",
+        "change_theme": "Canviar tema",
         "cancel": "Cancel·lar",
-        "save": "Guardar canvis",
+        "save": "Desar canvis",
         "title": "Seleccionar idioma",
-        "light_mode": "Tema Clar",
+        "light_mode": "Tema clar",
         "dark_mode": "Tema fosc",
         "followers": "Seguidors",
         "name": "Nom",
         "username": "Nom d'usuari",
         "bio": "Biografia",
-        "exit": "Eixir"
+        "exit": "Sortir"
     },
     "listUser": {
-        "search": "Buscar usuaris",
-        "search_placeholder": "Buscar usuari...",
+        "search": "Cercar usuaris",
+        "search_placeholder": "Cercar usuari...",
         "button": "Carregar més",
         "error": "No s'han trobat usuaris.",
         "notFound": "No s'han trobat usuaris.",
         "errorSearch": "No hi ha llocs amb aquest nom: "
     },
     "language": {
-        "es": "Castellà 🇪🇸",
+        "es": "Espanyol 🇪🇸",
         "en": "Anglés 🇬🇧",
         "ca": "Valencià 🏳️",
-        "zh": "Xinés 🇨🇳"
+        "zh": "Xinès 🇨🇳"
     },
     "placeScreen": {
         "buttonPodium": "Top 10 llocs",
         "headerPodium": "Podi de ressenyes",
         "anotherPlace": "Altres llocs destacats",
-        "noReview": "No hi ha ressenyes encara.",
-        "errorSearch": "No s'han trobat llocs amb aquest nom: "
+        "noReview": "Encara no hi ha ressenyes.",
+        "errorSearch": "No hi ha llocs amb aquest nom: "
     },
     "friends": {
         "friends": "Amics",
-        "list": "Llista d'Amics",
-        "searchHolder": "Buscar per nom",
+        "list": "Llista d'amics",
+        "searchHolder": "Cercar per nom",
         "notFound": "Encara no tens amics",
         "notFoundFriend": "No tens cap amic amb aquest nom",
-        "errorSearch": "No s'han trobat amics amb aquest nom: "
+        "errorSearch": "No hi ha amics amb aquest nom: "
     },
     "buttonExplorer": {
         "list": "Llista de llocs",
-        "searchHolder": "Buscar per títol",
+        "searchHolder": "Cercar per títol",
         "errorSearch": "No hi ha llocs amb aquest títol: ",
-        "noReview": "No hi ha ressenyes encara"
+        "noReview": "Encara no hi ha ressenyes"
     },
     "stackReview": {
         "comments": "COMENTARIS",
         "addComment": "AFEGIR COMENTARI"
     },
     "modalReview": {
-        "header": "Què t'ha semblat?",
-        "inputHolder": "Escriu ací la teua opinió sobre este lloc...",
+        "header": "Què et sembla?",
+        "inputHolder": "Escriu la teua opinió sobre aquest lloc aquí...",
         "buttonAdd": "Publicar ressenya",
         "buttonCancel": "Cancel·lar"
     },
@@ -120,33 +121,39 @@
         "afirmative": "Sí",
         "negative": "No"
     },
+
     "alerts": {
         "empptyData": "Dades buides",
-        "invalidEmail": "Email incorrecte",
+        "invalidEmail": "Correu electrònic incorrecte",
         "loginError": "Inici de sessió incorrecte",
         "obligatory": "Tots els camps són obligatoris",
         "differentsPassword": "Les contrasenyes no coincideixen",
-        "isValidEmail": "Per favor, introduïu un correu electrònic vàlid",
-        "privacity": "Heu d'acceptar els termes de privacitat",
+        "isValidEmail": "Si us plau, introdueix un correu electrònic vàlid",
+        "privacity": "Has d'acceptar els termes de privacitat",
         "registerProblem": "Hi ha hagut un problema amb el registre",
         "connection": "Hi ha hagut un problema amb la connexió",
-        "code": "Per favor, introduïu el codi de verificació.",
-        "publishScreen": "Per favor, completa tots els camps i assegura't d'haver afegit una imatge.",
-        "latitude": "Per favor, introduïu les coordenades en el format correcte (latitud, longitud).",
+        "code": "Si us plau, introdueix el codi de verificació.",
+        "publishScreen": "Si us plau, completa tots els camps i assegura't que has afegit una imatge.",
+        "latitude": "Si us plau, introdueix les coordenades en el format correcte (latitud,longitud).",
         "anonim": "Anònim",
         "excelentPublish": "Ressenya publicada amb èxit.",
         "errorPublish": "Hi ha hagut un error en publicar la ressenya.",
-        "errorConnection": "Hi ha hagut un error en enviar les dades. Per favor, torna-ho a intentar.",
-        "emailSession": "Error, No s'ha trobat l'email de sessió.",
-        "emptyUsername": "Error, El nom i el nom d'usuari no poden estar buits.",
-        "excelentEdit": "Èxit, Perfil actualitzat correctament.",
-        "errorEdit": "Error, No s'han pogut guardar els canvis.",
-        "errorSession": "Error, No hi ha sessió.",
-        "isInvalidImage": "Error, Imatge invàlida.",
-        "errorUrl": "Error, El servidor no ha retornat una URL vàlida.",
-        "errorImage": "Error, No s'ha pogut pujar la imatge.",
+        "errorConnection": "Hi ha hagut un error en enviar les dades. Si us plau, intenta-ho de nou.",
+        "emailSession": "Error, no s'ha trobat el correu electrònic de sessió.",
+        "emptyUsername": "Error, Nom i nom d'usuari no poden estar buits.",
+        "excelentEdit": "Èxit, perfil actualitzat correctament.",
+        "errorEdit": "Error, no es van poder desar els canvis.",
+        "errorSession": "Error, no hi ha sessió.",
+        "isInvalidImage": "Error, imatge invàlida.",
+        "errorUrl": "Error, el servidor no va retornar una URL vàlida.",
+        "errorImage": "Error, no es va poder pujar la imatge.",
         "changeImage": "Canviar imatge de perfil, tria una opció",
         "permissionGallery": "Permís, es requereix permís de galeria.",
-        "permissionCamera": "Permís, es requereix permís de càmera."
+        "permissionCamera": "Permís, es requereix permís de càmera.",
+        "successPosted": "Èxit",
+        "successPostedMessage": "Ressenya publicada amb èxit.",
+        "confirm_title": "Estàs segur?",
+        "errorReview": "Error",
+        "errorMessage": "Has de posar una valoració"
     }
 }

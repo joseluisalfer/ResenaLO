@@ -35,7 +35,7 @@ function Review({ route, navigation }) {
   const handleSubmitReview = async () => {
     // Validation logic
     if (rating === 0) {
-      Alert.alert(t("alerts.error"), t("alerts.selectRating"));
+      Alert.alert(t("alerts.errorReview"), t("alerts.errorMessage"));
       return;
     }
     if (!reviewText.trim()) {
@@ -64,7 +64,7 @@ function Review({ route, navigation }) {
 
       // Successfully posted
       if (response === null || response) {
-        Alert.alert(t("alerts.success"), t("alerts.reviewPosted"), [
+        Alert.alert(t("alerts.successPosted"), t("alerts.successPostedMessage"), [
           { text: "OK", onPress: () => navigation.goBack() },
         ]);
       } else {

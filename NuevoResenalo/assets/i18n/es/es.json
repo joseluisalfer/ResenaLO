@@ -39,7 +39,8 @@
         "buttonAdd": "Añadir al mapa",
         "buttonRestart": "Restablecer",
         "buttonDelete": "Eliminar Fotos",
-        "buttonAddMap": "Añadir al mapa"
+        "buttonAddMap": "Añadir al mapa",
+        "quetionUser": "Estas seguro de que quieres eliminar este lugar?"
     },
     "buttonAdd": {
         "add": "Añadir imagen ",
@@ -148,6 +149,11 @@
         "errorImage": "Error, No se pudo subir la imagen.",
         "changeImage": "Cambiar imagen de perfil, Elige una opción",
         "permissionGallery": "Permiso, Se requiere permiso de galería.",
-        "permissionCamera": "Permiso, Se requiere permiso de cámara."
+        "permissionCamera": "Permiso, Se requiere permiso de cámara.",
+        "successPosted": "Exito",
+        "successPostedMessage": "Reseña publicada con éxito.",
+        "confirm_title": "¿Estás seguro?",
+        "errorReview": "Error",
+        "errorMessage": "Debes poner una valoración"
     }
 }

@@ -1,21 +1,21 @@
 {
     "loginScreen": {
         "login": "Log In",
-        "footer": "Enter your email address and password to log in to this application",
-        "createAccount": "Create account",
-        "textAccount": "Create your account to register in ReseñaLo and discover new places.",
+        "footer": "Enter your email address and password to log in to this app",
+        "createAccount": "Create Account",
+        "textAccount": "Create your account to sign up for ReseñaLo and discover new places.",
         "register": "Register",
         "passwordPlaceHolder": "Password"
     },
     "registerScreen": {
-        "createAccount": "Create account",
+        "createAccount": "Create Account",
         "footer": "Enter your email and password to create an account:",
         "email": "Email",
         "password": "Password",
-        "confirm": "Confirm password",
+        "confirm": "Confirm Password",
         "user": "Username",
         "name": "Name",
-        "date": "Date of birth (DD/MM/YYYY)",
+        "date": "Date of Birth (DD/MM/YYYY)",
         "register": "Register",
         "buttonPrivaticy": "Privacy Terms",
         "buttonAccept": "Accept Terms",
@@ -26,24 +26,25 @@
         "buttonExplorer": "Explore"
     },
     "publishScreen": {
-        "new_place": "New place",
-        "header": "Add new place",
-        "name": "Place name",
-        "new_name": "New place",
+        "new_place": "New Place",
+        "header": "Add New Place",
+        "name": "Place Name",
+        "new_name": "New Place",
         "location": "Location",
         "new_location": "Example 40.7128°,-74.0060°",
         "type": "Type",
-        "new_type": "Place type",
+        "new_type": "Place Type",
         "description": "Description",
-        "new_description": "Place description",
-        "buttonAdd": "Add to map",
-        "buttonRestart": "Reset",
+        "new_description": "Place Description",
+        "buttonAdd": "Add to Map",
+        "buttonRestart": "Restart",
         "buttonDelete": "Delete Photos",
-        "buttonAddMap": "Add to map"
+        "buttonAddMap": "Add to Map",
+        "quetionUser": "Are you sure you want to delete this place?"
     },
     "buttonAdd": {
-        "add": "Add image",
-        "option": "Choose an option",
+        "add": "Add Image",
+        "option": "Choose an Option",
         "gallery": "GALLERY",
         "camera": "CAMERA",
         "cancel": "CANCEL"
@@ -51,14 +52,14 @@
     "profile": {
         "buttonEdit": "Edit Profile",
         "post": "Posts",
-        "logout": "Log out",
-        "change_lang": "Change language",
+        "logout": "Log Out",
+        "change_lang": "Change Language",
         "change_theme": "Change Theme",
         "cancel": "Cancel",
-        "save": "Save changes",
-        "title": "Select language",
-        "light_mode": "Light Mode",
-        "dark_mode": "Dark mode",
+        "save": "Save Changes",
+        "title": "Select Language",
+        "light_mode": "Light Theme",
+        "dark_mode": "Dark Theme",
         "followers": "Followers",
         "name": "Name",
         "username": "Username",
@@ -66,12 +67,12 @@
         "exit": "Exit"
     },
     "listUser": {
-        "search": "Search users",
-        "search_placeholder": "Search user...",
-        "button": "Load more",
+        "search": "Search Users",
+        "search_placeholder": "Search for user...",
+        "button": "Load More",
         "error": "No users found.",
         "notFound": "No users found.",
-        "errorSearch": "No sites found with that name: "
+        "errorSearch": "No places with that name: "
     },
     "language": {
         "es": "Spanish 🇪🇸",
@@ -80,24 +81,24 @@
         "zh": "Chinese 🇨🇳"
     },
     "placeScreen": {
-        "buttonPodium": "Top 10 places",
+        "buttonPodium": "Top 10 Places",
         "headerPodium": "Review Podium",
-        "anotherPlace": "Other featured places",
+        "anotherPlace": "Other Featured Places",
         "noReview": "No reviews yet.",
-        "errorSearch": "No places found with that name: "
+        "errorSearch": "No places with that name: "
     },
     "friends": {
         "friends": "Friends",
-        "list": "Friends List",
+        "list": "Friend List",
         "searchHolder": "Search by name",
         "notFound": "You don't have any friends yet",
-        "notFoundFriend": "You don't have any friend with that name",
-        "errorSearch": "No friends found with that name: "
+        "notFoundFriend": "You don't have any friends with that name",
+        "errorSearch": "No friends with that name: "
     },
     "buttonExplorer": {
-        "list": "Site list",
+        "list": "List of Places",
         "searchHolder": "Search by title",
-        "errorSearch": "No places found with that title: ",
+        "errorSearch": "No places with that title: ",
         "noReview": "No reviews yet"
     },
     "stackReview": {
@@ -107,7 +108,7 @@
     "modalReview": {
         "header": "What did you think?",
         "inputHolder": "Write your opinion about this place here...",
-        "buttonAdd": "Post review",
+        "buttonAdd": "Post Review",
         "buttonCancel": "Cancel"
     },
     "profileFriend": {
@@ -120,33 +121,39 @@
         "afirmative": "Yes",
         "negative": "No"
     },
+
     "alerts": {
         "empptyData": "Empty data",
         "invalidEmail": "Incorrect email",
         "loginError": "Incorrect login",
         "obligatory": "All fields are required",
         "differentsPassword": "Passwords do not match",
-        "isValidEmail": "Please enter a valid email address",
+        "isValidEmail": "Please enter a valid email",
         "privacity": "You must accept the privacy terms",
-        "registerProblem": "There was a problem with the registration",
-        "connection": "There was a connection problem",
+        "registerProblem": "There was an issue with the registration",
+        "connection": "There was an issue with the connection",
         "code": "Please enter the verification code.",
         "publishScreen": "Please complete all fields and make sure you have added an image.",
-        "latitude": "Please enter the coordinates in the correct format (latitude, longitude).",
+        "latitude": "Please enter coordinates in the correct format (latitude,longitude).",
         "anonim": "Anonymous",
-        "excelentPublish": "Review published successfully.",
-        "errorPublish": "There was an error publishing the review.",
+        "excelentPublish": "Review successfully posted.",
+        "errorPublish": "There was an error posting the review.",
         "errorConnection": "There was an error sending the data. Please try again.",
-        "emailSession": "Error, session email not found.",
+        "emailSession": "Error, email session not found.",
         "emptyUsername": "Error, Name and username cannot be empty.",
-        "excelentEdit": "Success, Profile updated correctly.",
-        "errorEdit": "Error, Changes could not be saved.",
-        "errorSession": "Error, No active session.",
-        "isInvalidImage": "Error, Invalid image.",
-        "errorUrl": "Error, The server did not return a valid URL.",
-        "errorImage": "Error, Could not upload image.",
-        "changeImage": "Change profile picture, Choose an option",
-        "permissionGallery": "Permission, Gallery permission is required.",
-        "permissionCamera": "Permission, Camera permission is required."
+        "excelentEdit": "Success, profile updated successfully.",
+        "errorEdit": "Error, unable to save changes.",
+        "errorSession": "Error, no session.",
+        "isInvalidImage": "Error, invalid image.",
+        "errorUrl": "Error, server did not return a valid URL.",
+        "errorImage": "Error, unable to upload image.",
+        "changeImage": "Change profile image, Choose an option",
+        "permissionGallery": "Permission, gallery permission required.",
+        "permissionCamera": "Permission, camera permission required.",
+        "successPosted": "Success",
+        "successPostedMessage": "Review successfully posted.",
+        "confirm_title": "Are you sure?",
+        "errorReview": "Error",
+        "errorMessage": "You must provide a rating"
     }
 }

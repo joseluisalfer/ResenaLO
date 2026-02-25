@@ -28,7 +28,7 @@ const DeleteModal = ({ isVisible, onClose, onConfirm, title }) => {
           {/* Fallback title handles both missing props and localization */}
           <Text style={[styles.modalTitle, { color: theme.text }]}>
             {title ||
-              t("publishScreen.delete_confirm_fallback") ||
+              t("publishScreen.quetionUser") ||
               "Are you sure you want to delete this location?"}
           </Text>
 

@@ -68,13 +68,13 @@ const Publish = () => {
       !images.length ||
       !images[0]
     ) {
-      Alert.alert(t("alerts.error"), t("alerts.publishScreen"));
+      Alert.alert(t("alerts.errorReview"), t("alerts.publishScreen"));
       return;
     }
 
     // Ensure coordinates are properly formatted (Latitude, Longitude)
     if (!coords.includes(",")) {
-      Alert.alert(t("alerts.error"), t("alerts.latitude"));
+      Alert.alert(t("alerts.errorReview"), t("alerts.latitude"));
       return;
     }
 
