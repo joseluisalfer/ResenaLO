@@ -1,0 +1,11 @@
+# Ignorar dependencias pesadas
+node_modules/
+
+# Ignorar carpetas que no son de la App Móvil
+BackEnd/
+.metadata/
+
+# Ignorar archivos del sistema y temporales
+.expo/
+.git/
+*.log
