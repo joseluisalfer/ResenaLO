@@ -6,11 +6,11 @@
 - **Curs:** 2º DAM
 - **Titulació:** Desenvolupament d'Aplicacions Multiplataforma
 - **Integrantes del equipo:**
-  - José Luis Aldana Fernández
-  - ÓscarMartorell Giner
-  - Unai Ruesta Perpiñá
-  - David Serrano Tarazona
-  - Carlos Vicente Teran Sanchez 
+  - [José Luis Aldana Fernández](https://github.com/joseluisalfer)
+  - [Óscar Martorell Giner](https://github.com/Oscarmarto)
+  - [Unai Ruesta Perpiñá](https://github.com/UzumaRP)
+  - [David Serrano Tarazona](https://github.com/seeran29)
+  - [Carlos Vicente Teran Sanchez](https://github.com/carlosss2442)
 
 ## Descripción del proyecto
 
